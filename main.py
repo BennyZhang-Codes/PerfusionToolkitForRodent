@@ -16,7 +16,6 @@ from Widget_FAIR import Widget_FAIR
 from Widget_DSC import Widget_DSC
 from MyWidgets.Status import Status_progressBar
 
-
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self) -> None:
         super().__init__()

@@ -13,7 +13,7 @@ from pydicom import FileDataset
 from modules.dcmreader.read_DSC_DCE import read_DSC_DCE_folder
 from MyWidgets.MWidget import MWidget
 
-from MyWidgets.MGraphicsItem import MGraphicsPixmapItem
+from MyWidgets.MGraphicsPixmapItem import MGraphicsPixmapItem
 
 class MGraphicsView_timeseries(QGraphicsView, MWidget):
     _idx_changed = Signal(int)
