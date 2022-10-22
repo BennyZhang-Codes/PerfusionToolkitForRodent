@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="新前缀">
+    <file>qrc/GUI_Logo.ico</file>
+    <file>qrc/folder.png</file>
+    <file>qrc/Exit.png</file>
+  </qresource>
+</RCC>
