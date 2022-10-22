@@ -18,11 +18,11 @@ class MGraphicsItem_Signal(QObject):
     ellipse_location = Signal(tuple)
     ellipse_shape = Signal(QPainterPath)
     item_delete = Signal(QGraphicsItem)
+    node_selected = Signal(QGraphicsItem)
     def __init__(self, *args, **kargs) -> None:
         super().__init__(*args, **kargs)
 
 class MGraphicsItem(QGraphicsItem):
-    signal = MGraphicsItem_Signal()
     def __init_MGraphicsItem__(self) -> None:
         self._itemtype = None
 
@@ -65,8 +65,6 @@ class MRoiItem(MGraphicsItem):
             self.setY(self.y() + y_diff)
             self.x_init = pos.x()
             self.y_init = pos.y()
-        return x_diff, y_diff
-
 
     @property
     def hoverEnter(self) -> bool:

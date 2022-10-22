@@ -1,18 +1,27 @@
 from math import sqrt
 
 from PySide6 import QtWidgets
-from PySide6.QtCore import Qt, QPointF
+from PySide6.QtCore import Qt, QPointF, Signal, QObject
 from PySide6.QtGui import QCursor, QColor
-from PySide6.QtGui import QPainter
+from PySide6.QtGui import QPainter, QPainterPath
 
 from PySide6.QtWidgets import QGraphicsSceneMouseEvent, QGraphicsSceneWheelEvent, QGraphicsSceneHoverEvent
-from PySide6.QtWidgets import QMenu, QColorDialog
+from PySide6.QtWidgets import QMenu, QColorDialog, QGraphicsItem
 from PySide6.QtWidgets import QGraphicsEllipseItem
 from PySide6.QtWidgets import QGraphicsSceneContextMenuEvent
 
 from MyWidgets.MGraphicsItem import MRoiItem
 
+
+class MEllipseItem_Signal(QObject):
+    ellipse_location = Signal(tuple)
+    ellipse_shape = Signal(QPainterPath)
+    item_delete = Signal(QGraphicsItem)
+    def __init__(self, *args, **kargs) -> None:
+        super().__init__(*args, **kargs)
+
 class MGraphicsEllipseItem(QGraphicsEllipseItem, MRoiItem):
+    signal = MEllipseItem_Signal()
     seleceted_color = QColor()
     def __init__(self) -> None:
         super().__init__()  
@@ -110,7 +119,6 @@ class MGraphicsEllipseItem(QGraphicsEllipseItem, MRoiItem):
     def hoverEnterEvent(self, event: QGraphicsSceneHoverEvent) -> None:
         self.hoverEnter = True
         self.setSelected(True)
-        self.setFocus()
         return super().hoverEnterEvent(event)
 
     def hoverMoveEvent(self, event: QGraphicsSceneHoverEvent) -> None:

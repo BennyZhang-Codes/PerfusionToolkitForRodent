@@ -1,4 +1,3 @@
-from distutils.log import error
 import numpy as np
 from PIL import Image
 from pydicom import FileDataset
@@ -15,8 +14,8 @@ from PySide6.QtWidgets import QGraphicsItemGroup, QGraphicsTextItem, QGraphicsPi
 
 from MyWidgets.MGraphicsPixmapItem import MGraphicsPixmapItem
 from MyWidgets.MGraphicsItemGroup import MGraphicsItemGroup
-from MyWidgets.MGraphicsItem import MRoiItem
-from MyWidgets.MGraphicsPolygonItem import MGraphicsPolygonItem, MGraphicsRectItem
+from MyWidgets.MGraphicsItem import MGraphicsItem, MRoiItem
+from MyWidgets.MGraphicsPolygonItem import MGraphicsPolygonItem
 from MyWidgets.MGraphicsEllipseItem import MGraphicsEllipseItem
 from MyWidgets.MGraphicsTextItem import MGraphicsTextItem
 from modules.dcmreader.read_Dicom import MAbstractDicomReader
@@ -39,6 +38,7 @@ class MGraphicsScene(QGraphicsScene):
         self.__func = 'window'
         self.__roi_type = None
         self.__roi_added = False
+        self.__drawing_roi = None
 
         self.__row = 0
         self.__column = 0
@@ -49,29 +49,28 @@ class MGraphicsScene(QGraphicsScene):
         point = self.item_img.maptoPixmap(pos)
         print('scene pressed {}'.format(self.itemAt(pos, QTransform())))
 
-        if not self.ROI_added:
-            if self.ROI_type == 'ellipse':
-                self.add_Mellipse(pos)
-                self.ROI_added = True
+        # print(self.drawing)
+        # print(self.drawingRoi)
+        if self.drawing:
+            self.drawingRoi.mousePressEvent(event)
+            print('drawing ROI')
+        else:
+            if not self.ROI_added:
+                if self.ROI_type == 'ellipse':
+                    self.add_Mellipse(pos)
+                    self.ROI_added = True
+                # if self.ROI_type == 'polygon':
+                #     self.add_Mpolygon(pos)
+                #     self.ROI_added = True
 
-            elif self.ROI_type == 'polygon':
-                self.add_Mpolygon()
-                self.ROI_added = True
 
-        if self.func == 'roi':
-            items = self.selectedItems()
-            if items:
-                items[0].mousePressEvent(event)
+            if self.SceneMode == self.SceneMode_roi:
+                items = self.selectedItems()
+                if items:
+                    items[0].mousePressEvent(event)
             else:
+                self.item_img.func = self.func
                 self.item_img.mousePressEvent(event)
-
-        if event.button() == Qt.MouseButton.LeftButton:
-            if self.func in ['window', 'move', 'zoom']:
-                self.item_img.mousePressEvent(event)
-            elif self.func == 'series':
-                self.y_init = pos.y()
-            elif self.func == 'point':
-                self._location.emit(point)
 
     def mouseMoveEvent(self, event: QGraphicsSceneMouseEvent) -> None:
         super().mouseMoveEvent(event)  # hover
@@ -81,68 +80,58 @@ class MGraphicsScene(QGraphicsScene):
         self.row = point
         self._update_item_info_LeftBottom()
 
-        item = self.itemAt(pos, QTransform())
-        if item is not None:
-            print(item.ItemType)
-            if item.ItemType == self.ItemType_roi:
-                self.SceneMode = self.SceneMode_roi
+        if self.drawing:
+            self.drawingRoi.mouseMoveEvent(event)
         else:
-            self.SceneMode = self.SceneMode_image
-        
-        print(self.SceneMode)
-        # if self.func == 'roi':
-            
-        #     items = self.selectedItems()
-        #     if items:
-        #         items[0].mouseMoveEvent(event)
-        #     else:
-        #         self.item_img.mouseMoveEvent(event)
-
-        # if event.buttons() == Qt.LeftButton | event.button() == Qt.MouseButton.LeftButton:
-        #     if self.func in ['window', 'move', 'zoom']:
-        #         self.item_img.mouseMoveEvent(event)
-        #     elif self.func == 'series':
-        #         self.y_end = pos.y()
-        #         y_diff = (self.y_end - self.y_init)
-        #         # totalnum = 100
-        #         # height_per_img = self.height() / totalnum
-        #         height_per_img = 10
-        #         if abs(y_diff) > height_per_img:
-        #             self.y_init = self.y_end
-        #             self._ds_idxchange.emit(int(y_diff/abs(y_diff)))
-        #             print(int(y_diff/abs(y_diff)))
-
-    def mouseReleaseEvent(self, event: QGraphicsSceneMouseEvent) -> None:
-        if self.func == 'roi':
             items = self.selectedItems()
             if items:
-                items[0].mouseReleaseEvent(event)
+                items[0].mouseMoveEvent(event)
+                self.SceneMode = self.SceneMode_roi
             else:
+                self.SceneMode = self.SceneMode_image
+                self.item_img.func = self.func
+                self.item_img.mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event: QGraphicsSceneMouseEvent) -> None:
+        if self.drawing:
+            self.drawingRoi.mouseReleaseEvent(event)
+        else:
+            if self.SceneMode == self.SceneMode_roi:
+                items = self.selectedItems()
+                if items:
+                    items[0].mouseReleaseEvent(event)
+            else:
+                self.item_img.func = self.func
                 self.item_img.mouseReleaseEvent(event)
 
     def wheelEvent(self, event: QGraphicsSceneWheelEvent) -> None:
-        if self.func == 'zoom':
-            self.item_img.wheelEvent(event)
-            self._update_item_info_LeftBottom()
-        elif self.func == 'roi':
+        if self.SceneMode == self.SceneMode_roi:
             items = self.selectedItems()
             if items:
                 items[0].wheelEvent(event)
-            else:
-                self.item_img.wheelEvent(event)
-                self._update_item_info_LeftBottom()
+        else:
+            self.item_img.func == self.func
+            self.item_img.wheelEvent(event)
+            self._update_item_info_LeftBottom()
 
     def mouseDoubleClickEvent(self, event: QGraphicsSceneMouseEvent) -> None:
-        if self.func == 'window':
-            max_value = np.max(self.item_img.img)
-            min_value = np.min(self.item_img.img)
-            self.item_img.WL = (max_value+min_value)/2
-            self.item_img.WW = max(0, max_value-min_value)
-
-        if self.func == 'point':
-            super().mouseDoubleClickEvent(event)
+        if self.drawing:
+            self.drawingRoi.mouseDoubleClickEvent(event)
         else:
-            self.set_scene(self.ds)
+            if self.SceneMode == self.SceneMode_roi:
+                items = self.selectedItems()
+                if items:
+                    items[0].mouseDoubleClickEvent(event)
+            else:
+                self.item_img.func == self.func
+                self.item_img.mouseDoubleClickEvent(event)
+                self._update_item_info_LeftBottom()
+
+
+        # if self.func == 'point':
+        #     super().mouseDoubleClickEvent(event)
+        # else:
+        #     self.set_scene(self.ds)
         return super().mouseDoubleClickEvent(event)
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
@@ -155,63 +144,16 @@ class MGraphicsScene(QGraphicsScene):
 
         return super().keyPressEvent(event)
 
-    def setup(self) -> None:
-        self.item_img = MGraphicsPixmapItem()
-        self.mask = MGraphicsPixmapItem()
-        self.mask.setParentItem(self.item_img)
-        self.item_info_RightTop = QGraphicsTextItem()
-        self.item_info_LeftBottom = QGraphicsTextItem()
-        self.item_info_LeftTop = QGraphicsTextItem()
-        self.item_info_RightBottom = QGraphicsTextItem()
-        self.item_info_group = MGraphicsItemGroup()
-        self.item_info_LeftBottom.setZValue(-1)
-        self.item_info_LeftTop.setZValue(-1)
-        self.item_info_RightTop.setZValue(-1)
-        self.item_info_RightBottom.setZValue(-1)
-        self.item_info_RightTop.setGroup(self.item_info_group)
-        self.item_info_LeftBottom.setGroup(self.item_info_group)
-        self.item_info_LeftTop.setGroup(self.item_info_group)
-        self.item_info_RightBottom.setGroup(self.item_info_group)
-        self.item_roi_group = MGraphicsItemGroup()
-
-        self.item_info_LeftTop.setObjectName('info_LeftTop')
-        self.item_info_LeftBottom.setObjectName('info_LeftBottom')
-        self.item_info_RightTop.setObjectName('info_RightTop')
-        self.item_info_RightBottom.setObjectName('info_RightBottom')
-
-        self.item_info_LeftTop.setDefaultTextColor(QColor(255, 255, 255, 255))
-        self.item_info_LeftBottom.setDefaultTextColor(QColor(255, 255, 255, 255))
-        self.item_info_RightTop.setDefaultTextColor(QColor(255, 255, 255, 255))
-        self.item_info_RightBottom.setDefaultTextColor(QColor(255, 255, 255, 255))
-
-        self.item_img.setZValue(-2)
-        self.item_info_group.setZValue(-1)
-        self.item_roi_group.setZValue(1)
-        self.addItem(self.item_img)
-        self.addItem(self.item_info_group)
-        self.addItem(self.item_roi_group)
-
-        # self.item = MGraphicsRectItem()
-        # self.item.setRect(QRect(0,0,20,20))
-        # self.item.setPen(QColor(255,255,255,255))
-        # self.item.setPos(200,200)
-        # self.item.setZValue(1)
-        # self.addItem(self.item)
-        # self.item = self.item
-
     def add_Mellipse(self, pos: QPointF) -> MGraphicsEllipseItem:
         ellipse = MGraphicsEllipseItem()
 
         pen = QPen(QColor(48,189,177,255))
         pen.setWidthF(2)
         pen.setStyle(Qt.DashLine)
-        # ellipse.setPen(, 1, Qt.DashLine))
         ellipse.setPen(pen)
         ellipse.setBrush(QColor(255,0,0,128))
-        # ellipse.setPos(self.width()/2, self.height()/2)
         ellipse.setPos(pos)
         ellipse.setZValue(1)
-
 
         # ellipse.signal.ellipse_location.connect(self.__slot_Mellipse_location)
         ellipse.signal.ellipse_shape.connect(self.__slot_roi_shape)
@@ -269,13 +211,140 @@ class MGraphicsScene(QGraphicsScene):
     def __slot_roi_delete(self, item: QGraphicsItem):
         self.removeItem(item)
 
+    def add_Mpolygon(self) -> MGraphicsPolygonItem: 
+        polygon = MGraphicsPolygonItem()
+        polygon.setPen(QPen(QColor(0,0,255,255), 1, Qt.SolidLine))
+        polygon.setBrush(QColor(255,0,0,255))
+        polygon.setZValue(1)
+        polygon.signal.drawing.connect(self.__slot_drawing)
+        polygon.signal.drawed.connect(self.__slot_drawed)
+        polygon.signal.polygon_shape.connect(self.__slot_roi_shape)
+        self.__add_roi(polygon)
+        polygon.signal.drawing.emit(polygon)
+        return polygon
+
+    def __slot_drawing(self, roi: MRoiItem):
+        self.drawingRoi = roi
+
+    def __slot_drawed(self):
+        self.drawingRoi = None
+
+    def itemAt(self, pos: QPointF, deviceTransform: QTransform) -> MGraphicsItem:
+        return super().itemAt(pos, deviceTransform)
+    
+    def selectedItems(self) -> list[MGraphicsItem]:
+        return super().selectedItems()
+
+    @property
+    def func(self) -> str:
+        return self.__func
+
+    @func.setter
+    def func(self, func: str) -> None:
+        if func in [
+            'window',
+            'series',
+            'move',
+            'zoom',
+            'roi',
+            'info',
+        ]:
+            self.__func = func
+        else:
+            raise ValueError('Unsupported func: {}'.format(func))
+
+    @property
+    def row(self) -> int:
+        return self.__row
+
+    @row.setter
+    def row(self, point: QPoint) -> None:
+        self.__row = point.y()
+
+    @property
+    def column(self) -> int:
+        return self.__column
+
+    @column.setter
+    def column(self, point: QPoint) -> None:
+        self.__column = point.x()
+
+    @property 
+    def SizeTooSmall(self) -> bool:
+        print(self.height(), self.width())
+        print(self.sceneRect())
+        return self.height() < 170 or self.width() < 400
+
+    @property
+    def InfoHide(self) -> bool:
+        return self.__InfoHide
+
+    @InfoHide.setter
+    def InfoHide(self, hide: bool) -> None:
+        # self.__InfoHide = hide
+        # if self.SizeTooSmall:
+        #     hide = True
+        self.__InfoHide = hide
+        self.item_info_group.setVisible(not self.__InfoHide)
+
+    @property
+    def ROI_type(self) -> str:
+        return self.__roi_type
+
+    @ROI_type.setter
+    def ROI_type(self, roi_type: str) -> None:
+        if roi_type in [
+            'ellipse',
+            'polygon',
+        ]:
+            self.__roi_type = roi_type
+        else:
+            raise ValueError('Unsupported ROI_type: {}'.format(roi_type))
+        
+    @property
+    def ROI_added(self) -> bool:
+        return self.__roi_added
+
+    @ROI_added.setter
+    def ROI_added(self, added: bool) -> None:
+        self.__roi_added = added
+
+    @property
+    def SceneMode(self) -> str:
+        return self.__SceneMode
+
+    @SceneMode.setter
+    def SceneMode(self, SceneMode: str) -> None:
+        if SceneMode in [
+            self.SceneMode_image,
+            self.SceneMode_roi,
+        ]:
+            self.__SceneMode = SceneMode
+        else:
+            raise ValueError('Unsupported SceneMode: {}'.format(SceneMode))
+
+    @property
+    def drawingRoi(self) -> QGraphicsItem:
+        return self.__drawing_roi
+
+    @drawingRoi.setter
+    def drawingRoi(self, Roi: QGraphicsItem) -> None:
+        self.__drawing_roi = Roi
+
+    @property
+    def drawing(self) -> bool:
+        if self.__drawing_roi is None:
+            draw = False
+        else:
+            draw = True
+        return draw
+    
     def set_scene(self, ds: FileDataset) -> None:
         self.ds = ds
-        self.item_img.update_pixmap(self.ds.pixel_array)
+        self.item_img.update_item(self.ds.pixel_array)
         self._prep_item_info(self.ds)
         self.InfoHide = self.InfoHide
         
-
     def _prep_item_info(self, ds: FileDataset):
         self._prep_item_info_LeftTop(ds)
         self._prep_item_info_LeftBottom()
@@ -352,8 +421,8 @@ class MGraphicsScene(QGraphicsScene):
 
     def _roi_menu(self) -> QMenu:
         menu = QMenu('ROI')
-        action_roi = menu.addAction('ROI mode')
-        action_roi.triggered.connect(self._action_roi)
+        # action_roi = menu.addAction('ROI mode')
+        # action_roi.triggered.connect(self._action_roi)
         action_ellipse = menu.addAction('add Ellipse')
         action_ellipse.triggered.connect(self._action_ellipse)
         action_polygon = menu.addAction('add Polygon')
@@ -407,128 +476,58 @@ class MGraphicsScene(QGraphicsScene):
     def _action_ellipse(self) -> None:
         self.ROI_added = False
         self.ROI_type = 'ellipse'
-        # self.add_Mellipse()
-        self._action_roi()
 
     def _action_polygon(self) -> None:
         self.ROI_added = False
         self.ROI_type = 'polygon'
-
-
-
-        self._action_roi()
+        self.add_Mpolygon()
     
     def _action_point(self) -> None:
         '''更换鼠标样式？'''
         self.func = 'point'
 
     def contextMenuEvent(self, event: QGraphicsSceneContextMenuEvent) -> None:
-        if self.func == 'roi':
+        if self.SceneMode == self.SceneMode_roi:
             items = self.selectedItems()
             if items:
                 items[0].contextMenuEvent(event)
-            else:
-                self._pop_menu()
         else:
             self._pop_menu()
 
-    def add_Mpolygon(self) -> MGraphicsPolygonItem: 
-        polygon = MGraphicsPolygonItem()
-        polygon.setPen(QPen(QColor(0,0,255,255), 1, Qt.SolidLine))
-        polygon.setBrush(QColor(255,0,0,255))
-        polygon.setZValue(1)
-        self.__add_roi(polygon)
-        return polygon
+    def setup(self) -> None:
+        self.item_img = MGraphicsPixmapItem()
+        self.mask = MGraphicsPixmapItem()
+        self.mask.setParentItem(self.item_img)
+        self.item_info_RightTop = MGraphicsTextItem()
+        self.item_info_LeftBottom = MGraphicsTextItem()
+        self.item_info_LeftTop = MGraphicsTextItem()
+        self.item_info_RightBottom = MGraphicsTextItem()
+        self.item_info_group = MGraphicsItemGroup()
 
-
-    def itemAt(self, pos: QPointF, deviceTransform: QTransform) -> MRoiItem:
-        return super().itemAt(pos, deviceTransform)
-
-    @property
-    def func(self) -> str:
-        return self.__func
-
-    @func.setter
-    def func(self, func: str) -> None:
-        if func in [
-            'window',
-            'series',
-            'move',
-            'zoom',
-            'roi',
-            'info',
-        ]:
-            self.__func = func
-        else:
-            raise ValueError('Unsupported func: {}'.format(func))
-
-    @property
-    def row(self) -> int:
-        return self.__row
-
-    @row.setter
-    def row(self, point: QPoint) -> None:
-        self.__row = point.y()
-
-    @property
-    def column(self) -> int:
-        return self.__column
-
-    @column.setter
-    def column(self, point: QPoint) -> None:
-        self.__column = point.x()
-
-    @property 
-    def SizeTooSmall(self) -> bool:
-        print(self.height(), self.width())
-        print(self.sceneRect())
-        return self.height() < 170 or self.width() < 400
-
-    @property
-    def InfoHide(self) -> bool:
-        return self.__InfoHide
-
-    @InfoHide.setter
-    def InfoHide(self, hide: bool) -> None:
-        # self.__InfoHide = hide
-        # if self.SizeTooSmall:
-        #     hide = True
-        self.__InfoHide = hide
-        self.item_info_group.setVisible(not self.__InfoHide)
-
-    @property
-    def ROI_type(self) -> str:
-        return self.__roi_type
-
-    @ROI_type.setter
-    def ROI_type(self, roi_type: str) -> None:
-        if roi_type in [
-            'ellipse',
-            'polygon',
-        ]:
-            self.__roi_type = roi_type
-        else:
-            raise ValueError('Unsupported ROI_type: {}'.format(roi_type))
+        self.item_info_LeftBottom.setZValue(-1)
+        self.item_info_LeftTop.setZValue(-1)
+        self.item_info_RightTop.setZValue(-1)
+        self.item_info_RightBottom.setZValue(-1)
         
-    
-    @property
-    def ROI_added(self) -> bool:
-        return self.__roi_added
+        self.item_info_RightTop.setGroup(self.item_info_group)
+        self.item_info_LeftBottom.setGroup(self.item_info_group)
+        self.item_info_LeftTop.setGroup(self.item_info_group)
+        self.item_info_RightBottom.setGroup(self.item_info_group)
+        self.item_roi_group = MGraphicsItemGroup()
+        
+        self.item_info_LeftTop.setObjectName('info_LeftTop')
+        self.item_info_LeftBottom.setObjectName('info_LeftBottom')
+        self.item_info_RightTop.setObjectName('info_RightTop')
+        self.item_info_RightBottom.setObjectName('info_RightBottom')
 
-    @ROI_added.setter
-    def ROI_added(self, added: bool) -> None:
-        self.__roi_added = added
+        self.item_info_LeftTop.setDefaultTextColor(QColor(255, 255, 255, 255))
+        self.item_info_LeftBottom.setDefaultTextColor(QColor(255, 255, 255, 255))
+        self.item_info_RightTop.setDefaultTextColor(QColor(255, 255, 255, 255))
+        self.item_info_RightBottom.setDefaultTextColor(QColor(255, 255, 255, 255))
 
-    @property
-    def SceneMode(self) -> str:
-        return self.__SceneMode
-
-    @SceneMode.setter
-    def SceneMode(self, SceneMode: str) -> None:
-        if SceneMode in [
-            self.SceneMode_image,
-            self.SceneMode_roi,
-        ]:
-            self.__SceneMode = SceneMode
-        else:
-            raise ValueError('Unsupported SceneMode: {}'.format(SceneMode))
+        self.item_img.setZValue(-2)
+        self.item_info_group.setZValue(-1)
+        self.item_roi_group.setZValue(1)
+        self.addItem(self.item_img)
+        self.addItem(self.item_info_group)
+        self.addItem(self.item_roi_group)
