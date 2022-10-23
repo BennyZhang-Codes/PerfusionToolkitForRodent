@@ -10,7 +10,7 @@ from PySide6.QtGui import QPainter, QPainterPath, QPen
 
 from PySide6.QtWidgets import QGraphicsPathItem, QGraphicsSceneMouseEvent, QGraphicsSceneWheelEvent, QGraphicsSceneContextMenuEvent
 from PySide6.QtWidgets import QWidget, QGraphicsScene, QMenu, QGraphicsTextItem, QGraphicsItem
-from PySide6.QtWidgets import QGraphicsItemGroup, QGraphicsTextItem, QGraphicsPixmapItem
+from PySide6.QtWidgets import QGraphicsTextItem
 
 from MyWidgets.MGraphicsPixmapItem import MGraphicsPixmapItem
 from MyWidgets.MGraphicsItemGroup import MGraphicsItemGroup
@@ -47,13 +47,8 @@ class MGraphicsScene(QGraphicsScene):
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent) -> None:
         pos = event.scenePos()
         point = self.item_img.maptoPixmap(pos)
-        print('scene pressed {}'.format(self.itemAt(pos, QTransform())))
-
-        # print(self.drawing)
-        # print(self.drawingRoi)
         if self.drawing:
             self.drawingRoi.mousePressEvent(event)
-            print('drawing ROI')
         else:
             if not self.ROI_added:
                 if self.ROI_type == 'ellipse':
@@ -135,27 +130,29 @@ class MGraphicsScene(QGraphicsScene):
         return super().mouseDoubleClickEvent(event)
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
-        print(event)
-        print(self.selectedItems())
-        if event.key() == Qt.Key_Delete:
-            for item in self.selectedItems():
-                self.removeItem(item)
-            print('Key_delete scene')
+        if self.drawing:
+            self.drawingRoi.keyPressEvent(event)
+        else:
+            if self.SceneMode == self.SceneMode_roi:
+                items = self.selectedItems()
+                if items:
+                    items[0].keyPressEvent(event)
 
-        return super().keyPressEvent(event)
+    def keyReleaseEvent(self, event: QKeyEvent) -> None:
+        if self.drawing:
+            self.drawingRoi.keyReleaseEvent(event)
+        else:
+            if self.SceneMode == self.SceneMode_roi:
+                items = self.selectedItems()
+                if items:
+                    items[0].keyReleaseEvent(event)
 
     def add_Mellipse(self, pos: QPointF) -> MGraphicsEllipseItem:
         ellipse = MGraphicsEllipseItem()
 
-        pen = QPen(QColor(48,189,177,255))
-        pen.setWidthF(2)
-        pen.setStyle(Qt.DashLine)
-        ellipse.setPen(pen)
-        ellipse.setBrush(QColor(255,0,0,128))
         ellipse.setPos(pos)
         ellipse.setZValue(1)
 
-        # ellipse.signal.ellipse_location.connect(self.__slot_Mellipse_location)
         ellipse.signal.ellipse_shape.connect(self.__slot_roi_shape)
         ellipse.signal.item_delete.connect(self.__slot_roi_delete)
         self.__add_roi(ellipse)
@@ -165,30 +162,13 @@ class MGraphicsScene(QGraphicsScene):
         self.addItem(item)
         self.ROI.append(item)
 
-    # def __slot_Mellipse_location(self, location: tuple):
-    #     lt, rb = location
-
-    #     lt = self.item_img.maptoSelf(lt)
-    #     rb = self.item_img.maptoSelf(rb)
-    #     lt = (lt.x()-1, lt.y()-1)
-    #     rb = (rb.x()-1, rb.y()-1)
-    #     pix = self.item_img.pixmap()
-    #     shape = (pix.height(), pix.width())
-    #     mask = shape_to_mask(img_shape=shape, points=(lt, rb), shape_type='ellipse')
-    #     img = Image.fromarray(mask)
-    #     img.save('mask.png')
-    #     img.toqimage()
-
-    #     index = get_index_of_mask(mask)
-    #     self._mask.emit(index)
-
-
     def __slot_roi_shape(self, painterpath: QPainterPath): 
         w = self.item_img.pixmap().width()
         h = self.item_img.pixmap().height()
         path = self.item_img.mapFromScene(painterpath)
         pix = QPixmap(w, h)
         pix.fill(QColor(0,0,0,0))
+
         painter = QPainter(pix)
         pen = QPen()
         pen.setWidthF(0)
@@ -197,8 +177,8 @@ class MGraphicsScene(QGraphicsScene):
         painter.setBrush(QColor(0,255,255,100))
         painter.drawPath(path)
         painter.end()
-        
-        self.mask.setPixmap(pix)
+        # self.mask.setPixmap(pix)
+
         img = pix.toImage()
         b = img.bits()
         img_array = np.frombuffer(b, np.uint8).reshape((h, w, 4))
@@ -219,6 +199,7 @@ class MGraphicsScene(QGraphicsScene):
         polygon.signal.drawing.connect(self.__slot_drawing)
         polygon.signal.drawed.connect(self.__slot_drawed)
         polygon.signal.polygon_shape.connect(self.__slot_roi_shape)
+        polygon.signal.item_delete.connect(self.__slot_roi_delete)
         self.__add_roi(polygon)
         polygon.signal.drawing.emit(polygon)
         return polygon
@@ -271,8 +252,6 @@ class MGraphicsScene(QGraphicsScene):
 
     @property 
     def SizeTooSmall(self) -> bool:
-        print(self.height(), self.width())
-        print(self.sceneRect())
         return self.height() < 170 or self.width() < 400
 
     @property

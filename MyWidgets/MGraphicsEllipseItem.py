@@ -2,7 +2,7 @@ from math import sqrt
 
 from PySide6 import QtWidgets
 from PySide6.QtCore import Qt, QPointF, Signal, QObject
-from PySide6.QtGui import QCursor, QColor
+from PySide6.QtGui import QCursor, QColor, QKeyEvent, QPen
 from PySide6.QtGui import QPainter, QPainterPath
 
 from PySide6.QtWidgets import QGraphicsSceneMouseEvent, QGraphicsSceneWheelEvent, QGraphicsSceneHoverEvent
@@ -21,35 +21,42 @@ class MEllipseItem_Signal(QObject):
         super().__init__(*args, **kargs)
 
 class MGraphicsEllipseItem(QGraphicsEllipseItem, MRoiItem):
-    signal = MEllipseItem_Signal()
-    seleceted_color = QColor()
+    PEN_COLOR = QColor(49, 200, 10, 255)
+    DEFAULT_COLOR = QColor(118,185,172,128)
     def __init__(self) -> None:
         super().__init__()  
         self.__init_MRoiItem__()
+        self.signal = MEllipseItem_Signal()
         self.x_negtive = False
         self.x_positive = False
         self.y_negtive = False
         self.y_positive = False
-        self.__func = 'zoom'
-        self.__axis_long = 50
-        self.__axis_short = 50
+        self._delete = False
+        self._func = 'zoom'
+        self._axis_long = 50
+        self._axis_short = 50
         self.__updateRect()
- 
+
+        pen = QPen(self.PEN_COLOR)
+        pen.setWidthF(2.5)
+        self.setPen(pen)
+        self.setBrush(self.DEFAULT_COLOR)
+
     @property
     def axis_long(self) -> float:
-        return max(10, self.__axis_long)
+        return max(10, self._axis_long)
 
     @axis_long.setter
     def axis_long(self, value: float) -> None: 
-        self.__axis_long = value
+        self._axis_long = value
 
     @property
     def axis_short(self) -> float:
-        return max(10, self.__axis_short)
+        return max(10, self._axis_short)
 
     @axis_short.setter
     def axis_short(self, value: float) -> None: 
-        self.__axis_short = value
+        self._axis_short = value
 
     @property
     def point_lefttop(self) -> QPointF:
@@ -89,7 +96,6 @@ class MGraphicsEllipseItem(QGraphicsEllipseItem, MRoiItem):
                 self.y_init = pos.y()
 
     def mouseReleaseEvent(self, event: QGraphicsSceneMouseEvent) -> None:
-        print('ellipse released')
         self.signal.ellipse_location.emit((self.mapToScene(self.point_lefttop), self.mapToScene(self.point_rightbottom)))
         self.signal.ellipse_shape.emit(self.mapToScene(self.shape()))
         return super().mouseReleaseEvent(event)
@@ -146,20 +152,30 @@ class MGraphicsEllipseItem(QGraphicsEllipseItem, MRoiItem):
         self.setSelected(False)
         self.update()
         return super().hoverLeaveEvent(event)
+    
+    def keyPressEvent(self, event: QKeyEvent) -> None:
+        if event.key() == Qt.Key_Delete:
+            self.Delete = True
+
+    def keyReleaseEvent(self, event: QKeyEvent) -> None:
+        if event.key() == Qt.Key_Delete:
+            if self.Delete:
+                
+                self.signal.item_delete.emit(self)
 
     def contextMenuEvent(self, event: QGraphicsSceneContextMenuEvent) -> None:
         self.__pop_menu()
         return super().contextMenuEvent(event)
 
     def paint(self, painter: QPainter, option: QtWidgets.QStyleOptionGraphicsItem, widget) -> None:
+        painter.setRenderHint(QPainter.Antialiasing)
+        option.state = QtWidgets.QStyle.State_None
         pen = painter.pen()
         pen.setWidthF(0)
+
         super().paint(painter, option, widget)
-        painter.setRenderHint(QPainter.Antialiasing)
         
-
         if self.hoverEnter:
-
             pen.setColor(QColor(255,255,255, 200))
             pen.setWidthF(2)
             painter.setPen(pen)
@@ -211,9 +227,16 @@ class MGraphicsEllipseItem(QGraphicsEllipseItem, MRoiItem):
 
     @property
     def func(self) -> str:
-        return self.__func
+        return self._func
 
     @func.setter
     def func(self, func: str) -> None:
-        self.__func = func
+        self._func = func
 
+    @property
+    def Delete(self) -> bool:
+        return self._delete
+
+    @Delete.setter
+    def Delete(self, delete: bool) -> None:
+        self._delete = delete
