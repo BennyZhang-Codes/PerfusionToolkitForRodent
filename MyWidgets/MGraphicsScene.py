@@ -27,8 +27,9 @@ class MGraphicsScene(QGraphicsScene):
     ItemType_info = 'info'
     SceneMode_roi = 'roi'
     SceneMode_image = 'image'
-    _mask = Signal(list)
-    _location = Signal(QPoint)
+    signal_ROI = Signal(tuple)  # mask np.array  index np.array
+    signal_ROI_point = Signal(QPoint)
+    signal_ROI_color = Signal(QColor)
     _ds_idxchange = Signal(int)
     def __init__(self, *args, **kargs):
         super().__init__(*args, **kargs)
@@ -66,6 +67,8 @@ class MGraphicsScene(QGraphicsScene):
             else:
                 self.item_img.func = self.func
                 self.item_img.mousePressEvent(event)
+                if self.func == 'point':
+                    self.signal_ROI_point.emit(point)
 
     def mouseMoveEvent(self, event: QGraphicsSceneMouseEvent) -> None:
         super().mouseMoveEvent(event)  # hover
@@ -179,14 +182,14 @@ class MGraphicsScene(QGraphicsScene):
         painter.end()
         # self.mask.setPixmap(pix)
 
-        img = pix.toImage()
-        b = img.bits()
-        img_array = np.frombuffer(b, np.uint8).reshape((h, w, 4))
-        mask = img_array[:,:,-1].astype(bool)
-        plt.imsave('mask.jpg', mask)
+        # img = pix.toImage()
+        # b = img.bits()
+        # img_array = np.frombuffer(b, np.uint8).reshape((h, w, 4))
+        # mask = img_array[:,:,-1].astype(bool)
+        # plt.imsave('mask.jpg', mask)
 
-        index = get_index_of_mask(mask)
-        self._mask.emit(index)
+        # index = get_index_of_mask(mask)
+        self.signal_ROI.emit((path, self.item_img.pixmap()))
     
     def __slot_roi_delete(self, item: QGraphicsItem):
         self.removeItem(item)
@@ -200,11 +203,15 @@ class MGraphicsScene(QGraphicsScene):
         polygon.signal.drawed.connect(self.__slot_drawed)
         polygon.signal.polygon_shape.connect(self.__slot_roi_shape)
         polygon.signal.item_delete.connect(self.__slot_roi_delete)
+        polygon.signal.ROI_color.connect(self.__slot_roi_color)
         self.__add_roi(polygon)
         polygon.signal.drawing.emit(polygon)
         return polygon
 
-    def __slot_drawing(self, roi: MRoiItem):
+    def __slot_roi_color(self, color: QColor) ->None:
+        self.signal_ROI_color.emit(color)
+        
+    def __slot_drawing(self, roi: MRoiItem) ->None:
         self.drawingRoi = roi
 
     def __slot_drawed(self):
@@ -229,6 +236,7 @@ class MGraphicsScene(QGraphicsScene):
             'zoom',
             'roi',
             'info',
+            'point',
         ]:
             self.__func = func
         else:

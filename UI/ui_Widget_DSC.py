@@ -17,8 +17,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractSpinBox, QApplication, QHBoxLayout, QLabel,
-    QProgressBar, QScrollBar, QSizePolicy, QSpacerItem,
-    QSpinBox, QTabWidget, QVBoxLayout, QWidget)
+    QProgressBar, QScrollArea, QScrollBar, QSizePolicy,
+    QSpacerItem, QSpinBox, QTabWidget, QVBoxLayout,
+    QWidget)
 
 from MyWidgets.MGraphicsView_timeseries import MGraphicsView_timeseries
 
@@ -178,7 +179,52 @@ class Ui_Widget_DSC(object):
         self.tabWidgetPage1 = QWidget()
         self.tabWidgetPage1.setObjectName(u"tabWidgetPage1")
         self.horizontalLayout_4 = QHBoxLayout(self.tabWidgetPage1)
+        self.horizontalLayout_4.setSpacing(0)
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.horizontalLayout_4.setContentsMargins(0, 0, 0, 0)
+        self.widget_4 = QWidget(self.tabWidgetPage1)
+        self.widget_4.setObjectName(u"widget_4")
+        self.horizontalLayout_10 = QHBoxLayout(self.widget_4)
+        self.horizontalLayout_10.setSpacing(0)
+        self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
+        self.horizontalLayout_10.setContentsMargins(0, 0, 0, 0)
+        self.scrollArea = QScrollArea(self.widget_4)
+        self.scrollArea.setObjectName(u"scrollArea")
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollAreaWidgetContents = QWidget()
+        self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 1030, 512))
+        self.horizontalLayout_11 = QHBoxLayout(self.scrollAreaWidgetContents)
+        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
+        self.horizontalLayout_11.setContentsMargins(0, 0, 0, 0)
+        self.label_mask = QLabel(self.scrollAreaWidgetContents)
+        self.label_mask.setObjectName(u"label_mask")
+        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label_mask.sizePolicy().hasHeightForWidth())
+        self.label_mask.setSizePolicy(sizePolicy)
+        self.label_mask.setMinimumSize(QSize(512, 512))
+        self.label_mask.setAlignment(Qt.AlignCenter)
+
+        self.horizontalLayout_11.addWidget(self.label_mask)
+
+        self.label_mask_img = QLabel(self.scrollAreaWidgetContents)
+        self.label_mask_img.setObjectName(u"label_mask_img")
+        sizePolicy.setHeightForWidth(self.label_mask_img.sizePolicy().hasHeightForWidth())
+        self.label_mask_img.setSizePolicy(sizePolicy)
+        self.label_mask_img.setMinimumSize(QSize(512, 512))
+        self.label_mask_img.setAlignment(Qt.AlignCenter)
+
+        self.horizontalLayout_11.addWidget(self.label_mask_img)
+
+        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
+
+        self.horizontalLayout_10.addWidget(self.scrollArea)
+
+
+        self.horizontalLayout_4.addWidget(self.widget_4)
+
         self.tabWidget.addTab(self.tabWidgetPage1, "")
 
         self.verticalLayout.addWidget(self.tabWidget)
@@ -190,14 +236,12 @@ class Ui_Widget_DSC(object):
 
         self.widget_load = QWidget(Widget_DSC)
         self.widget_load.setObjectName(u"widget_load")
-        self.verticalLayout_7 = QVBoxLayout(self.widget_load)
-        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
+        self.verticalLayout_6 = QVBoxLayout(self.widget_load)
+        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
         self.verticalSpacer_2 = QSpacerItem(20, 93, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-        self.verticalLayout_7.addItem(self.verticalSpacer_2)
+        self.verticalLayout_6.addItem(self.verticalSpacer_2)
 
-        self.verticalLayout_6 = QVBoxLayout()
-        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
         self.horizontalLayout_9 = QHBoxLayout()
         self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
         self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
@@ -216,24 +260,35 @@ class Ui_Widget_DSC(object):
 
         self.verticalLayout_6.addLayout(self.horizontalLayout_9)
 
+        self.horizontalLayout_12 = QHBoxLayout()
+        self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
+        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_12.addItem(self.horizontalSpacer_5)
+
         self.load_progressBar = QProgressBar(self.widget_load)
         self.load_progressBar.setObjectName(u"load_progressBar")
         self.load_progressBar.setValue(24)
 
-        self.verticalLayout_6.addWidget(self.load_progressBar)
+        self.horizontalLayout_12.addWidget(self.load_progressBar)
 
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        self.verticalLayout_7.addLayout(self.verticalLayout_6)
+        self.horizontalLayout_12.addItem(self.horizontalSpacer_4)
+
+        self.horizontalLayout_12.setStretch(0, 1)
+        self.horizontalLayout_12.setStretch(1, 2)
+        self.horizontalLayout_12.setStretch(2, 1)
+
+        self.verticalLayout_6.addLayout(self.horizontalLayout_12)
 
         self.verticalSpacer_3 = QSpacerItem(20, 93, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-        self.verticalLayout_7.addItem(self.verticalSpacer_3)
+        self.verticalLayout_6.addItem(self.verticalSpacer_3)
 
 
         self.verticalLayout_5.addWidget(self.widget_load)
 
-        self.verticalLayout_5.setStretch(0, 9)
-        self.verticalLayout_5.setStretch(1, 5)
 
         self.retranslateUi(Widget_DSC)
 
@@ -248,7 +303,9 @@ class Ui_Widget_DSC(object):
         self.label_4.setText(QCoreApplication.translate("Widget_DSC", u"Column", None))
         self.spinBox_column.setSuffix("")
         self.spinBox_column.setPrefix("")
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabWidgetPage1), "")
+        self.label_mask.setText("")
+        self.label_mask_img.setText("")
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabWidgetPage1), QCoreApplication.translate("Widget_DSC", u"ROI", None))
         self.load_label.setText(QCoreApplication.translate("Widget_DSC", u"TextLabel", None))
     # retranslateUi
 

@@ -34,23 +34,23 @@ class MGraphicsView(QGraphicsView, MWidget):
         self.mainwindow = mainwindow
         
     def _setupUI(self) -> None:
-        self.setStyleSheet('''MGraphicsView{background-color: rgb(0, 0, 0);}''')
+        self.setStyleSheet('''MGraphicsView{background-color: rgb(0, 0, 0); padding: 0px; border: 0px}''')
         self.setFrameShape(QFrame.NoFrame)
         self.setFrameShadow(QFrame.Plain)
         self.setLineWidth(0)
         self.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignTop)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.icon_move = QPixmap(u"qrc/move.png")
-        self.icon_move = self.icon_move.scaled(29, 29, mode=Qt.SmoothTransformation)
-        self.icon_zoom_in = QPixmap(u"qrc/zoom_in.png")
-        self.icon_zoom_in = self.icon_zoom_in.scaled(29, 29, mode=Qt.SmoothTransformation)
-        self.icon_zoom_out = QPixmap(u"qrc/zoom_out.png")
-        self.icon_zoom_out = self.icon_zoom_out.scaled(29, 29, mode=Qt.SmoothTransformation)
+        # self.icon_move = QPixmap(u"qrc/move.png")
+        # self.icon_move = self.icon_move.scaled(29, 29, mode=Qt.SmoothTransformation)
+        # self.icon_zoom_in = QPixmap(u"qrc/zoom_in.png")
+        # self.icon_zoom_in = self.icon_zoom_in.scaled(29, 29, mode=Qt.SmoothTransformation)
+        # self.icon_zoom_out = QPixmap(u"qrc/zoom_out.png")
+        # self.icon_zoom_out = self.icon_zoom_out.scaled(29, 29, mode=Qt.SmoothTransformation)
         
     def __setup_scene(self):
         self.mscene = MGraphicsScene(self)
-        self.mscene._mask.connect(self.__mask)
+        self.mscene.signal_ROI.connect(self.__mask)
         self.mscene._ds_idxchange.connect(self.__ds_idx_change)
         self.setScene(self.mscene)
 
@@ -80,9 +80,6 @@ class MGraphicsView(QGraphicsView, MWidget):
     def resizeEvent(self, event: QResizeEvent) -> None:
         self.scene().setSceneRect(self.geometry())
         self.set_scene(self.idx)
-        # if hasattr(self, 'mainwindow'):
-        #     self.mainwindow.statusBar().showMessage('MGraphicsView::Resize GraphicsView: {}/{}, Scene: {}/{} '.format(
-        #         self.height(), self.width(), self.scene().height(), self.scene().width()))
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         return super().mousePressEvent(event)

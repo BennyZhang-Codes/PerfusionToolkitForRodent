@@ -1,5 +1,9 @@
-from PySide6.QtCore import Qt, Slot, QSize, QModelIndex, QEvent, qDebug
-from PySide6.QtGui import QImage, QPixmap, QIcon, QResizeEvent, QMouseEvent, QCursor, QColor, QWheelEvent
+from typing import ChainMap
+import numpy as np
+import matplotlib.pyplot as plt
+
+from PySide6.QtCore import Qt, Slot, QSize, QModelIndex, QEvent, qDebug, QPoint
+from PySide6.QtGui import QImage, QPixmap, QIcon, QResizeEvent, QMouseEvent, QCursor, QColor, QWheelEvent, QPen
 
 from PySide6.QtWidgets import QWidget, QGraphicsPixmapItem, QGraphicsScene, QMenu, QHBoxLayout
 from PySide6.QtWidgets import QListWidgetItem, QListWidget, QGraphicsView, QLabel
@@ -9,7 +13,10 @@ from PySide6.QtCharts import QChart, QChartView, QLineSeries, QScatterSeries
 from UI.ui_Widget_DSC import Ui_Widget_DSC
 from modules.dcmreader.read_DSC_DCE import read_DSC_DCE_folder
 
+from modules.utils.shape import shape_to_mask, get_index_of_mask
+
 class Widget_DSC(QWidget, Ui_Widget_DSC):
+
     def __init__(self, dicom_dir, mainwindow):
         super().__init__()
         self.mainwindow = mainwindow
@@ -19,6 +26,7 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         self.dicom_reader._loading.connect(self.__slot_loading)
         self.dicom_reader._loaded.connect(self.__slot_loaded)
         self.setupUi(self)
+        self._ROI_color = QColor(118,185,172,196)
         
 
     def _setupUI(self):
@@ -31,10 +39,11 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         self.chartView.setChart(self.chart)
 
         self.graphicsView.set_mainwindow(self.mainwindow)
-        self.graphicsView.set_dicom_reader(self.dicom_reader)
-        self.graphicsView._slice.connect(self.__slot_graphicsView_slice)
+        self.graphicsView.DicomReader = self.dicom_reader
         self.graphicsView._idx_changed.connect(self.__slot_graphicsView_idx_changed)
-        self.graphicsView._location.connect(self.__slot_graphicsView_location)
+        self.graphicsView.mscene.signal_ROI_point.connect(self.__slot_ROI_point)
+        self.graphicsView.mscene.signal_ROI.connect(self.__slot_ROI)
+        self.graphicsView.mscene.signal_ROI_color.connect(self.__slot_ROI_color)
         
         
 
@@ -55,14 +64,53 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         self.spinBox_column.setMaximum(self.dicom_reader.get_column())
         self.spinBox_column.setMinimum(1)
 
-    def __item_img(self, event: QMouseEvent):
-        print('clicked')
+    def __slot_ROI(self, data: tuple):
+        path, item_pix = data
+        w = item_pix.width()
+        h = item_pix.height()
+        pix = QPixmap(w, h)
+        pix.fill(QColor(0,0,0,255))
 
-    def __slot_graphicsView_slice(self, idx: int):
-        self.dicom_reader.set_slice(idx)
-        self.graphicsView.set_scene(self.graphicsView.idx)
-        self.spinBox_slice.setValue(idx+1)
+        
+        pen = QPen()
+        pen.setWidthF(0)
+        pen.setColor(QColor(0,0,0,0))
 
+        painter_item_pix = QPainter(item_pix)
+        painter_item_pix.setPen(pen)
+        painter_item_pix.setBrush(self.ROI_color)
+        painter_item_pix.drawPath(path)
+        painter_item_pix.end()
+
+        painter_pix = QPainter(pix)
+        painter_pix.setPen(pen)
+        painter_pix.setBrush(QColor(255,255,255,255))
+        painter_pix.drawPath(path)
+        painter_pix.end()
+
+
+        img = pix.toImage()
+        b = img.bits()
+        img_array = np.frombuffer(b, np.uint8).reshape((pix.height(), pix.width(), 4))
+        mask = img_array[:,:,-2].astype(bool)
+        plt.imsave('mask.jpg', mask, cmap='gray')
+
+        index = get_index_of_mask(mask)
+        ydata = []
+        for idx in index:
+            ydata.append(self.dicom_reader.get_imgs_curSlice()[:, idx[0], idx[1]])
+
+        ydata = np.array(ydata)
+        xdata = self.dicom_reader.get_time_points()
+        self.__curve(xdata, np.mean(ydata, axis=0))
+
+        self.label_mask.setPixmap(pix.scaled(512,512, Qt.KeepAspectRatio, Qt.FastTransformation))
+
+        self.label_mask_img.setPixmap(item_pix.scaled(512,512, Qt.KeepAspectRatio, Qt.FastTransformation))
+        # self.label_mask_img.setScaledContents(True)
+    def __slot_ROI_color(self, color: QColor) -> None:
+        self.ROI_color = color
+        
     def __slot_graphicsView_idx_changed(self, idx: int):
         self.verticalScrollBar.setValue(idx+1)
 
@@ -76,7 +124,11 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
     def on_spinBox_slice_valueChanged(self, value: int):
         self.dicom_reader.set_slice(value - 1)
         self.graphicsView.set_scene(self.graphicsView.idx)
-        self.__curve(self.spinBox_row.value(), self.spinBox_column.value())
+        row = self.spinBox_row.value()
+        col = self.spinBox_column.value()
+        ydata = self.dicom_reader.get_imgs_curSlice()[:, row - 1, col - 1]
+        xdata = self.dicom_reader.get_time_points()
+        self.__curve(xdata, ydata)
 
     @Slot(int)
     def on_verticalScrollBar_valueChanged(self, value: int):
@@ -84,23 +136,34 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
 
     @Slot(int)
     def on_spinBox_row_valueChanged(self, value: int):
-        self.__curve(value, self.spinBox_column.value())
+        row = value
+        col = self.spinBox_column.value()
+        ydata = self.dicom_reader.get_imgs_curSlice()[:, row - 1, col - 1]
+        xdata = self.dicom_reader.get_time_points()
+        self.__curve(xdata, ydata)
 
     @Slot(int)
     def on_spinBox_column_valueChanged(self, value: int):
-        self.__curve(self.spinBox_row.value(), value)
+        row = self.spinBox_row.value()
+        col = value
+        ydata = self.dicom_reader.get_imgs_curSlice()[:, row - 1, col - 1]
+        xdata = self.dicom_reader.get_time_points()
+        self.__curve(xdata, ydata)
 
-    def __slot_graphicsView_location(self, pos: tuple):
-        row, col = pos
+    def __slot_ROI_point(self, pos: QPoint):
+        row = pos.y()
+        col = pos.x()
         self.spinBox_row.setValue(row)
         self.spinBox_column.setValue(col)
-        self.__curve(row, col)
 
-    def __curve(self, row: int, col: int) -> None:
         ydata = self.dicom_reader.get_imgs_curSlice()[:, row - 1, col - 1]
+        xdata = self.dicom_reader.get_time_points()
+        self.__curve(xdata, ydata)
+
+    def __curve(self, xdata: np.array, ydata: np.array) -> None:
         self.chart.removeAllSeries()
         series = QLineSeries()
-        for time_point, value in zip(self.dicom_reader.get_time_points(), ydata):
+        for time_point, value in zip(xdata, ydata):
             series.append(time_point, value)
         series.setPointsVisible(True)
         series.setMarkerSize(4)
@@ -136,7 +199,16 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
             self.dicom_reader.set_slice(0)
 
             self._setupUI()
-            self.graphicsView.item_img.mouseDoubleClickEvent = self.__item_img
+
+
+
+    @property
+    def ROI_color(self) -> QColor:
+        return self._ROI_color
+
+    @ROI_color.setter
+    def ROI_color(self, color: QColor) -> None:
+        self._ROI_color = color
             
       
 

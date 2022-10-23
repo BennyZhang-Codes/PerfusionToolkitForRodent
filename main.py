@@ -25,14 +25,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.add_dockWidgets()
         self._setup()
         self.statusBar().showMessage('Ready')
+        self.setStyleSheet(qdarkstyle.load_stylesheet_pyside2())
+
         # self.setStyleSheet(qdarkstyle.load_stylesheet_pyside2())
+        # self.setStyleSheet('''MGraphicsView{background-color: rgb(0, 0, 0); padding: 0px; border: 0px}''')
 
     def _setup(self):
         self._Status_progressBar = Status_progressBar(self.statusBar())
         self._Status_progressBar.setHidden(True)
         self.statusBar().addPermanentWidget(self._Status_progressBar)
-        # root = r'E:\PySide6\examplefiles\E7_DCE_FLASH'
-        # self.tabWidget.addTab(Widget_DSC(root, self), root)
+        root = r'E:\PySide6\examplefiles\E7_DCE_FLASH'
+        self.tabWidget.addTab(Widget_DSC(root, self), root)
         root = r'E:\PySide6\examplefiles'
         self.tabWidget.addTab(Widget_Browse(root, self), root)
         # root = r'E:\A30\FAIR\19\pdata\1\dicom'
@@ -70,7 +73,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 app = QApplication(sys.argv)
 window = MainWindow()
 # window.setWindowFlags(Qt.FramelessWindowHint)
-
 
 # window.showMaximized()'
 window.show()

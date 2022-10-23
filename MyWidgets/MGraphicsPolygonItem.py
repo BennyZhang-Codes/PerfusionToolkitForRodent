@@ -36,6 +36,7 @@ class MPolylItem_Signal(QObject):
     drawing = Signal(MRoiItem)
     drawed = Signal()
     item_delete = Signal(QGraphicsItem)
+    ROI_color = Signal(QColor)
     def __init__(self, *args, **kargs) -> None:
         super().__init__(*args, **kargs)
 
@@ -460,7 +461,8 @@ class MGraphicsPolygonItem(QGraphicsPathItem, MRoiItem):
         # self.mouseTrackNode.update_prevLine()
 
     def mouseReleaseEvent(self, event: QGraphicsSceneMouseEvent) -> None:
-        self.signal.polygon_shape.emit(self.mapToScene(self.shape()))
+        if self.closed:
+            self.signal.polygon_shape.emit(self.mapToScene(self.shape()))
         return super().mouseReleaseEvent(event)
     
     def mouseDoubleClickEvent(self, event: QGraphicsSceneMouseEvent) -> None:
@@ -645,6 +647,8 @@ class MGraphicsPolygonItem(QGraphicsPathItem, MRoiItem):
         cd.exec()
         color = cd.selectedColor()
         self.DEFAULT_COLOR = color
+
+        self.signal.ROI_color.emit(color)
 
         self.update()
 
