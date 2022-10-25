@@ -19,7 +19,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QDockWidget, QFr
     QHBoxLayout, QHeaderView, QListWidget, QListWidgetItem,
     QSizePolicy, QTabWidget, QTreeView, QVBoxLayout,
     QWidget)
-import icons_rc
+import UI.icons_rc as icons_rc
 
 class Ui_DockWidget_Start(object):
     def setupUi(self, DockWidget_Start):

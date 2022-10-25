@@ -3,12 +3,14 @@ from PySide6 import QtWidgets, QtCore, QtGui
 from PySide6.QtWidgets import QDockWidget, QFileSystemModel, QMenu
 from PySide6.QtCore import Slot, QDir, QModelIndex, Qt
 from PySide6.QtGui import QCursor
-from Widget_DSC import Widget_DSC
-from Widget_FAIR import Widget_FAIR
+
+
+import CenterWidgets.Browse as Browse
+import CenterWidgets.DSC as DSC
+import CenterWidgets.FAIR as FAIR
 
 from UI.ui_DockWidget_Start import Ui_DockWidget_Start
 from UI.ui_DockWidget_FAIR import Ui_DockWidget_FAIR
-from Widget_Browse import Widget_Browse
 
 class DockWidget_Start(QDockWidget, Ui_DockWidget_Start):
     def __init__(self, mainwindow) -> None:
@@ -40,16 +42,16 @@ class DockWidget_Start(QDockWidget, Ui_DockWidget_Start):
 
     def _action_fair(self):
         current_path = self.filesystem_model.filePath(self.treeView.currentIndex())
-        self.mainwindow.tabWidget.addTab(Widget_FAIR(current_path, self.mainwindow), current_path)
+        self.mainwindow.tabWidget.addTab(FAIR.Widget_FAIR(current_path, self.mainwindow), current_path)
 
     def _action_dsc(self):
         current_path = self.filesystem_model.filePath(self.treeView.currentIndex())
-        self.mainwindow.tabWidget.addTab(Widget_DSC(current_path, self.mainwindow), current_path)
+        self.mainwindow.tabWidget.addTab(DSC.Widget_DSC(current_path, self.mainwindow), current_path)
 
     def _action_opendicomfolder(self):
         '''添加tab'''
         current_path = self.filesystem_model.filePath(self.treeView.currentIndex())
-        self.mainwindow.tabWidget.addTab(Widget_Browse(current_path, self.mainwindow), current_path)
+        self.mainwindow.tabWidget.addTab(Browse.Widget_Browse(current_path, self.mainwindow), current_path)
 
     @Slot(QModelIndex)
     def on_treeView_clicked(self, Qmodelidx):

@@ -7,7 +7,7 @@ from PySide6.QtWidgets import QWidget
 from PySide6.QtWidgets import QGraphicsView, QFrame
 
 from modules.dcmreader.Read_dcm import MAbstractDicomReader
-from modules.dcmreader.read_DSC_DCE import read_DSC_DCE_folder
+from modules.dcmreader.read_DSC_DCE import Read_Bruker_TimeSeries
 from MyWidgets.MWidget import MWidget
 from MyWidgets.MGraphicsScene import MGraphicsScene
 

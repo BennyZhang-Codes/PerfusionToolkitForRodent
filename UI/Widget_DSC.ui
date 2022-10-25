@@ -16,277 +16,29 @@
   <layout class="QVBoxLayout" name="verticalLayout_5">
    <item>
     <widget class="QWidget" name="widget_center" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
-       <widget class="QWidget" name="widget" native="true">
-        <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="4,3">
-         <property name="spacing">
-          <number>0</number>
-         </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="10,0,5">
-           <property name="spacing">
-            <number>0</number>
-           </property>
-           <item>
-            <widget class="MGraphicsView_timeseries" name="graphicsView"/>
-           </item>
-           <item>
-            <widget class="QScrollBar" name="verticalScrollBar">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QWidget" name="widget_tools" native="true">
-             <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0">
-              <property name="spacing">
-               <number>5</number>
-              </property>
-              <property name="leftMargin">
-               <number>5</number>
-              </property>
-              <property name="topMargin">
-               <number>5</number>
-              </property>
-              <property name="rightMargin">
-               <number>5</number>
-              </property>
-              <property name="bottomMargin">
-               <number>5</number>
-              </property>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_8">
-                <item>
-                 <layout class="QVBoxLayout" name="verticalLayout_2">
-                  <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_2">
-                    <item>
-                     <widget class="QLabel" name="label">
-                      <property name="text">
-                       <string>Slice</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QSpinBox" name="spinBox_slice">
-                      <property name="value">
-                       <number>1</number>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
-                  <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout">
-                    <property name="spacing">
-                     <number>6</number>
-                    </property>
-                    <item>
-                     <widget class="QLabel" name="label_2">
-                      <property name="text">
-                       <string>Time point</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QSpinBox" name="spinBox_timepoint">
-                      <property name="value">
-                       <number>1</number>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
-                  <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_6">
-                    <item>
-                     <widget class="QLabel" name="label_3">
-                      <property name="text">
-                       <string>Row</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QSpinBox" name="spinBox_row">
-                      <property name="value">
-                       <number>1</number>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
-                  <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_7">
-                    <item>
-                     <widget class="QLabel" name="label_4">
-                      <property name="text">
-                       <string>Column</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QSpinBox" name="spinBox_column">
-                      <property name="frame">
-                       <bool>true</bool>
-                      </property>
-                      <property name="buttonSymbols">
-                       <enum>QAbstractSpinBox::UpDownArrows</enum>
-                      </property>
-                      <property name="suffix">
-                       <string/>
-                      </property>
-                      <property name="prefix">
-                       <string/>
-                      </property>
-                      <property name="value">
-                       <number>1</number>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <widget class="QToolBox" name="toolBox">
-                <property name="currentIndex">
-                 <number>1</number>
-                </property>
-                <widget class="QWidget" name="page">
-                 <property name="geometry">
-                  <rect>
-                   <x>0</x>
-                   <y>0</y>
-                   <width>180</width>
-                   <height>106</height>
-                  </rect>
-                 </property>
-                 <attribute name="label">
-                  <string>ROI</string>
-                 </attribute>
-                 <layout class="QVBoxLayout" name="verticalLayout_4" stretch="5">
-                  <property name="spacing">
-                   <number>0</number>
-                  </property>
-                  <property name="leftMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="topMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="rightMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="bottomMargin">
-                   <number>0</number>
-                  </property>
-                  <item>
-                   <widget class="QListWidget" name="listWidget"/>
-                  </item>
-                 </layout>
-                </widget>
-                <widget class="QWidget" name="page_2">
-                 <property name="geometry">
-                  <rect>
-                   <x>0</x>
-                   <y>0</y>
-                   <width>180</width>
-                   <height>91</height>
-                  </rect>
-                 </property>
-                 <attribute name="label">
-                  <string>Correction</string>
-                 </attribute>
-                 <widget class="QPushButton" name="pushButton">
-                  <property name="geometry">
-                   <rect>
-                    <x>20</x>
-                    <y>50</y>
-                    <width>75</width>
-                    <height>24</height>
-                   </rect>
-                  </property>
-                  <property name="text">
-                   <string>PushButton</string>
-                  </property>
-                 </widget>
-                </widget>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <widget class="QWidget" name="widget_chart" native="true">
-           <layout class="QVBoxLayout" name="verticalLayout_3">
-            <property name="spacing">
-             <number>0</number>
-            </property>
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="QChartView" name="chartView"/>
-            </item>
-           </layout>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QTabWidget" name="tabWidget">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>50</height>
-         </size>
+       <widget class="QSplitter" name="splitter_3">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
         </property>
-        <widget class="QWidget" name="tabWidgetPage1">
-         <attribute name="title">
-          <string>ROI</string>
-         </attribute>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <widget class="QWidget" name="widget" native="true">
+         <layout class="QVBoxLayout" name="verticalLayout_8">
           <property name="spacing">
            <number>0</number>
           </property>
@@ -303,102 +55,443 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QWidget" name="widget_4" native="true">
-            <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="0">
-             <property name="spacing">
-              <number>0</number>
-             </property>
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QScrollArea" name="scrollArea">
-               <property name="widgetResizable">
-                <bool>true</bool>
-               </property>
-               <widget class="QWidget" name="scrollAreaWidgetContents">
-                <property name="geometry">
-                 <rect>
-                  <x>0</x>
-                  <y>0</y>
-                  <width>1030</width>
-                  <height>512</height>
-                 </rect>
+           <widget class="QSplitter" name="splitter_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <widget class="QWidget" name="">
+             <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="10,0,5">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="MGraphicsView_timeseries" name="graphicsView"/>
+              </item>
+              <item>
+               <widget class="QScrollBar" name="verticalScrollBar">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
                 </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_11">
-                 <property name="leftMargin">
-                  <number>0</number>
+               </widget>
+              </item>
+              <item>
+               <widget class="QWidget" name="widget_tools" native="true">
+                <layout class="QVBoxLayout" name="verticalLayout_7">
+                 <property name="spacing">
+                  <number>5</number>
                  </property>
                  <property name="topMargin">
-                  <number>0</number>
+                  <number>5</number>
                  </property>
                  <property name="rightMargin">
-                  <number>0</number>
+                  <number>5</number>
                  </property>
                  <property name="bottomMargin">
-                  <number>0</number>
+                  <number>5</number>
                  </property>
                  <item>
-                  <widget class="QLabel" name="label_mask">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
+                  <widget class="QSplitter" name="splitter">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
                    </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>512</width>
-                     <height>512</height>
-                    </size>
+                   <property name="childrenCollapsible">
+                    <bool>false</bool>
                    </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QLabel" name="label_mask_img">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>512</width>
-                     <height>512</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignCenter</set>
-                   </property>
+                   <widget class="QWidget" name="">
+                    <layout class="QHBoxLayout" name="horizontalLayout_18">
+                     <item>
+                      <layout class="QVBoxLayout" name="verticalLayout_2">
+                       <item>
+                        <layout class="QHBoxLayout" name="horizontalLayout_8">
+                         <item>
+                          <widget class="QLabel" name="label_5">
+                           <property name="text">
+                            <string>Group By</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QComboBox" name="comboBox">
+                           <item>
+                            <property name="text">
+                             <string>Slice</string>
+                            </property>
+                           </item>
+                           <item>
+                            <property name="text">
+                             <string>Time point</string>
+                            </property>
+                           </item>
+                          </widget>
+                         </item>
+                        </layout>
+                       </item>
+                       <item>
+                        <layout class="QHBoxLayout" name="horizontalLayout_15">
+                         <item>
+                          <layout class="QHBoxLayout" name="horizontalLayout_2">
+                           <item>
+                            <widget class="QLabel" name="label">
+                             <property name="text">
+                              <string>Slice</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QSpinBox" name="spinBox_slice">
+                             <property name="value">
+                              <number>1</number>
+                             </property>
+                            </widget>
+                           </item>
+                          </layout>
+                         </item>
+                         <item>
+                          <layout class="QHBoxLayout" name="horizontalLayout">
+                           <property name="spacing">
+                            <number>6</number>
+                           </property>
+                           <item>
+                            <widget class="QLabel" name="label_2">
+                             <property name="text">
+                              <string>Time point</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QSpinBox" name="spinBox_timepoint">
+                             <property name="value">
+                              <number>1</number>
+                             </property>
+                            </widget>
+                           </item>
+                          </layout>
+                         </item>
+                        </layout>
+                       </item>
+                       <item>
+                        <layout class="QHBoxLayout" name="horizontalLayout_16">
+                         <item>
+                          <layout class="QHBoxLayout" name="horizontalLayout_13">
+                           <item>
+                            <widget class="QLabel" name="label_6">
+                             <property name="text">
+                              <string>Window level</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QSpinBox" name="spinBox"/>
+                           </item>
+                          </layout>
+                         </item>
+                         <item>
+                          <layout class="QHBoxLayout" name="horizontalLayout_14">
+                           <item>
+                            <widget class="QLabel" name="label_7">
+                             <property name="text">
+                              <string>Window width</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QSpinBox" name="spinBox_2"/>
+                           </item>
+                          </layout>
+                         </item>
+                        </layout>
+                       </item>
+                       <item>
+                        <layout class="QHBoxLayout" name="horizontalLayout_17">
+                         <item>
+                          <layout class="QHBoxLayout" name="horizontalLayout_6">
+                           <item>
+                            <widget class="QLabel" name="label_3">
+                             <property name="text">
+                              <string>Row</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QSpinBox" name="spinBox_row">
+                             <property name="value">
+                              <number>1</number>
+                             </property>
+                            </widget>
+                           </item>
+                          </layout>
+                         </item>
+                         <item>
+                          <layout class="QHBoxLayout" name="horizontalLayout_7">
+                           <item>
+                            <widget class="QLabel" name="label_4">
+                             <property name="text">
+                              <string>Column</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QSpinBox" name="spinBox_column">
+                             <property name="frame">
+                              <bool>true</bool>
+                             </property>
+                             <property name="buttonSymbols">
+                              <enum>QAbstractSpinBox::UpDownArrows</enum>
+                             </property>
+                             <property name="suffix">
+                              <string/>
+                             </property>
+                             <property name="prefix">
+                              <string/>
+                             </property>
+                             <property name="value">
+                              <number>1</number>
+                             </property>
+                            </widget>
+                           </item>
+                          </layout>
+                         </item>
+                        </layout>
+                       </item>
+                      </layout>
+                     </item>
+                     <item>
+                      <spacer name="horizontalSpacer">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                    </layout>
+                   </widget>
+                   <widget class="QToolBox" name="toolBox">
+                    <property name="currentIndex">
+                     <number>0</number>
+                    </property>
+                    <widget class="QWidget" name="page">
+                     <property name="geometry">
+                      <rect>
+                       <x>0</x>
+                       <y>0</y>
+                       <width>265</width>
+                       <height>123</height>
+                      </rect>
+                     </property>
+                     <attribute name="label">
+                      <string>ROI</string>
+                     </attribute>
+                     <layout class="QVBoxLayout" name="verticalLayout_4" stretch="5">
+                      <property name="spacing">
+                       <number>0</number>
+                      </property>
+                      <property name="leftMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="topMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="rightMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="bottomMargin">
+                       <number>0</number>
+                      </property>
+                      <item>
+                       <widget class="QListWidget" name="listWidget"/>
+                      </item>
+                     </layout>
+                    </widget>
+                    <widget class="QWidget" name="page_2">
+                     <property name="geometry">
+                      <rect>
+                       <x>0</x>
+                       <y>0</y>
+                       <width>265</width>
+                       <height>123</height>
+                      </rect>
+                     </property>
+                     <attribute name="label">
+                      <string>Correction</string>
+                     </attribute>
+                     <widget class="QPushButton" name="pushButton">
+                      <property name="geometry">
+                       <rect>
+                        <x>20</x>
+                        <y>50</y>
+                        <width>75</width>
+                        <height>24</height>
+                       </rect>
+                      </property>
+                      <property name="text">
+                       <string>PushButton</string>
+                      </property>
+                     </widget>
+                    </widget>
+                   </widget>
                   </widget>
                  </item>
                 </layout>
                </widget>
-              </widget>
-             </item>
-            </layout>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="widget_chart" native="true">
+             <layout class="QVBoxLayout" name="verticalLayout_3">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QChartView" name="chartView"/>
+              </item>
+             </layout>
+            </widget>
            </widget>
           </item>
          </layout>
+        </widget>
+        <widget class="QTabWidget" name="tabWidget">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>50</height>
+          </size>
+         </property>
+         <widget class="QWidget" name="tabWidgetPage1">
+          <attribute name="title">
+           <string>ROI</string>
+          </attribute>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QWidget" name="widget_4" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="0">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QScrollArea" name="scrollArea">
+                <property name="widgetResizable">
+                 <bool>true</bool>
+                </property>
+                <widget class="QWidget" name="scrollAreaWidgetContents">
+                 <property name="geometry">
+                  <rect>
+                   <x>0</x>
+                   <y>0</y>
+                   <width>1030</width>
+                   <height>512</height>
+                  </rect>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_11">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QLabel" name="label_mask">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>512</width>
+                      <height>512</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_mask_img">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>512</width>
+                      <height>512</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </widget>
        </widget>
       </item>

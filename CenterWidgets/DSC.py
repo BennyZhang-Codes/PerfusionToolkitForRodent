@@ -1,4 +1,4 @@
-from typing import ChainMap
+from codecs import readbuffer_encode
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -11,9 +11,11 @@ from PySide6.QtGui import QPainter
 from PySide6.QtCharts import QChart, QChartView, QLineSeries, QScatterSeries
 
 from UI.ui_Widget_DSC import Ui_Widget_DSC
-from modules.dcmreader.read_DSC_DCE import read_DSC_DCE_folder
+from modules.dcmreader.read_DSC_DCE import Read_Bruker_TimeSeries
 
 from modules.utils.shape import shape_to_mask, get_index_of_mask
+
+
 
 class Widget_DSC(QWidget, Ui_Widget_DSC):
 
@@ -21,11 +23,16 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         super().__init__()
         self.mainwindow = mainwindow
         self.root = dicom_dir
-        self.dicom_reader = read_DSC_DCE_folder(self.root)
-        self.dicom_reader._loadstart.connect(self.__slot_loadstart)
-        self.dicom_reader._loading.connect(self.__slot_loading)
-        self.dicom_reader._loaded.connect(self.__slot_loaded)
         self.setupUi(self)
+        
+        self.dicom_reader = Read_Bruker_TimeSeries(self.root)
+        if self.comboBox.currentText() == 'Slice':
+            self.dicom_reader.GroupBy = 'Slice'
+
+        self.dicom_reader.signal_loadstart.connect(self.__slot_loadstart)
+        self.dicom_reader.signal_loading.connect(self.__slot_loading)
+        self.dicom_reader.signal_loaded.connect(self.__slot_loaded)
+        
         self._ROI_color = QColor(118,185,172,196)
         
 
@@ -45,13 +52,12 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         self.graphicsView.mscene.signal_ROI.connect(self.__slot_ROI)
         self.graphicsView.mscene.signal_ROI_color.connect(self.__slot_ROI_color)
         
-        
 
-        self.spinBox_timepoint.setMaximum(self.dicom_reader.max_idx() + 1)
-        self.spinBox_timepoint.setMinimum(self.dicom_reader.min_idx() + 1)
+        self.spinBox_timepoint.setMaximum(self.dicom_reader.max_idx + 1)
+        self.spinBox_timepoint.setMinimum(self.dicom_reader.min_idx + 1)
         self.spinBox_timepoint.setValue(self.graphicsView.idx + 1)
-        self.verticalScrollBar.setMaximum(self.dicom_reader.max_idx() + 1)
-        self.verticalScrollBar.setMinimum(self.dicom_reader.min_idx() + 1)
+        self.verticalScrollBar.setMaximum(self.dicom_reader.max_idx + 1)
+        self.verticalScrollBar.setMinimum(self.dicom_reader.min_idx + 1)
         self.verticalScrollBar.setValue(self.graphicsView.idx + 1)
 
         self.spinBox_slice.setMaximum(self.dicom_reader.SliceNum)
@@ -98,7 +104,7 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         index = get_index_of_mask(mask)
         ydata = []
         for idx in index:
-            ydata.append(self.dicom_reader.imgs_curSlice[:, idx[0], idx[1]])
+            ydata.append(self.dicom_reader.img_GroupBySlice[:, idx[0], idx[1]])
 
         ydata = np.array(ydata)
         xdata = self.dicom_reader.TimePoints
@@ -122,11 +128,11 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
 
     @Slot(int)
     def on_spinBox_slice_valueChanged(self, value: int):
-        self.dicom_reader.set_slice(value - 1)
+        self.dicom_reader.CurrentSlice = value - 1
         self.graphicsView.set_scene(self.graphicsView.idx)
         row = self.spinBox_row.value()
         col = self.spinBox_column.value()
-        ydata = self.dicom_reader.imgs_curSlice[:, row - 1, col - 1]
+        ydata = self.dicom_reader.img_GroupBySlice[:, row - 1, col - 1]
         xdata = self.dicom_reader.TimePoints
         self.__curve(xdata, ydata)
 
@@ -138,7 +144,7 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
     def on_spinBox_row_valueChanged(self, value: int):
         row = value
         col = self.spinBox_column.value()
-        ydata = self.dicom_reader.imgs_curSlice[:, row - 1, col - 1]
+        ydata = self.dicom_reader.img_GroupBySlice[:, row - 1, col - 1]
         xdata = self.dicom_reader.TimePoints
         self.__curve(xdata, ydata)
 
@@ -146,7 +152,7 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
     def on_spinBox_column_valueChanged(self, value: int):
         row = self.spinBox_row.value()
         col = value
-        ydata = self.dicom_reader.imgs_curSlice[:, row - 1, col - 1]
+        ydata = self.dicom_reader.img_GroupBySlice[:, row - 1, col - 1]
         xdata = self.dicom_reader.TimePoints
         self.__curve(xdata, ydata)
 
@@ -156,7 +162,7 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         self.spinBox_row.setValue(row)
         self.spinBox_column.setValue(col)
 
-        ydata = self.dicom_reader.imgs_curSlice[:, row - 1, col - 1]
+        ydata = self.dicom_reader.img_GroupBySlice[:, row - 1, col - 1]
         xdata = self.dicom_reader.TimePoints
         self.__curve(xdata, ydata)
 
@@ -196,7 +202,6 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
             self.widget_center.setVisible(True)
             self.widget_load.setEnabled(False)
             self.widget_load.setVisible(False)
-            self.dicom_reader.set_slice(0)
 
             self._setupUI()
 

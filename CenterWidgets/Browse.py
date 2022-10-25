@@ -1,14 +1,16 @@
 import numpy as np
-from PySide6.QtCore import Qt, Slot, QSize, QModelIndex, QEvent
-from PySide6.QtGui import QImage, QPixmap, QIcon, QResizeEvent, QMouseEvent, QCursor, QColor, QWheelEvent
+from PySide6.QtCore import Qt, Slot, QSize
+from PySide6.QtGui import QImage, QPixmap, QIcon, QResizeEvent
 
-from PySide6.QtWidgets import QWidget, QGraphicsPixmapItem, QGraphicsScene, QMenu, QScrollBar
-from PySide6.QtWidgets import QListWidgetItem, QListWidget, QGraphicsView, QLabel, QFileSystemModel
+from PySide6.QtWidgets import QWidget
+from PySide6.QtWidgets import QListWidgetItem
 
 from UI.ui_Widget_Browse import Ui_Widget_Browse
 
 from modules.dcmreader.read_Dicom import read_Dicom_folder
-from modules.threads.thread_Iconlist import ThreadIconlist
+from modules.threads.Iconlist import ThreadIconlist
+
+
 
 class Widget_Browse(QWidget, Ui_Widget_Browse):
     def __init__(self, dicom_dir, mainwindow):

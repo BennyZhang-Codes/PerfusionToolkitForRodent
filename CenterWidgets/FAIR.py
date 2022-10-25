@@ -10,7 +10,7 @@ from PySide6.QtWidgets import QListWidgetItem, QListWidget, QGraphicsView, QLabe
 
 from UI.ui_Widget_FAIR import Ui_Widget_FAIR
 from modules.dcmreader.read_FAIR import read_FAIR_folder
-from modules.threads.thread_FAIR_CBF import Thread_FAIR_CBF_Calc
+from modules.threads.FAIR_CBF import Thread_FAIR_CBF_Calc
 from modules.FAIR_CBF import _fig_FAIR_Images, _fig_Fitting, _fig_Results, Msel, Msel_abs
 from scipy.optimize import curve_fit
 import matplotlib.pyplot as plt

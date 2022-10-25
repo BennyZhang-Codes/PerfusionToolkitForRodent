@@ -6,14 +6,14 @@ from PySide6 import QtWidgets, QtCore, QtGui
 from PySide6.QtWidgets import QWidget, QApplication, QMainWindow, QFileDialog
 from PySide6.QtCore import Qt, Slot
 from PySide6.QtGui import QImage, QPixmap, QIcon
-
+from UI.ui_Main_Window import Ui_MainWindow
 import qdarkstyle
 
-from ui_Main_Window import Ui_MainWindow
-from DockWidgets import DockWidget_Start, DockWidget_FAIR
-from Widget_Browse import Widget_Browse
-from Widget_FAIR import Widget_FAIR
-from Widget_DSC import Widget_DSC
+
+from DockWidgets.Start import DockWidget_FAIR, DockWidget_Start
+import CenterWidgets.Browse as Browse
+import CenterWidgets.DSC as DSC
+import CenterWidgets.FAIR as FAIR
 from MyWidgets.Status import Status_progressBar
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -35,9 +35,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self._Status_progressBar.setHidden(True)
         self.statusBar().addPermanentWidget(self._Status_progressBar)
         root = r'E:\PySide6\examplefiles\E7_DCE_FLASH'
-        self.tabWidget.addTab(Widget_DSC(root, self), root)
+        self.tabWidget.addTab(DSC.Widget_DSC(root, self), root)
         root = r'E:\PySide6\examplefiles'
-        self.tabWidget.addTab(Widget_Browse(root, self), root)
+        self.tabWidget.addTab(Browse.Widget_Browse(root, self), root)
         # root = r'E:\A30\FAIR\19\pdata\1\dicom'
         # self.tabWidget.addTab(Widget_FAIR(root, self), root)
 
@@ -67,8 +67,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def on_actionSelect_Dicom_Folder_triggered(self):
         self.root = QFileDialog.getExistingDirectory(self,"Choose Folder",r"C:\Users\Administrator\Desktop\\")
 
-        subwindow = Widget_Browse(self.root, self)
-        self.tabWidget.addTab(Widget_Browse(self.root, self), self.root)
+        subwindow = Browse.Widget_Browse(self.root, self)
+        self.tabWidget.addTab(Browse.Widget_Browse(self.root, self), self.root)
 
 app = QApplication(sys.argv)
 window = MainWindow()
