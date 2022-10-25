@@ -25,24 +25,23 @@ class read_DSC_DCE_folder(MAbstractDicomReader):
         self.root = new_dicom_dir
         self.acqp_path = '{}/acqp'.format(self.root)
         self.dicom_path = self.root + r'\pdata\1\dicom'
-        self.__slice_num, self.__time_points_num, self.__time_points = self.__read_acqp(self.acqp_path)
-        self.__dcm_list = self.__load_dcm_list()
+        self._slice_num, self._time_points_num, self._time_points = self.__read_acqp(self.acqp_path)
+        self._dcm_list = self.__load_dcm_list()
         self.Thread_loader = Thread_load_DSC_DCE(self)
         self.Thread_loader._loadstart.connect(self.__loadstart)
         self.Thread_loader._loading.connect(self.__loading)
         self.Thread_loader._loaded.connect(self.__loaded)
         self.Thread_loader.start()
         
-    def __shape(self):
-        self.__row, self.__col = self.__imgs_all[0,0,:,:].shape
+
 
     def set_slice(self, idx: int):
         idx = self.__check_slice(idx)
         
-        self.__current_slice = idx + 1
+        self._current_slice = idx + 1
 
-        self.__imgs_curSlice = self.__imgs_all[idx]
-        self.__dss_curSlice = self.__dss_all[idx]
+        self._imgs_curSlice = self.__imgs_all[idx]
+        self._dss_curSlice = self.__dss_all[idx]
 
         # if hasattr(self, '__imgs_all') and hasattr(self, '__dss_all') :
         #     self.__imgs_curSlice = self.__imgs_all[idx]
@@ -74,14 +73,14 @@ class read_DSC_DCE_folder(MAbstractDicomReader):
         return dcm_list
 
     def __load_slice(self, idx: int) -> np.array:
-        dcms = self.__dcm_list[idx::self.__slice_num]
+        dcms = self.DicomList[idx::self.SliceNum]
         ds_perSlice = [dcmread(self.dicom_path + '/' + dcm) for dcm in dcms]
         imgs_perSlice = [ds.pixel_array for ds in ds_perSlice]
         return np.array(imgs_perSlice), np.array(ds_perSlice)
 
     def __load_all(self) -> np.array:
         '''QThread'''
-        res = [self.__load_slice(idx) for idx in range(self.__slice_num)]
+        res = [self.__load_slice(idx) for idx in range(self.SliceNum)]
         imgs_all = [r[0] for r in res]
         dss_all = [r[1] for r in res]
         return np.array(imgs_all), np.array(dss_all)
@@ -95,26 +94,28 @@ class read_DSC_DCE_folder(MAbstractDicomReader):
 
     def get_ds(self, index: int) -> FileDataset:
         index = self.__check_time_point(index)
-        return self.__dss_curSlice[index]
+        return self.dss_curSlice[index]
 
     def get_ds_and_array(self, index: int) -> tuple:
         ds = self.get_ds(index)
         return ds, ds.pixel_array
          
+
+    @property
     def len(self) -> int:
-        return self.__time_points_num
+        return self.TimePointsNum
         
     def min_idx(self) -> int:
         return 0
 
     def max_idx(self) -> int:
-        return self.len() - 1
+        return self.len - 1
 
     def __check_time_point(self, idx: int) -> int:
         return self.__check_index(idx, self.min_idx(), self.max_idx())
 
     def __check_slice(self, idx: int) -> int:
-        return self.__check_index(idx, 0, self.__slice_num-1)
+        return self.__check_index(idx, 0, self._slice_num-1)
 
     @staticmethod
     def __check_index(para: int, min: int, max: int) -> int:
@@ -124,32 +125,34 @@ class read_DSC_DCE_folder(MAbstractDicomReader):
             para = max
         return para
 
-    def get_row(self) -> int:
-        return self.__row
 
-    def get_column(self) -> int:
-        return self.__col
+    @property
+    def SliceNum(self) -> int:
+        return self._slice_num
 
-    def get_slice_num(self) -> int:
-        return self.__slice_num
+    @property
+    def TimePointsNum(self) -> int:
+        return self._time_points_num
 
-    def get_time_points_num(self) -> int:
-        return self.__time_points_num
+    @property
+    def TimePoints(self) -> np.array:
+        return self._time_points
 
-    def get_time_points(self) -> np.array:
-        return self.__time_points
+    @property
+    def CurrentSlice(self) -> int:
+        return self._current_slice
 
-    def get_current_slice(self) -> int:
-        return self.__current_slice
+    @property
+    def imgs_curSlice(self) -> np.array:
+        return self._imgs_curSlice
 
-    def get_imgs_curSlice(self) -> np.array:
-        return self.__imgs_curSlice
-         
-    def get_dss_curSlice(self) -> np.array:
-        return self.__dss_curSlice
+    @property 
+    def dss_curSlice(self) -> np.array:
+        return self._dss_curSlice
 
-    def get_dcm_list(self) -> list:
-        return self.__dcm_list
+    @property
+    def DicomList(self) -> list:
+        return self._dcm_list
 
     def __loadstart(self, start: bool):
         self._loadstart.emit(start)
@@ -159,7 +162,15 @@ class read_DSC_DCE_folder(MAbstractDicomReader):
 
     def __loaded(self, data: tuple):
         self.__imgs_all, self.__dss_all = data
-        self.__shape()
+        self._row, self._col = self.__imgs_all[0,0,:,:].shape
         self._loaded.emit(True)
+
+    @property
+    def RowNum(self) -> int:
+        return self._row
+
+    @property
+    def ColNum(self) -> int:
+        return self._col
         
 

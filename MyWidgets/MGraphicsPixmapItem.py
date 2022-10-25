@@ -33,7 +33,6 @@ class MGraphicsPixmapItem(QGraphicsPixmapItem, MGraphicsItem):
         self.__WL = 1000
         self.__func = 'window'
 
-
     def update_item(self, img: np.array=None):
         if img is None:
             img = self.img.copy()
@@ -156,7 +155,6 @@ class MGraphicsPixmapItem(QGraphicsPixmapItem, MGraphicsItem):
         elif self.func in [self.Func_Move, self.Func_Zoom]:
             self.update_scale()
             self.update_ScenePos()
-        # print('updated')
         return super().mouseDoubleClickEvent(event)
 
     def wheelEvent(self, event: QGraphicsSceneWheelEvent) -> None:
@@ -243,3 +241,4 @@ class MGraphicsPixmapItem(QGraphicsPixmapItem, MGraphicsItem):
     @initPos.setter
     def initPos(self, Pos: QPointF) -> None:
         self.__init_Pos = Pos
+

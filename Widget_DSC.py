@@ -54,14 +54,14 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         self.verticalScrollBar.setMinimum(self.dicom_reader.min_idx() + 1)
         self.verticalScrollBar.setValue(self.graphicsView.idx + 1)
 
-        self.spinBox_slice.setMaximum(self.dicom_reader.get_slice_num())
+        self.spinBox_slice.setMaximum(self.dicom_reader.SliceNum)
         self.spinBox_slice.setMinimum(1)
-        self.spinBox_slice.setValue(self.dicom_reader.get_current_slice())
+        self.spinBox_slice.setValue(self.dicom_reader.CurrentSlice)
 
-        self.spinBox_row.setMaximum(self.dicom_reader.get_row())
+        self.spinBox_row.setMaximum(self.dicom_reader.RowNum)
         self.spinBox_row.setMinimum(1)
 
-        self.spinBox_column.setMaximum(self.dicom_reader.get_column())
+        self.spinBox_column.setMaximum(self.dicom_reader.ColNum)
         self.spinBox_column.setMinimum(1)
 
     def __slot_ROI(self, data: tuple):
@@ -98,10 +98,10 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         index = get_index_of_mask(mask)
         ydata = []
         for idx in index:
-            ydata.append(self.dicom_reader.get_imgs_curSlice()[:, idx[0], idx[1]])
+            ydata.append(self.dicom_reader.imgs_curSlice[:, idx[0], idx[1]])
 
         ydata = np.array(ydata)
-        xdata = self.dicom_reader.get_time_points()
+        xdata = self.dicom_reader.TimePoints
         self.__curve(xdata, np.mean(ydata, axis=0))
 
         self.label_mask.setPixmap(pix.scaled(512,512, Qt.KeepAspectRatio, Qt.FastTransformation))
@@ -126,8 +126,8 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         self.graphicsView.set_scene(self.graphicsView.idx)
         row = self.spinBox_row.value()
         col = self.spinBox_column.value()
-        ydata = self.dicom_reader.get_imgs_curSlice()[:, row - 1, col - 1]
-        xdata = self.dicom_reader.get_time_points()
+        ydata = self.dicom_reader.imgs_curSlice[:, row - 1, col - 1]
+        xdata = self.dicom_reader.TimePoints
         self.__curve(xdata, ydata)
 
     @Slot(int)
@@ -138,16 +138,16 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
     def on_spinBox_row_valueChanged(self, value: int):
         row = value
         col = self.spinBox_column.value()
-        ydata = self.dicom_reader.get_imgs_curSlice()[:, row - 1, col - 1]
-        xdata = self.dicom_reader.get_time_points()
+        ydata = self.dicom_reader.imgs_curSlice[:, row - 1, col - 1]
+        xdata = self.dicom_reader.TimePoints
         self.__curve(xdata, ydata)
 
     @Slot(int)
     def on_spinBox_column_valueChanged(self, value: int):
         row = self.spinBox_row.value()
         col = value
-        ydata = self.dicom_reader.get_imgs_curSlice()[:, row - 1, col - 1]
-        xdata = self.dicom_reader.get_time_points()
+        ydata = self.dicom_reader.imgs_curSlice[:, row - 1, col - 1]
+        xdata = self.dicom_reader.TimePoints
         self.__curve(xdata, ydata)
 
     def __slot_ROI_point(self, pos: QPoint):
@@ -156,8 +156,8 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         self.spinBox_row.setValue(row)
         self.spinBox_column.setValue(col)
 
-        ydata = self.dicom_reader.get_imgs_curSlice()[:, row - 1, col - 1]
-        xdata = self.dicom_reader.get_time_points()
+        ydata = self.dicom_reader.imgs_curSlice[:, row - 1, col - 1]
+        xdata = self.dicom_reader.TimePoints
         self.__curve(xdata, ydata)
 
     def __curve(self, xdata: np.array, ydata: np.array) -> None:
@@ -181,8 +181,8 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
             self.widget_load.setVisible(True)
 
             self.load_progressBar.setMinimum(1)
-            slice_num = self.dicom_reader.get_slice_num()
-            timepoints_num = self.dicom_reader.get_time_points_num()
+            slice_num = self.dicom_reader.SliceNum
+            timepoints_num = self.dicom_reader.TimePointsNum
             self.load_progressBar.setMaximum(slice_num*timepoints_num)
             self.load_label.setText('Loading ...')
 

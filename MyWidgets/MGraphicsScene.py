@@ -328,7 +328,7 @@ class MGraphicsScene(QGraphicsScene):
     
     def set_scene(self, ds: FileDataset) -> None:
         self.ds = ds
-        self.item_img.update_item(self.ds.pixel_array)
+        self.item_img.update_item(self.__rotation180(self.ds.pixel_array))
         self._prep_item_info(self.ds)
         self.InfoHide = self.InfoHide
         
@@ -518,3 +518,21 @@ class MGraphicsScene(QGraphicsScene):
         self.addItem(self.item_img)
         self.addItem(self.item_info_group)
         self.addItem(self.item_roi_group)
+
+
+
+
+
+########
+
+    def __rotation180(self, img: np.array) -> np.array:
+        return np.flipud(np.fliplr(img))
+
+
+    @property
+    def PatientSpeciesDescription(self) -> str:
+        return self._PatientSpeciesDescription
+
+    @PatientSpeciesDescription.setter
+    def PatientSpeciesDescription(self, psd: str) -> None:
+        self._PatientSpeciesDescription = psd

@@ -17,8 +17,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractSpinBox, QApplication, QHBoxLayout, QLabel,
-    QProgressBar, QScrollArea, QScrollBar, QSizePolicy,
-    QSpacerItem, QSpinBox, QTabWidget, QVBoxLayout,
+    QListWidget, QListWidgetItem, QProgressBar, QPushButton,
+    QScrollArea, QScrollBar, QSizePolicy, QSpacerItem,
+    QSpinBox, QTabWidget, QToolBox, QVBoxLayout,
     QWidget)
 
 from MyWidgets.MGraphicsView_timeseries import MGraphicsView_timeseries
@@ -54,25 +55,24 @@ class Ui_Widget_DSC(object):
 
         self.horizontalLayout_3.addWidget(self.verticalScrollBar)
 
-        self.widget_2 = QWidget(self.widget)
-        self.widget_2.setObjectName(u"widget_2")
-        self.verticalLayout_4 = QVBoxLayout(self.widget_2)
-        self.verticalLayout_4.setSpacing(0)
-        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
-        self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
+        self.widget_tools = QWidget(self.widget)
+        self.widget_tools.setObjectName(u"widget_tools")
+        self.verticalLayout_7 = QVBoxLayout(self.widget_tools)
+        self.verticalLayout_7.setSpacing(5)
+        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
+        self.verticalLayout_7.setContentsMargins(5, 5, 5, 5)
         self.horizontalLayout_8 = QHBoxLayout()
-        self.horizontalLayout_8.setSpacing(0)
         self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
         self.verticalLayout_2 = QVBoxLayout()
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.label = QLabel(self.widget_2)
+        self.label = QLabel(self.widget_tools)
         self.label.setObjectName(u"label")
 
         self.horizontalLayout_2.addWidget(self.label)
 
-        self.spinBox_slice = QSpinBox(self.widget_2)
+        self.spinBox_slice = QSpinBox(self.widget_tools)
         self.spinBox_slice.setObjectName(u"spinBox_slice")
         self.spinBox_slice.setValue(1)
 
@@ -84,12 +84,12 @@ class Ui_Widget_DSC(object):
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setSpacing(6)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.label_2 = QLabel(self.widget_2)
+        self.label_2 = QLabel(self.widget_tools)
         self.label_2.setObjectName(u"label_2")
 
         self.horizontalLayout.addWidget(self.label_2)
 
-        self.spinBox_timepoint = QSpinBox(self.widget_2)
+        self.spinBox_timepoint = QSpinBox(self.widget_tools)
         self.spinBox_timepoint.setObjectName(u"spinBox_timepoint")
         self.spinBox_timepoint.setValue(1)
 
@@ -100,12 +100,12 @@ class Ui_Widget_DSC(object):
 
         self.horizontalLayout_6 = QHBoxLayout()
         self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
-        self.label_3 = QLabel(self.widget_2)
+        self.label_3 = QLabel(self.widget_tools)
         self.label_3.setObjectName(u"label_3")
 
         self.horizontalLayout_6.addWidget(self.label_3)
 
-        self.spinBox_row = QSpinBox(self.widget_2)
+        self.spinBox_row = QSpinBox(self.widget_tools)
         self.spinBox_row.setObjectName(u"spinBox_row")
         self.spinBox_row.setValue(1)
 
@@ -116,12 +116,12 @@ class Ui_Widget_DSC(object):
 
         self.horizontalLayout_7 = QHBoxLayout()
         self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
-        self.label_4 = QLabel(self.widget_2)
+        self.label_4 = QLabel(self.widget_tools)
         self.label_4.setObjectName(u"label_4")
 
         self.horizontalLayout_7.addWidget(self.label_4)
 
-        self.spinBox_column = QSpinBox(self.widget_2)
+        self.spinBox_column = QSpinBox(self.widget_tools)
         self.spinBox_column.setObjectName(u"spinBox_column")
         self.spinBox_column.setFrame(True)
         self.spinBox_column.setButtonSymbols(QAbstractSpinBox.UpDownArrows)
@@ -140,35 +140,57 @@ class Ui_Widget_DSC(object):
         self.horizontalLayout_8.addItem(self.horizontalSpacer)
 
 
-        self.verticalLayout_4.addLayout(self.horizontalLayout_8)
+        self.verticalLayout_7.addLayout(self.horizontalLayout_8)
 
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.toolBox = QToolBox(self.widget_tools)
+        self.toolBox.setObjectName(u"toolBox")
+        self.page = QWidget()
+        self.page.setObjectName(u"page")
+        self.page.setGeometry(QRect(0, 0, 180, 106))
+        self.verticalLayout_4 = QVBoxLayout(self.page)
+        self.verticalLayout_4.setSpacing(0)
+        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+        self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
+        self.listWidget = QListWidget(self.page)
+        self.listWidget.setObjectName(u"listWidget")
 
-        self.verticalLayout_4.addItem(self.verticalSpacer)
+        self.verticalLayout_4.addWidget(self.listWidget)
+
+        self.verticalLayout_4.setStretch(0, 5)
+        self.toolBox.addItem(self.page, u"ROI")
+        self.page_2 = QWidget()
+        self.page_2.setObjectName(u"page_2")
+        self.page_2.setGeometry(QRect(0, 0, 180, 91))
+        self.pushButton = QPushButton(self.page_2)
+        self.pushButton.setObjectName(u"pushButton")
+        self.pushButton.setGeometry(QRect(20, 50, 75, 24))
+        self.toolBox.addItem(self.page_2, u"Correction")
+
+        self.verticalLayout_7.addWidget(self.toolBox)
 
 
-        self.horizontalLayout_3.addWidget(self.widget_2)
+        self.horizontalLayout_3.addWidget(self.widget_tools)
 
         self.horizontalLayout_3.setStretch(0, 10)
-        self.horizontalLayout_3.setStretch(2, 1)
+        self.horizontalLayout_3.setStretch(2, 5)
 
         self.horizontalLayout_5.addLayout(self.horizontalLayout_3)
 
-        self.widget_3 = QWidget(self.widget)
-        self.widget_3.setObjectName(u"widget_3")
-        self.verticalLayout_3 = QVBoxLayout(self.widget_3)
+        self.widget_chart = QWidget(self.widget)
+        self.widget_chart.setObjectName(u"widget_chart")
+        self.verticalLayout_3 = QVBoxLayout(self.widget_chart)
         self.verticalLayout_3.setSpacing(0)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
-        self.chartView = QChartView(self.widget_3)
+        self.chartView = QChartView(self.widget_chart)
         self.chartView.setObjectName(u"chartView")
 
         self.verticalLayout_3.addWidget(self.chartView)
 
 
-        self.horizontalLayout_5.addWidget(self.widget_3)
+        self.horizontalLayout_5.addWidget(self.widget_chart)
 
-        self.horizontalLayout_5.setStretch(0, 2)
+        self.horizontalLayout_5.setStretch(0, 4)
         self.horizontalLayout_5.setStretch(1, 3)
 
         self.verticalLayout.addWidget(self.widget)
@@ -292,6 +314,9 @@ class Ui_Widget_DSC(object):
 
         self.retranslateUi(Widget_DSC)
 
+        self.toolBox.setCurrentIndex(1)
+
+
         QMetaObject.connectSlotsByName(Widget_DSC)
     # setupUi
 
@@ -303,6 +328,9 @@ class Ui_Widget_DSC(object):
         self.label_4.setText(QCoreApplication.translate("Widget_DSC", u"Column", None))
         self.spinBox_column.setSuffix("")
         self.spinBox_column.setPrefix("")
+        self.toolBox.setItemText(self.toolBox.indexOf(self.page), QCoreApplication.translate("Widget_DSC", u"ROI", None))
+        self.pushButton.setText(QCoreApplication.translate("Widget_DSC", u"PushButton", None))
+        self.toolBox.setItemText(self.toolBox.indexOf(self.page_2), QCoreApplication.translate("Widget_DSC", u"Correction", None))
         self.label_mask.setText("")
         self.label_mask_img.setText("")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabWidgetPage1), QCoreApplication.translate("Widget_DSC", u"ROI", None))

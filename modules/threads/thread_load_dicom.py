@@ -3,6 +3,7 @@ import numpy as np
 from pydicom import dcmread
 from PySide6.QtCore import Signal, QThread
 
+# from modules.dcmreader.read_DSC_DCE import read_DSC_DCE_folder
 class Thread_load_DSC_DCE(QThread):
     _loadstart = Signal(bool)
     _loading = Signal(int)
@@ -11,18 +12,17 @@ class Thread_load_DSC_DCE(QThread):
         super().__init__()
         self.parent = parent
 
-
     def run(self):
         self._loadstart.emit(True)
         imgs_all = []
         dss_all = []
-        for slice_idx in range(self.parent.get_slice_num()):
-            dcms = self.parent.get_dcm_list()[slice_idx::self.parent.get_slice_num()]
+        for slice_idx in range(self.parent.SliceNum):
+            dcms = self.parent.DicomList[slice_idx::self.parent.SliceNum]
             ds_perSlice = []
             imgs_perSlice = []
-            for point_idx in range(self.parent.get_time_points_num()):
+            for point_idx in range(self.parent.TimePointsNum):
 
-                self._loading.emit(slice_idx*self.parent.get_time_points_num() + point_idx + 1)
+                self._loading.emit(slice_idx*self.parent.TimePointsNum + point_idx + 1)
 
                 ds = dcmread(self.parent.dicom_path + '/' + dcms[point_idx])
                 ds_perSlice.append(ds)
