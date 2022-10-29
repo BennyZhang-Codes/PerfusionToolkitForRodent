@@ -12,7 +12,7 @@ from modules.dcmreader.read_DSC_DCE import Read_Bruker_TimeSeries
 
 from modules.utils.shape import shape_to_mask, get_index_of_mask
 from MyWidgets.Mmodel.TabelModel import TimePointsTableModel
-from MyWidgets.MChart.MChart import MChart
+from MyWidgets.MChart.MChart import MChart, MLineSeries
 
 class Widget_DSC(QWidget, Ui_Widget_DSC):
 
@@ -165,24 +165,28 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
 
     def __curve(self, xdata: np.array, ydata: np.array) -> None:
         self.chart.removeAllSeries()
-        series = QLineSeries()
-        # series = QScatterSeries()
+        series = MLineSeries()
+        series1 = QScatterSeries()
+
+        for x, y in zip(xdata, ydata):
+            series.append(x, y)
+            series1.append(x, y)
 
 
 
 
 
         model = TimePointsTableModel(xdata, ydata)
-        self.mapper = QVXYModelMapper(self)
-        self.mapper.setXColumn(1)
-        self.mapper.setYColumn(2)
-        self.mapper.setSeries(series)
-        self.mapper.setModel(model)
+        # self.mapper = QVXYModelMapper(self)
+        # self.mapper.setXColumn(1)
+        # self.mapper.setYColumn(2)
+        # self.mapper.setSeries(series)
+        # self.mapper.setModel(model)
         self.tableView_points.setModel(model)
+        self.tableView_points.selected_row.connect(series._slot)
 
-        series.setPointsVisible(True)
-        series.setMarkerSize(4)
         self.chart.addSeries(series)
+        self.chart.addSeries(series1)
         self.chart.createDefaultAxes()
 
     def _setup(self):

@@ -1,4 +1,5 @@
 
+from signal import SIG_DFL
 from PySide6.QtWidgets import *
 from PySide6.QtCore import *
 from PySide6.QtGui import *
@@ -6,6 +7,7 @@ from PySide6.QtGui import *
 
 
 class MTableView(QTableView):
+    selected_row = Signal(int)
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self.setFocusPolicy(Qt.NoFocus)
@@ -24,6 +26,10 @@ class MTableView(QTableView):
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         print(event)
+        print(self.selectedIndexes())
+
+        # print(self.selectedIndexes()[0].row())
+        # self.selected_row.emit(self.selectedIndexes()[0].row())
         return super().mousePressEvent(event)
 
     def mouseDoubleClickEvent(self, event: QMouseEvent) -> None:
@@ -32,7 +38,6 @@ class MTableView(QTableView):
 
 
     def contextMenuEvent(self, arg__1: QContextMenuEvent) -> None:
-        print(123)
         self.Menu.exec_(QCursor.pos())
         
         print(QCursor.pos())

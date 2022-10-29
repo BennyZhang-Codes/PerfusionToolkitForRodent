@@ -27,10 +27,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.statusBar().showMessage('Ready')
         self.setStyleSheet(qdarkstyle.load_stylesheet_pyside2())
 
-        with open('234.qss',mode='w') as f:
-            f.writelines(qdarkstyle.load_stylesheet_pyside2())
-
-        
+    def theme(self, file):
+        str = open(file, 'r').read()
+        self.setStyleSheet(str)
 
         # self.setStyleSheet(qdarkstyle.load_stylesheet_pyside2())
         # self.setStyleSheet('''MGraphicsView{background-color: rgb(0, 0, 0); padding: 0px; border: 0px}''')
