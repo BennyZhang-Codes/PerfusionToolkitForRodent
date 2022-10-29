@@ -18,7 +18,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QPushButton,
     QSizePolicy, QVBoxLayout, QWidget)
 
-from MyWidgets.MGraphicsView import MGraphicsView
+from MyWidgets.MGraphicsView.MGraphicsView import MGraphicsView
 
 class Ui_Widget_FAIR(object):
     def setupUi(self, Widget_FAIR):

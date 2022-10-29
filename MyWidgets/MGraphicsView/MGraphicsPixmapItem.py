@@ -3,18 +3,11 @@ from matplotlib.pyplot import sca
 
 import numpy as np
 from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import Qt, Slot, QSize, QEvent, QPoint, QPointF, Signal, QLine, QObject
-from PySide6.QtGui import QImage, QPixmap, QIcon, QResizeEvent, QMouseEvent, QCursor, QColor, QWheelEvent
-from PySide6.QtGui import QPainter, QPainterPath, QPen
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
 
-from PySide6.QtWidgets import QGraphicsSceneMouseEvent, QGraphicsSceneMoveEvent, QGraphicsSceneWheelEvent, QGraphicsSceneHoverEvent
-from PySide6.QtWidgets import QWidget, QGraphicsScene, QMenu, QScrollBar
-from PySide6.QtWidgets import QGraphicsItem, QGraphicsEllipseItem, QGraphicsPolygonItem, QGraphicsTextItem, QGraphicsPixmapItem
-from PySide6.QtWidgets import QGraphicsLineItem, QGraphicsPathItem
-from PySide6.QtWidgets import QGraphicsSceneContextMenuEvent
-from pyparsing import FollowedBy
-
-from MyWidgets.MGraphicsItem import MGraphicsItem
+from MyWidgets.MGraphicsView.MGraphicsItem import MGraphicsItem
 
 
 class MGraphicsPixmapItem(QGraphicsPixmapItem, MGraphicsItem):

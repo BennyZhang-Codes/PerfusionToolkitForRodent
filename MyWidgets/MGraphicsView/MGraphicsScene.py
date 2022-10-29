@@ -3,21 +3,16 @@ from PIL import Image
 from pydicom import FileDataset
 import matplotlib.pyplot as plt
 from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import Qt, Slot, QSize, QEvent, QPoint, QPointF, Signal, QRect
-from PySide6.QtGui import QImage, QPixmap, QIcon, QCursor, QColor, QTransform
-from PySide6.QtGui import QKeyEvent 
-from PySide6.QtGui import QPainter, QPainterPath, QPen
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
 
-from PySide6.QtWidgets import QGraphicsPathItem, QGraphicsSceneMouseEvent, QGraphicsSceneWheelEvent, QGraphicsSceneContextMenuEvent
-from PySide6.QtWidgets import QWidget, QGraphicsScene, QMenu, QGraphicsTextItem, QGraphicsItem
-from PySide6.QtWidgets import QGraphicsTextItem
-
-from MyWidgets.MGraphicsPixmapItem import MGraphicsPixmapItem
-from MyWidgets.MGraphicsItemGroup import MGraphicsItemGroup
-from MyWidgets.MGraphicsItem import MGraphicsItem, MRoiItem
-from MyWidgets.MGraphicsPolygonItem import MGraphicsPolygonItem
-from MyWidgets.MGraphicsEllipseItem import MGraphicsEllipseItem
-from MyWidgets.MGraphicsTextItem import MGraphicsTextItem
+from MyWidgets.MGraphicsView.MGraphicsPixmapItem import MGraphicsPixmapItem
+from MyWidgets.MGraphicsView.MGraphicsItemGroup import MGraphicsItemGroup
+from MyWidgets.MGraphicsView.MGraphicsItem import MGraphicsItem, MRoiItem
+from MyWidgets.MGraphicsView.MGraphicsPolygonItem import MGraphicsPolygonItem
+from MyWidgets.MGraphicsView.MGraphicsEllipseItem import MGraphicsEllipseItem
+from MyWidgets.MGraphicsView.MGraphicsTextItem import MGraphicsTextItem
 from modules.dcmreader.read_Dicom import MAbstractDicomReader
 from modules.utils.shape import shape_to_mask, get_index_of_mask
 
@@ -102,6 +97,9 @@ class MGraphicsScene(QGraphicsScene):
                 self.item_img.func = self.func
                 self.item_img.mouseReleaseEvent(event)
 
+    def resizeevent(self) -> None:
+        self.InfoHide = self.InfoHide
+
     def wheelEvent(self, event: QGraphicsSceneWheelEvent) -> None:
         if self.SceneMode == self.SceneMode_roi:
             items = self.selectedItems()
@@ -151,7 +149,7 @@ class MGraphicsScene(QGraphicsScene):
                     items[0].keyReleaseEvent(event)
 
     def add_Mellipse(self, pos: QPointF) -> MGraphicsEllipseItem:
-        ellipse = MGraphicsEllipseItem()
+        ellipse = MGraphicsEllipseItem(self.parent())
 
         ellipse.setPos(pos)
         ellipse.setZValue(1)
@@ -195,9 +193,9 @@ class MGraphicsScene(QGraphicsScene):
         self.removeItem(item)
 
     def add_Mpolygon(self) -> MGraphicsPolygonItem: 
-        polygon = MGraphicsPolygonItem()
-        polygon.setPen(QPen(QColor(0,0,255,255), 1, Qt.SolidLine))
-        polygon.setBrush(QColor(255,0,0,255))
+        polygon = MGraphicsPolygonItem(self.parent())
+        # polygon.setPen(QPen(QColor(0,0,255,255), 1, Qt.SolidLine))
+        # polygon.setBrush(QColor(255,0,0,255))
         polygon.setZValue(1)
         polygon.signal.drawing.connect(self.__slot_drawing)
         polygon.signal.drawed.connect(self.__slot_drawed)
@@ -268,11 +266,11 @@ class MGraphicsScene(QGraphicsScene):
 
     @InfoHide.setter
     def InfoHide(self, hide: bool) -> None:
-        # self.__InfoHide = hide
-        # if self.SizeTooSmall:
-        #     hide = True
         self.__InfoHide = hide
-        self.item_info_group.setVisible(not self.__InfoHide)
+        if self.SizeTooSmall:
+            self.item_info_group.setVisible(False)
+        else:
+            self.item_info_group.setVisible(not self.__InfoHide)
 
     @property
     def ROI_type(self) -> str:
@@ -326,9 +324,10 @@ class MGraphicsScene(QGraphicsScene):
             draw = True
         return draw
     
+    
     def set_scene(self, ds: FileDataset) -> None:
         self.ds = ds
-        self.item_img.update_item(self.__rotation180(self.ds.pixel_array))
+        self.item_img.update_item(self.ds.pixel_array)
         self._prep_item_info(self.ds)
         self.InfoHide = self.InfoHide
         
@@ -406,32 +405,6 @@ class MGraphicsScene(QGraphicsScene):
             ds_info = 0.0
         return ds_info
 
-    def _roi_menu(self) -> QMenu:
-        menu = QMenu('ROI')
-        # action_roi = menu.addAction('ROI mode')
-        # action_roi.triggered.connect(self._action_roi)
-        action_ellipse = menu.addAction('add Ellipse')
-        action_ellipse.triggered.connect(self._action_ellipse)
-        action_polygon = menu.addAction('add Polygon')
-        action_polygon.triggered.connect(self._action_polygon)
-        action_point = menu.addAction('Point')
-        action_point.triggered.connect(self._action_point)
-        return menu
-    
-    def _pop_menu(self) -> None:
-        menu = QMenu()
-        action_window = menu.addAction('Window')
-        action_window.triggered.connect(self._action_window)
-        menu.addMenu(self._roi_menu())
-        action_series = menu.addAction('Series Scroll')
-        action_series.triggered.connect(self._action_series)
-        action_move = menu.addAction('Move')
-        action_move.triggered.connect(self._action_move)
-        action_zoom = menu.addAction('Zoom')
-        action_zoom.triggered.connect(self._action_zoom)
-        self.action_info = menu.addAction('info')
-        self.action_info.triggered.connect(self._action_info)
-        menu.exec_(QCursor.pos())
 
     def _action_info(self) -> None:
         self.InfoHide = not self.InfoHide
@@ -479,7 +452,7 @@ class MGraphicsScene(QGraphicsScene):
             if items:
                 items[0].contextMenuEvent(event)
         else:
-            self._pop_menu()
+            self.menu.exec_(QCursor.pos())
 
     def setup(self) -> None:
         self.item_img = MGraphicsPixmapItem()
@@ -519,9 +492,34 @@ class MGraphicsScene(QGraphicsScene):
         self.addItem(self.item_info_group)
         self.addItem(self.item_roi_group)
 
+        self._menu = QMenu(self.parent())
+        self.setup_menu()
 
+    def setup_menu(self) -> None:
+        ROI_menu = QMenu(title='ROI', parent=self.parent())
+        action_ellipse = ROI_menu.addAction('add Ellipse')
+        action_ellipse.triggered.connect(self._action_ellipse)
+        action_polygon = ROI_menu.addAction('add Polygon')
+        action_polygon.triggered.connect(self._action_polygon)
+        action_point = ROI_menu.addAction('Point')
+        action_point.triggered.connect(self._action_point)
 
+        menu = self._menu
+        action_window = menu.addAction('Window')
+        action_window.triggered.connect(self._action_window)
+        menu.addMenu(ROI_menu)
+        action_series = menu.addAction('Series Scroll')
+        action_series.triggered.connect(self._action_series)
+        action_move = menu.addAction('Move')
+        action_move.triggered.connect(self._action_move)
+        action_zoom = menu.addAction('Zoom')
+        action_zoom.triggered.connect(self._action_zoom)
+        self.action_info = menu.addAction('Info Hide')
+        self.action_info.triggered.connect(self._action_info)
 
+    @property
+    def menu(self) -> QMenu:
+        return self._menu
 
 ########
 

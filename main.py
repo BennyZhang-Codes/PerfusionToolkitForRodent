@@ -3,9 +3,9 @@ import os
 import numpy as np
 
 from PySide6 import QtWidgets, QtCore, QtGui
-from PySide6.QtWidgets import QWidget, QApplication, QMainWindow, QFileDialog
-from PySide6.QtCore import Qt, Slot
-from PySide6.QtGui import QImage, QPixmap, QIcon
+from PySide6.QtWidgets import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
 from UI.ui_Main_Window import Ui_MainWindow
 import qdarkstyle
 
@@ -27,6 +27,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.statusBar().showMessage('Ready')
         self.setStyleSheet(qdarkstyle.load_stylesheet_pyside2())
 
+        with open('234.qss',mode='w') as f:
+            f.writelines(qdarkstyle.load_stylesheet_pyside2())
+
+        
+
         # self.setStyleSheet(qdarkstyle.load_stylesheet_pyside2())
         # self.setStyleSheet('''MGraphicsView{background-color: rgb(0, 0, 0); padding: 0px; border: 0px}''')
 
@@ -36,6 +41,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.statusBar().addPermanentWidget(self._Status_progressBar)
         root = r'E:\PySide6\examplefiles\E7_DCE_FLASH'
         self.tabWidget.addTab(DSC.Widget_DSC(root, self), root)
+
         root = r'E:\PySide6\examplefiles'
         self.tabWidget.addTab(Browse.Widget_Browse(root, self), root)
         # root = r'E:\A30\FAIR\19\pdata\1\dicom'

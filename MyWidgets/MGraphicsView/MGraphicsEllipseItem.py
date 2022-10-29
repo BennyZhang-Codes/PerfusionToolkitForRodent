@@ -1,16 +1,12 @@
 from math import sqrt
+from tkinter import Menu
 
 from PySide6 import QtWidgets
-from PySide6.QtCore import Qt, QPointF, Signal, QObject
-from PySide6.QtGui import QCursor, QColor, QKeyEvent, QPen
-from PySide6.QtGui import QPainter, QPainterPath
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
 
-from PySide6.QtWidgets import QGraphicsSceneMouseEvent, QGraphicsSceneWheelEvent, QGraphicsSceneHoverEvent
-from PySide6.QtWidgets import QMenu, QColorDialog, QGraphicsItem
-from PySide6.QtWidgets import QGraphicsEllipseItem
-from PySide6.QtWidgets import QGraphicsSceneContextMenuEvent
-
-from MyWidgets.MGraphicsItem import MRoiItem
+from MyWidgets.MGraphicsView.MGraphicsItem import MRoiItem
 
 
 class MEllipseItem_Signal(QObject):
@@ -23,9 +19,9 @@ class MEllipseItem_Signal(QObject):
 class MGraphicsEllipseItem(QGraphicsEllipseItem, MRoiItem):
     PEN_COLOR = QColor(49, 200, 10, 255)
     DEFAULT_COLOR = QColor(118,185,172,128)
-    def __init__(self) -> None:
+    def __init__(self, parent) -> None:
         super().__init__()  
-        self.__init_MRoiItem__()
+        self.__init_MRoiItem__(parent)
         self.signal = MEllipseItem_Signal()
         self.x_negtive = False
         self.x_positive = False
@@ -123,8 +119,7 @@ class MGraphicsEllipseItem(QGraphicsEllipseItem, MRoiItem):
             self.setRotation(self.rotation()+value*5)
     
     def hoverEnterEvent(self, event: QGraphicsSceneHoverEvent) -> None:
-        self.hoverEnter = True
-        self.setSelected(True)
+
         return super().hoverEnterEvent(event)
 
     def hoverMoveEvent(self, event: QGraphicsSceneHoverEvent) -> None:
@@ -148,8 +143,7 @@ class MGraphicsEllipseItem(QGraphicsEllipseItem, MRoiItem):
         return super().hoverMoveEvent(event)
 
     def hoverLeaveEvent(self, event: QGraphicsSceneHoverEvent) -> None:
-        self.hoverEnter = False
-        self.setSelected(False)
+
         self.update()
         return super().hoverLeaveEvent(event)
     
@@ -164,8 +158,7 @@ class MGraphicsEllipseItem(QGraphicsEllipseItem, MRoiItem):
                 self.signal.item_delete.emit(self)
 
     def contextMenuEvent(self, event: QGraphicsSceneContextMenuEvent) -> None:
-        self.__pop_menu()
-        return super().contextMenuEvent(event)
+        self.menu.exec_(QCursor.pos())
 
     def paint(self, painter: QPainter, option: QtWidgets.QStyleOptionGraphicsItem, widget) -> None:
         painter.setRenderHint(QPainter.Antialiasing)
@@ -193,34 +186,7 @@ class MGraphicsEllipseItem(QGraphicsEllipseItem, MRoiItem):
                 painter.drawArc(self.rect(), 60*16, 60*16)
                 painter.drawArc(self.rect(), 240*16, 60*16)
 
-    def __pop_menu(self):
-        menu = QMenu()
-        action_zoom = menu.addAction('Zoom')
-        action_zoom.triggered.connect(self.__action_zoom)
-        action_rotate = menu.addAction('Rotate')
-        action_rotate.triggered.connect(self.__action_rotate)
-        action_color = menu.addAction('Color')
-        action_color.triggered.connect(self.__action_color)
-        action_delete = menu.addAction('Delete')
-        action_delete.triggered.connect(self.__action_delete)
-        menu.exec_(QCursor.pos())
 
-    def __action_color(self) -> None:
-        cd = QColorDialog(self.brush().color())
-        cd.setOption(cd.ShowAlphaChannel)
-        cd.setOption(cd.DontUseNativeDialog)
-        cd.exec()
-        color = cd.selectedColor()
-        self.setBrush(color)
-
-    def __action_delete(self) -> None:
-        self.signal.item_delete.emit(self)
-
-    def __action_rotate(self) -> None:
-        self.func = 'rotate'
-    
-    def __action_zoom(self) -> None:
-        self.func = 'zoom'
 
     def __DistanceToCenter(self, point: QPointF) -> float:
         return sqrt(point.x() ** 2 + point.y() ** 2)
@@ -240,3 +206,34 @@ class MGraphicsEllipseItem(QGraphicsEllipseItem, MRoiItem):
     @Delete.setter
     def Delete(self, delete: bool) -> None:
         self._delete = delete
+
+
+
+
+    def setup_menu(self) -> None:
+        menu = self.menu
+        action_zoom = menu.addAction('Zoom')
+        action_zoom.triggered.connect(self.__action_zoom)
+        action_rotate = menu.addAction('Rotate')
+        action_rotate.triggered.connect(self.__action_rotate)
+        action_color = menu.addAction('Color')
+        action_color.triggered.connect(self.__action_color)
+        action_delete = menu.addAction('Delete')
+        action_delete.triggered.connect(self.__action_delete)
+
+    def __action_color(self) -> None:
+        cd = QColorDialog(self.brush().color())
+        cd.setOption(cd.ShowAlphaChannel)
+        cd.setOption(cd.DontUseNativeDialog)
+        cd.exec()
+        color = cd.selectedColor()
+        self.setBrush(color)
+
+    def __action_delete(self) -> None:
+        self.signal.item_delete.emit(self)
+
+    def __action_rotate(self) -> None:
+        self.func = 'rotate'
+    
+    def __action_zoom(self) -> None:
+        self.func = 'zoom'

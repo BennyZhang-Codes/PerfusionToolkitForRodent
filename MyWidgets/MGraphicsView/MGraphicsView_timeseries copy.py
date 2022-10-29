@@ -2,18 +2,15 @@ from math import ceil
 
 import numpy as np
 from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import Qt, Slot, QSize, QEvent, QPoint, QPointF, Signal
-from PySide6.QtGui import QImage, QPixmap, QIcon, QResizeEvent, QMouseEvent, QCursor, QColor, QWheelEvent, QPen
-
-from PySide6.QtWidgets import QWidget, QGraphicsScene, QMenu
-from PySide6.QtWidgets import QGraphicsView, QLabel, QSizePolicy, QFrame
-from PySide6.QtWidgets import QGraphicsItemGroup, QGraphicsTextItem, QGraphicsPixmapItem, QGraphicsEllipseItem
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
 from pydicom import FileDataset
 
 from modules.dcmreader.read_DSC_DCE import read_DSC_DCE_folder
 from MyWidgets.MWidget import MWidget
 
-from MyWidgets.MGraphicsPixmapItem import MGraphicsPixmapItem
+from MyWidgets.MGraphicsView.MGraphicsPixmapItem import MGraphicsPixmapItem
 
 class MGraphicsView_timeseries(QGraphicsView, MWidget):
     _idx_changed = Signal(int)

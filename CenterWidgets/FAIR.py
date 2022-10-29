@@ -2,12 +2,9 @@ import numpy as np
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
-from PySide6.QtCore import Qt, Slot, QSize, QModelIndex, QEvent
-from PySide6.QtGui import QImage, QPixmap, QIcon, QResizeEvent, QMouseEvent, QCursor, QColor, QWheelEvent
-
-from PySide6.QtWidgets import QWidget, QGraphicsPixmapItem, QGraphicsScene, QMenu, QHBoxLayout
-from PySide6.QtWidgets import QListWidgetItem, QListWidget, QGraphicsView, QLabel
-
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
 from UI.ui_Widget_FAIR import Ui_Widget_FAIR
 from modules.dcmreader.read_FAIR import read_FAIR_folder
 from modules.threads.FAIR_CBF import Thread_FAIR_CBF_Calc

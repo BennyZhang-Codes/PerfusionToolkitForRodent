@@ -1,9 +1,8 @@
 import os
 from PySide6 import QtWidgets, QtCore, QtGui
-from PySide6.QtWidgets import QDockWidget, QFileSystemModel, QMenu
-from PySide6.QtCore import Slot, QDir, QModelIndex, Qt
-from PySide6.QtGui import QCursor
-
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
 
 import CenterWidgets.Browse as Browse
 import CenterWidgets.DSC as DSC

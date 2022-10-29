@@ -1,9 +1,7 @@
 import numpy as np
-from PySide6.QtCore import Qt, Slot, QSize
-from PySide6.QtGui import QImage, QPixmap, QIcon, QResizeEvent
-
-from PySide6.QtWidgets import QWidget
-from PySide6.QtWidgets import QListWidgetItem
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
 
 from UI.ui_Widget_Browse import Ui_Widget_Browse
 
@@ -32,7 +30,7 @@ class Widget_Browse(QWidget, Ui_Widget_Browse):
         self.splitter.setStretchFactor(1, 7)
 
         self.listWidget.resizeEvent = self._listWidget_resizeEvent
-        self.graphicsView.set_dicom_reader(self.dicom_reader)
+        self.graphicsView.DicomReader = self.dicom_reader
         self.graphicsView.set_mainwindow(self.mainwindow)
         self.graphicsView._idx_changed.connect(self._slot_idx)
 
@@ -41,8 +39,8 @@ class Widget_Browse(QWidget, Ui_Widget_Browse):
         self.WW = 10000
         self.idw = self._set_IDW()
         self.verticalScrollBar_Image.setMaximum(self.dicom_reader.len())
-        self.verticalScrollBar_Image.setMinimum(self.graphicsView.dicom_reader.min_idx()+1)
-        self.verticalScrollBar_Image.setValue(self.graphicsView.dicom_reader.min_idx()+1)
+        self.verticalScrollBar_Image.setMinimum(self.graphicsView.DicomReader.min_idx()+1)
+        self.verticalScrollBar_Image.setValue(self.graphicsView.DicomReader.min_idx()+1)
         self.threadiconlist = ThreadIconlist(self)
         self.threadiconlist.loading_signal.connect(self._slot_loading)
         self.threadiconlist.loaded_signal.connect(self._slot_loaded)

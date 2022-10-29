@@ -1,17 +1,9 @@
-from math import ceil, sqrt
-from types import NoneType
 
 import numpy as np
 from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import Qt, Slot, QSize, QEvent, QPoint, QPointF, Signal, QLine, QObject, QRectF
-from PySide6.QtGui import QImage, QPixmap, QIcon, QResizeEvent, QMouseEvent, QCursor, QColor, QWheelEvent
-from PySide6.QtGui import QPainter, QPainterPath, QPen, QPolygon, QPolygonF
-
-from PySide6.QtWidgets import QGraphicsRectItem, QGraphicsSceneMouseEvent, QGraphicsSceneMoveEvent, QGraphicsSceneWheelEvent, QGraphicsSceneHoverEvent
-from PySide6.QtWidgets import QWidget, QGraphicsScene, QMenu, QScrollBar, QColorDialog
-from PySide6.QtWidgets import QGraphicsItem, QGraphicsEllipseItem, QGraphicsPolygonItem, QGraphicsTextItem, QGraphicsPixmapItem
-from PySide6.QtWidgets import QGraphicsLineItem, QGraphicsPathItem
-from PySide6.QtWidgets import QGraphicsSceneContextMenuEvent
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
 
 
 class MGraphicsItem_Signal(QObject):
@@ -42,13 +34,21 @@ class MGraphicsItem(QGraphicsItem):
             raise ValueError('Unsupported ItemType: {}'.format(itemtype))
 
 class MRoiItem(MGraphicsItem):
-    def __init_MRoiItem__(self) -> None:
+    def __init_MRoiItem__(self, parent=None) -> None:
         super().__init_MGraphicsItem__()
         self.ItemType = 'roi'
         self.setFlag(QGraphicsItem.ItemIsSelectable)
         self.setSelected(False) 
         self.setAcceptHoverEvents(True)
         self._HoverEntered = True
+        if parent is not None:
+            self._menu = QMenu(parent)
+        else:
+            self._menu = QMenu()
+        
+        self._ColorDialog = QColorDialog()
+
+        self.setup_menu()
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         pos = event.scenePos()
@@ -66,6 +66,21 @@ class MRoiItem(MGraphicsItem):
             self.x_init = pos.x()
             self.y_init = pos.y()
 
+    def hoverEnterEvent(self, event: QGraphicsSceneHoverEvent) -> None:
+        self.hoverEnter = True
+        self.setSelected(True)
+        self.setZValue(2)
+        return super().hoverEnterEvent(event)
+
+    def hoverLeaveEvent(self, event: QGraphicsSceneHoverEvent) -> None:
+        self.hoverEnter = False
+        self.setSelected(False)
+        self.setZValue(1)
+        return super().hoverEnterEvent(event)
+
+    def setup_menu(self) -> None:
+        pass
+
     @property
     def hoverEnter(self) -> bool:
         return self._HoverEntered
@@ -73,3 +88,11 @@ class MRoiItem(MGraphicsItem):
     @hoverEnter.setter
     def hoverEnter(self, enter: bool) -> None:
         self._HoverEntered = enter
+
+    @property
+    def menu(self) -> QMenu:
+        return self._menu
+
+    @property
+    def ColorDialog(self) -> QColorDialog:
+        return self._ColorDialog

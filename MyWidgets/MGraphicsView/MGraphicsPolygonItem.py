@@ -2,17 +2,11 @@ from math import sqrt
 
 import numpy as np
 from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import Qt, QPoint, QPointF, Signal, QLine, QObject
-from PySide6.QtGui import QCursor, QColor, QWheelEvent
-from PySide6.QtGui import QPainter, QPainterPath, QPen, QPolygon, QPolygonF, QBrush, QTransform, QKeyEvent
- 
-from PySide6.QtWidgets import QGraphicsSceneMouseEvent, QGraphicsSceneHoverEvent
-from PySide6.QtWidgets import QMenu, QColorDialog
-from PySide6.QtWidgets import QGraphicsItem
-from PySide6.QtWidgets import QGraphicsPathItem
-from PySide6.QtWidgets import QGraphicsSceneContextMenuEvent
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
 
-from MyWidgets.MGraphicsItem import MRoiItem
+from MyWidgets.MGraphicsView.MGraphicsItem import MRoiItem
 
 class MNodeItem_Signal(QObject):
     item_delete = Signal(QGraphicsItem)
@@ -377,9 +371,9 @@ class MNodeItem(QGraphicsPathItem, MRoiItem):
 
 class MGraphicsPolygonItem(QGraphicsPathItem, MRoiItem):
     DEFAULT_COLOR = QColor(118,185,172,128)
-    def __init__(self, *args, **kargs) -> None:
-        super().__init__(*args, **kargs)  
-        self.__init_MRoiItem__()
+    def __init__(self, parent) -> None:
+        super().__init__()  
+        self.__init_MRoiItem__(parent)
         self.signal = MPolylItem_Signal()
         self.poly_path = QPainterPath()
         self.prev_node = MNodeItem()
@@ -390,6 +384,8 @@ class MGraphicsPolygonItem(QGraphicsPathItem, MRoiItem):
         self._drawed = False
         self._closed = False
         self._delete = False
+
+        # self.setup_menu()
         # self.mouseTrackNode = None
 
     def setMouseTrack(self, track: bool):
@@ -469,15 +465,12 @@ class MGraphicsPolygonItem(QGraphicsPathItem, MRoiItem):
         pass
     
     def hoverEnterEvent(self, event: QGraphicsSceneHoverEvent) -> None:
-        self.hoverEnter = True
-        self.setSelected(True)
+        return super().hoverEnterEvent(event)
 
     def hoverMoveEvent(self, event: QGraphicsSceneHoverEvent) -> None:
         return super().hoverMoveEvent(event)
 
     def hoverLeaveEvent(self, event: QGraphicsSceneHoverEvent) -> None:
-        self.hoverEnter = False
-        self.setSelected(False)
         return super().hoverLeaveEvent(event)
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
@@ -629,19 +622,12 @@ class MGraphicsPolygonItem(QGraphicsPathItem, MRoiItem):
         self._drawed = drawed
 
     def contextMenuEvent(self, event: QGraphicsSceneContextMenuEvent) -> None:
-        self.__pop_menu()
-        return super().contextMenuEvent(event)
-
-    def __pop_menu(self):
-        menu = QMenu()
-        action_color = menu.addAction('Color')
-        action_color.triggered.connect(self.__action_color)
-        action_delete = menu.addAction('Delete')
-        action_delete.triggered.connect(self.__action_delete)
-        menu.exec_(QCursor.pos())
+        self.menu.exec_(QCursor.pos())
 
     def __action_color(self) -> None:
-        cd = QColorDialog(self.brush().color())
+        cd = self.ColorDialog
+        cd.setMouseTracking(False)
+        cd.setCurrentColor(self.brush().color())
         cd.setOption(cd.ShowAlphaChannel)
         cd.setOption(cd.DontUseNativeDialog)
         cd.exec()
@@ -685,3 +671,12 @@ class MGraphicsPolygonItem(QGraphicsPathItem, MRoiItem):
             node = node.nextNode
 
         self.poly_path.addPolygon(poly)
+
+
+
+    def setup_menu(self) -> None:
+        menu = self.menu
+        action_color = menu.addAction('Color')
+        action_color.triggered.connect(self.__action_color)
+        action_delete = menu.addAction('Delete')
+        action_delete.triggered.connect(self.__action_delete)

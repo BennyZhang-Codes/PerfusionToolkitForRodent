@@ -16,8 +16,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QDockWidget, QFrame,
-    QHBoxLayout, QHeaderView, QListWidget, QListWidgetItem,
-    QSizePolicy, QTabWidget, QTreeView, QVBoxLayout,
+    QHeaderView, QSizePolicy, QTreeView, QVBoxLayout,
     QWidget)
 import UI.icons_rc as icons_rc
 
@@ -28,23 +27,9 @@ class Ui_DockWidget_Start(object):
         DockWidget_Start.resize(461, 714)
         self.dockWidgetContents = QWidget()
         self.dockWidgetContents.setObjectName(u"dockWidgetContents")
-        self.horizontalLayout = QHBoxLayout(self.dockWidgetContents)
-        self.horizontalLayout.setSpacing(0)
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
-        self.tabWidget = QTabWidget(self.dockWidgetContents)
-        self.tabWidget.setObjectName(u"tabWidget")
-        self.tabWidget.setElideMode(Qt.ElideNone)
-        self.tabWidget.setDocumentMode(False)
-        self.tabWidget.setTabsClosable(False)
-        self.tabWidget.setMovable(False)
-        self.tab_Browse = QWidget()
-        self.tab_Browse.setObjectName(u"tab_Browse")
-        self.verticalLayout = QVBoxLayout(self.tab_Browse)
-        self.verticalLayout.setSpacing(0)
+        self.verticalLayout = QVBoxLayout(self.dockWidgetContents)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
-        self.treeView = QTreeView(self.tab_Browse)
+        self.treeView = QTreeView(self.dockWidgetContents)
         self.treeView.setObjectName(u"treeView")
         self.treeView.setFrameShape(QFrame.NoFrame)
         self.treeView.setFrameShadow(QFrame.Plain)
@@ -54,38 +39,14 @@ class Ui_DockWidget_Start(object):
 
         self.verticalLayout.addWidget(self.treeView)
 
-        self.tabWidget.addTab(self.tab_Browse, "")
-        self.tab_Thumbnail = QWidget()
-        self.tab_Thumbnail.setObjectName(u"tab_Thumbnail")
-        self.verticalLayout_2 = QVBoxLayout(self.tab_Thumbnail)
-        self.verticalLayout_2.setSpacing(0)
-        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
-        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.listWidget = QListWidget(self.tab_Thumbnail)
-        self.listWidget.setObjectName(u"listWidget")
-        self.listWidget.setFrameShape(QFrame.NoFrame)
-        self.listWidget.setFrameShadow(QFrame.Plain)
-        self.listWidget.setLineWidth(0)
-
-        self.verticalLayout_2.addWidget(self.listWidget)
-
-        self.tabWidget.addTab(self.tab_Thumbnail, "")
-
-        self.horizontalLayout.addWidget(self.tabWidget)
-
         DockWidget_Start.setWidget(self.dockWidgetContents)
 
         self.retranslateUi(DockWidget_Start)
-
-        self.tabWidget.setCurrentIndex(0)
-
 
         QMetaObject.connectSlotsByName(DockWidget_Start)
     # setupUi
 
     def retranslateUi(self, DockWidget_Start):
         DockWidget_Start.setWindowTitle(QCoreApplication.translate("DockWidget_Start", u"Start", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Browse), QCoreApplication.translate("DockWidget_Start", u"Browse", None))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_Thumbnail), QCoreApplication.translate("DockWidget_Start", u"Thumbnail", None))
     # retranslateUi
 

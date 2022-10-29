@@ -8,7 +8,6 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCharts import QChartView
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
     QMetaObject, QObject, QPoint, QRect,
     QSize, QTime, QUrl, Qt)
@@ -16,19 +15,22 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractSpinBox, QApplication, QComboBox, QHBoxLayout,
-    QLabel, QListWidget, QListWidgetItem, QProgressBar,
-    QPushButton, QScrollArea, QScrollBar, QSizePolicy,
-    QSpacerItem, QSpinBox, QSplitter, QTabWidget,
-    QToolBox, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QAbstractSpinBox, QApplication, QComboBox,
+    QHBoxLayout, QHeaderView, QLabel, QListWidget,
+    QListWidgetItem, QProgressBar, QPushButton, QScrollArea,
+    QScrollBar, QSizePolicy, QSpacerItem, QSpinBox,
+    QSplitter, QTabWidget, QToolBox, QVBoxLayout,
+    QWidget)
 
-from MyWidgets.MGraphicsView_timeseries import MGraphicsView_timeseries
+from MyWidgets.MChart.MChart import MChartView
+from MyWidgets.MGraphicsView.MGraphicsView_TimeSeries import MGraphicsView_TimeSeries
+from MyWidgets.MView.MTableView import MTableView
 
 class Ui_Widget_DSC(object):
     def setupUi(self, Widget_DSC):
         if not Widget_DSC.objectName():
             Widget_DSC.setObjectName(u"Widget_DSC")
-        Widget_DSC.resize(1065, 795)
+        Widget_DSC.resize(1065, 792)
         self.verticalLayout_5 = QVBoxLayout(Widget_DSC)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
         self.widget_center = QWidget(Widget_DSC)
@@ -49,24 +51,25 @@ class Ui_Widget_DSC(object):
         self.splitter_2 = QSplitter(self.widget)
         self.splitter_2.setObjectName(u"splitter_2")
         self.splitter_2.setOrientation(Qt.Horizontal)
-        self.widget1 = QWidget(self.splitter_2)
-        self.widget1.setObjectName(u"widget1")
-        self.horizontalLayout_3 = QHBoxLayout(self.widget1)
+        self.layoutWidget = QWidget(self.splitter_2)
+        self.layoutWidget.setObjectName(u"layoutWidget")
+        self.horizontalLayout_3 = QHBoxLayout(self.layoutWidget)
         self.horizontalLayout_3.setSpacing(0)
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.horizontalLayout_3.setContentsMargins(0, 0, 0, 0)
-        self.graphicsView = MGraphicsView_timeseries(self.widget1)
+        self.graphicsView = MGraphicsView_TimeSeries(self.layoutWidget)
         self.graphicsView.setObjectName(u"graphicsView")
+        self.graphicsView.setMinimumSize(QSize(0, 0))
 
         self.horizontalLayout_3.addWidget(self.graphicsView)
 
-        self.verticalScrollBar = QScrollBar(self.widget1)
+        self.verticalScrollBar = QScrollBar(self.layoutWidget)
         self.verticalScrollBar.setObjectName(u"verticalScrollBar")
         self.verticalScrollBar.setOrientation(Qt.Vertical)
 
         self.horizontalLayout_3.addWidget(self.verticalScrollBar)
 
-        self.widget_tools = QWidget(self.widget1)
+        self.widget_tools = QWidget(self.layoutWidget)
         self.widget_tools.setObjectName(u"widget_tools")
         self.verticalLayout_7 = QVBoxLayout(self.widget_tools)
         self.verticalLayout_7.setSpacing(5)
@@ -76,21 +79,21 @@ class Ui_Widget_DSC(object):
         self.splitter.setObjectName(u"splitter")
         self.splitter.setOrientation(Qt.Vertical)
         self.splitter.setChildrenCollapsible(False)
-        self.widget2 = QWidget(self.splitter)
-        self.widget2.setObjectName(u"widget2")
-        self.horizontalLayout_18 = QHBoxLayout(self.widget2)
+        self.layoutWidget1 = QWidget(self.splitter)
+        self.layoutWidget1.setObjectName(u"layoutWidget1")
+        self.horizontalLayout_18 = QHBoxLayout(self.layoutWidget1)
         self.horizontalLayout_18.setObjectName(u"horizontalLayout_18")
         self.horizontalLayout_18.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_2 = QVBoxLayout()
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.horizontalLayout_8 = QHBoxLayout()
         self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
-        self.label_5 = QLabel(self.widget2)
+        self.label_5 = QLabel(self.layoutWidget1)
         self.label_5.setObjectName(u"label_5")
 
         self.horizontalLayout_8.addWidget(self.label_5)
 
-        self.comboBox = QComboBox(self.widget2)
+        self.comboBox = QComboBox(self.layoutWidget1)
         self.comboBox.addItem("")
         self.comboBox.addItem("")
         self.comboBox.setObjectName(u"comboBox")
@@ -104,12 +107,12 @@ class Ui_Widget_DSC(object):
         self.horizontalLayout_15.setObjectName(u"horizontalLayout_15")
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.label = QLabel(self.widget2)
+        self.label = QLabel(self.layoutWidget1)
         self.label.setObjectName(u"label")
 
         self.horizontalLayout_2.addWidget(self.label)
 
-        self.spinBox_slice = QSpinBox(self.widget2)
+        self.spinBox_slice = QSpinBox(self.layoutWidget1)
         self.spinBox_slice.setObjectName(u"spinBox_slice")
         self.spinBox_slice.setValue(1)
 
@@ -121,12 +124,12 @@ class Ui_Widget_DSC(object):
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setSpacing(6)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.label_2 = QLabel(self.widget2)
+        self.label_2 = QLabel(self.layoutWidget1)
         self.label_2.setObjectName(u"label_2")
 
         self.horizontalLayout.addWidget(self.label_2)
 
-        self.spinBox_timepoint = QSpinBox(self.widget2)
+        self.spinBox_timepoint = QSpinBox(self.layoutWidget1)
         self.spinBox_timepoint.setObjectName(u"spinBox_timepoint")
         self.spinBox_timepoint.setValue(1)
 
@@ -142,12 +145,12 @@ class Ui_Widget_DSC(object):
         self.horizontalLayout_16.setObjectName(u"horizontalLayout_16")
         self.horizontalLayout_13 = QHBoxLayout()
         self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
-        self.label_6 = QLabel(self.widget2)
+        self.label_6 = QLabel(self.layoutWidget1)
         self.label_6.setObjectName(u"label_6")
 
         self.horizontalLayout_13.addWidget(self.label_6)
 
-        self.spinBox = QSpinBox(self.widget2)
+        self.spinBox = QSpinBox(self.layoutWidget1)
         self.spinBox.setObjectName(u"spinBox")
 
         self.horizontalLayout_13.addWidget(self.spinBox)
@@ -157,12 +160,12 @@ class Ui_Widget_DSC(object):
 
         self.horizontalLayout_14 = QHBoxLayout()
         self.horizontalLayout_14.setObjectName(u"horizontalLayout_14")
-        self.label_7 = QLabel(self.widget2)
+        self.label_7 = QLabel(self.layoutWidget1)
         self.label_7.setObjectName(u"label_7")
 
         self.horizontalLayout_14.addWidget(self.label_7)
 
-        self.spinBox_2 = QSpinBox(self.widget2)
+        self.spinBox_2 = QSpinBox(self.layoutWidget1)
         self.spinBox_2.setObjectName(u"spinBox_2")
 
         self.horizontalLayout_14.addWidget(self.spinBox_2)
@@ -177,12 +180,12 @@ class Ui_Widget_DSC(object):
         self.horizontalLayout_17.setObjectName(u"horizontalLayout_17")
         self.horizontalLayout_6 = QHBoxLayout()
         self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
-        self.label_3 = QLabel(self.widget2)
+        self.label_3 = QLabel(self.layoutWidget1)
         self.label_3.setObjectName(u"label_3")
 
         self.horizontalLayout_6.addWidget(self.label_3)
 
-        self.spinBox_row = QSpinBox(self.widget2)
+        self.spinBox_row = QSpinBox(self.layoutWidget1)
         self.spinBox_row.setObjectName(u"spinBox_row")
         self.spinBox_row.setValue(1)
 
@@ -193,12 +196,12 @@ class Ui_Widget_DSC(object):
 
         self.horizontalLayout_7 = QHBoxLayout()
         self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
-        self.label_4 = QLabel(self.widget2)
+        self.label_4 = QLabel(self.layoutWidget1)
         self.label_4.setObjectName(u"label_4")
 
         self.horizontalLayout_7.addWidget(self.label_4)
 
-        self.spinBox_column = QSpinBox(self.widget2)
+        self.spinBox_column = QSpinBox(self.layoutWidget1)
         self.spinBox_column.setObjectName(u"spinBox_column")
         self.spinBox_column.setFrame(True)
         self.spinBox_column.setButtonSymbols(QAbstractSpinBox.UpDownArrows)
@@ -219,12 +222,12 @@ class Ui_Widget_DSC(object):
 
         self.horizontalLayout_18.addItem(self.horizontalSpacer)
 
-        self.splitter.addWidget(self.widget2)
+        self.splitter.addWidget(self.layoutWidget1)
         self.toolBox = QToolBox(self.splitter)
         self.toolBox.setObjectName(u"toolBox")
         self.page = QWidget()
         self.page.setObjectName(u"page")
-        self.page.setGeometry(QRect(0, 0, 265, 123))
+        self.page.setGeometry(QRect(0, 0, 265, 116))
         self.verticalLayout_4 = QVBoxLayout(self.page)
         self.verticalLayout_4.setSpacing(0)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
@@ -238,7 +241,7 @@ class Ui_Widget_DSC(object):
         self.toolBox.addItem(self.page, u"ROI")
         self.page_2 = QWidget()
         self.page_2.setObjectName(u"page_2")
-        self.page_2.setGeometry(QRect(0, 0, 265, 123))
+        self.page_2.setGeometry(QRect(0, 0, 265, 116))
         self.pushButton = QPushButton(self.page_2)
         self.pushButton.setObjectName(u"pushButton")
         self.pushButton.setGeometry(QRect(20, 50, 75, 24))
@@ -252,17 +255,35 @@ class Ui_Widget_DSC(object):
 
         self.horizontalLayout_3.setStretch(0, 10)
         self.horizontalLayout_3.setStretch(2, 5)
-        self.splitter_2.addWidget(self.widget1)
+        self.splitter_2.addWidget(self.layoutWidget)
         self.widget_chart = QWidget(self.splitter_2)
         self.widget_chart.setObjectName(u"widget_chart")
-        self.verticalLayout_3 = QVBoxLayout(self.widget_chart)
-        self.verticalLayout_3.setSpacing(0)
-        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
-        self.chartView = QChartView(self.widget_chart)
-        self.chartView.setObjectName(u"chartView")
+        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.widget_chart.sizePolicy().hasHeightForWidth())
+        self.widget_chart.setSizePolicy(sizePolicy)
+        self.horizontalLayout_5 = QHBoxLayout(self.widget_chart)
+        self.horizontalLayout_5.setSpacing(0)
+        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
+        self.horizontalLayout_5.setContentsMargins(0, 0, 0, 0)
+        self.tableView_points = MTableView(self.widget_chart)
+        self.tableView_points.setObjectName(u"tableView_points")
+        sizePolicy.setHeightForWidth(self.tableView_points.sizePolicy().hasHeightForWidth())
+        self.tableView_points.setSizePolicy(sizePolicy)
+        self.tableView_points.setMinimumSize(QSize(0, 0))
+        self.tableView_points.setMaximumSize(QSize(200, 16777215))
+        self.tableView_points.setEditTriggers(QAbstractItemView.AnyKeyPressed|QAbstractItemView.DoubleClicked|QAbstractItemView.EditKeyPressed|QAbstractItemView.SelectedClicked)
+        self.tableView_points.setTextElideMode(Qt.ElideMiddle)
+        self.tableView_points.verticalHeader().setVisible(False)
 
-        self.verticalLayout_3.addWidget(self.chartView)
+        self.horizontalLayout_5.addWidget(self.tableView_points)
+
+        self.chartView = MChartView(self.widget_chart)
+        self.chartView.setObjectName(u"chartView")
+        self.chartView.setMinimumSize(QSize(0, 0))
+
+        self.horizontalLayout_5.addWidget(self.chartView)
 
         self.splitter_2.addWidget(self.widget_chart)
 
@@ -295,11 +316,11 @@ class Ui_Widget_DSC(object):
         self.horizontalLayout_11.setContentsMargins(0, 0, 0, 0)
         self.label_mask = QLabel(self.scrollAreaWidgetContents)
         self.label_mask.setObjectName(u"label_mask")
-        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.label_mask.sizePolicy().hasHeightForWidth())
-        self.label_mask.setSizePolicy(sizePolicy)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.label_mask.sizePolicy().hasHeightForWidth())
+        self.label_mask.setSizePolicy(sizePolicy1)
         self.label_mask.setMinimumSize(QSize(512, 512))
         self.label_mask.setAlignment(Qt.AlignCenter)
 
@@ -307,8 +328,8 @@ class Ui_Widget_DSC(object):
 
         self.label_mask_img = QLabel(self.scrollAreaWidgetContents)
         self.label_mask_img.setObjectName(u"label_mask_img")
-        sizePolicy.setHeightForWidth(self.label_mask_img.sizePolicy().hasHeightForWidth())
-        self.label_mask_img.setSizePolicy(sizePolicy)
+        sizePolicy1.setHeightForWidth(self.label_mask_img.sizePolicy().hasHeightForWidth())
+        self.label_mask_img.setSizePolicy(sizePolicy1)
         self.label_mask_img.setMinimumSize(QSize(512, 512))
         self.label_mask_img.setAlignment(Qt.AlignCenter)
 

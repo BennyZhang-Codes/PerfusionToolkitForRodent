@@ -19,7 +19,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFrame, QHBoxLay
     QListView, QListWidget, QListWidgetItem, QScrollBar,
     QSizePolicy, QSplitter, QWidget)
 
-from MyWidgets.MGraphicsView import MGraphicsView
+from MyWidgets.MGraphicsView.MGraphicsView import MGraphicsView
 
 class Ui_Widget_Browse(object):
     def setupUi(self, Widget_Browse):

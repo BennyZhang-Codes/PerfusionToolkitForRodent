@@ -1,26 +1,28 @@
+from math import ceil
+
 import numpy as np
 from PySide6 import QtCore, QtGui, QtWidgets
-from PySide6.QtCore import Qt, Slot, QSize, QEvent, QPoint, QPointF, Signal
-from PySide6.QtGui import QImage, QPixmap, QResizeEvent, QMouseEvent, QColor
-
-from PySide6.QtWidgets import QWidget
-from PySide6.QtWidgets import QGraphicsView, QFrame
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
+from pydicom import FileDataset
 
 from modules.dcmreader.Read_dcm import MAbstractDicomReader
-from modules.dcmreader.read_DSC_DCE import Read_Bruker_TimeSeries
-from MyWidgets.MWidget import MWidget
-from MyWidgets.MGraphicsScene import MGraphicsScene
+from modules.dcmreader.read_Dicom import read_Dicom_folder
+from MyWidgets.MGraphicsView.MGraphicsScene import MGraphicsScene
 
-class MGraphicsView_timeseries(QGraphicsView, MWidget):
+class MGraphicsView(QGraphicsView):
     _idx_changed = Signal(int)
-    _slice = Signal(int)
+    _location = Signal(tuple)
 
     def __init__(self, parent: QWidget=None):
         super().__init__(parent)
         self.idx = 0
         self.setMouseTracking(True)
+        self._mainwindow = None
         self._dicom_reader = None
         self.__setup_scene()
+        self._setupUI()
 
     @property
     def DicomReader(self) -> MAbstractDicomReader:
@@ -29,31 +31,33 @@ class MGraphicsView_timeseries(QGraphicsView, MWidget):
     @DicomReader.setter
     def DicomReader(self, dr: MAbstractDicomReader) -> None:
         self._dicom_reader = dr
-        self._setupUI()
-    
-    def set_mainwindow(self, mainwindow) -> None:
-        self.mainwindow = mainwindow
 
+    def set_mainwindow(self, mainwindow) -> None:
+        self.MainWindow = mainwindow
         
     def _setupUI(self) -> None:
-        self.setStyleSheet('''MGraphicsView_timeseries{background-color: rgb(0, 0, 0); padding: 0px; border: 0px}''')
-        # self.setBackgroundBrush(QColor(0,0,0,255))
+        self.setStyleSheet('''MGraphicsView{background-color: rgb(0, 0, 0); padding: 0px; border: 0px}''')
         self.setFrameShape(QFrame.NoFrame)
         self.setFrameShadow(QFrame.Plain)
         self.setLineWidth(0)
         self.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignTop)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-
+        # self.icon_move = QPixmap(u"qrc/move.png")
+        # self.icon_move = self.icon_move.scaled(29, 29, mode=Qt.SmoothTransformation)
+        # self.icon_zoom_in = QPixmap(u"qrc/zoom_in.png")
+        # self.icon_zoom_in = self.icon_zoom_in.scaled(29, 29, mode=Qt.SmoothTransformation)
+        # self.icon_zoom_out = QPixmap(u"qrc/zoom_out.png")
+        # self.icon_zoom_out = self.icon_zoom_out.scaled(29, 29, mode=Qt.SmoothTransformation)
+        
     def __setup_scene(self):
         self.mscene = MGraphicsScene(self)
         self.mscene.signal_ROI.connect(self.__mask)
         self.mscene._ds_idxchange.connect(self.__ds_idx_change)
         self.setScene(self.mscene)
-        
+
     def __mask(self, index):
         pass
-        # print('get mask')
 
     def __ds_idx_change(self, idx: int) -> None:
         idx = self.idx + idx
@@ -61,9 +65,11 @@ class MGraphicsView_timeseries(QGraphicsView, MWidget):
         self.set_scene(idx)
         self.idx = idx
 
+
     def set_scene(self, idx: int) -> None:
         ds = self.DicomReader.get_ds(idx)
         self.mscene.set_scene(ds)
+
 
     def _check_idx(self, idx: int) -> int:
         if idx < self.DicomReader.min_idx():
@@ -74,9 +80,9 @@ class MGraphicsView_timeseries(QGraphicsView, MWidget):
 
     def resizeEvent(self, event: QResizeEvent) -> None:
         if self.DicomReader is not None:
-            self.scene().setSceneRect(self.geometry())
+            self.mscene.setSceneRect(self.geometry())
             self.set_scene(self.idx)
-        return super().resizeEvent(event)
+            self.mscene.resizeevent()
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         return super().mousePressEvent(event)
@@ -89,5 +95,14 @@ class MGraphicsView_timeseries(QGraphicsView, MWidget):
 
     def contextMenuEvent(self, event):
         super().contextMenuEvent(event)
+
+    @property
+    def MainWindow(self) -> QMainWindow:
+        return self._mainwindow
+
+    @MainWindow.setter
+    def MainWindow(self, mainwindow: QMainWindow) -> None:
+        self._mainwindow = mainwindow
+
 if __name__ == '__main__':
-    mGraphicView = MGraphicsView_timeseries()
+    mGraphicView = MGraphicsView()

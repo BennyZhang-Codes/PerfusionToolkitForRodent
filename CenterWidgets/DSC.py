@@ -1,21 +1,18 @@
-from codecs import readbuffer_encode
+
 import numpy as np
 import matplotlib.pyplot as plt
 
-from PySide6.QtCore import Qt, Slot, QSize, QModelIndex, QEvent, qDebug, QPoint
-from PySide6.QtGui import QImage, QPixmap, QIcon, QResizeEvent, QMouseEvent, QCursor, QColor, QWheelEvent, QPen
-
-from PySide6.QtWidgets import QWidget, QGraphicsPixmapItem, QGraphicsScene, QMenu, QHBoxLayout
-from PySide6.QtWidgets import QListWidgetItem, QListWidget, QGraphicsView, QLabel
-from PySide6.QtGui import QPainter
-from PySide6.QtCharts import QChart, QChartView, QLineSeries, QScatterSeries
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
+from PySide6.QtCharts import QChart, QChartView, QLineSeries, QScatterSeries, QVXYModelMapper
 
 from UI.ui_Widget_DSC import Ui_Widget_DSC
 from modules.dcmreader.read_DSC_DCE import Read_Bruker_TimeSeries
 
 from modules.utils.shape import shape_to_mask, get_index_of_mask
-
-
+from MyWidgets.Mmodel.TabelModel import TimePointsTableModel
+from MyWidgets.MChart.MChart import MChart
 
 class Widget_DSC(QWidget, Ui_Widget_DSC):
 
@@ -37,7 +34,7 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         
 
     def _setupUI(self):
-        self.chart = QChart()
+        self.chart = MChart()
         self.chart.setTheme(QChart.ChartThemeDark)
         self.chart.legend().hide()
         
@@ -169,8 +166,20 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
     def __curve(self, xdata: np.array, ydata: np.array) -> None:
         self.chart.removeAllSeries()
         series = QLineSeries()
-        for time_point, value in zip(xdata, ydata):
-            series.append(time_point, value)
+        # series = QScatterSeries()
+
+
+
+
+
+        model = TimePointsTableModel(xdata, ydata)
+        self.mapper = QVXYModelMapper(self)
+        self.mapper.setXColumn(1)
+        self.mapper.setYColumn(2)
+        self.mapper.setSeries(series)
+        self.mapper.setModel(model)
+        self.tableView_points.setModel(model)
+
         series.setPointsVisible(True)
         series.setMarkerSize(4)
         self.chart.addSeries(series)

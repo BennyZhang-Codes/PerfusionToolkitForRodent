@@ -161,7 +161,7 @@
   <customwidget>
    <class>MGraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header>MyWidgets.MGraphicsView</header>
+   <header location="global">MyWidgets.MGraphicsView.MGraphicsView</header>
   </customwidget>
  </customwidgets>
  <resources/>
