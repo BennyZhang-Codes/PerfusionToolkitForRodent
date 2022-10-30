@@ -19,16 +19,18 @@ from MyWidgets.Status import Status_progressBar
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self) -> None:
         super().__init__()
-        # themeFile = 'themes/py_dracula_light.qss'
-        # self.sheet = open(themeFile, 'r').read()
+
         self.setupUi(self)
         self.add_dockWidgets()
         self._setup()
         self.statusBar().showMessage('Ready')
-        self.setStyleSheet(qdarkstyle.load_stylesheet_pyside2())
+        # self.setStyleSheet(qdarkstyle.load_stylesheet_pyside2())
+        self.theme()
 
-    def theme(self, file):
-        str = open(file, 'r').read()
+    def theme(self):
+        themeFile = 'dark.qss'
+        self.sheet = open(themeFile, 'r').read()
+        str = open(themeFile, 'r').read()
         self.setStyleSheet(str)
 
         # self.setStyleSheet(qdarkstyle.load_stylesheet_pyside2())

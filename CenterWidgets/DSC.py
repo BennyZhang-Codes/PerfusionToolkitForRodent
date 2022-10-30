@@ -36,8 +36,6 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
     def _setupUI(self):
         self.chart = MChart()
         self.chartView.setChart(self.chart)
-        
-        self.chartView.setRenderHint(QPainter.Antialiasing)
 
         self.graphicsView.set_mainwindow(self.mainwindow)
         self.graphicsView.DicomReader = self.dicom_reader
@@ -46,7 +44,6 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         self.graphicsView.mscene.signal_ROI.connect(self.__slot_ROI)
         self.graphicsView.mscene.signal_ROI_color.connect(self.__slot_ROI_color)
         
-
         self.spinBox_timepoint.setMaximum(self.dicom_reader.max_idx + 1)
         self.spinBox_timepoint.setMinimum(self.dicom_reader.min_idx + 1)
         self.spinBox_timepoint.setValue(self.graphicsView.idx + 1)
@@ -161,33 +158,13 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         self.__curve(xdata, ydata)
 
     def __curve(self, xdata: np.array, ydata: np.array) -> None:
-        # self.chart.removeAllSeries()
-        # series = MLineSeries()
-        # series1 = QScatterSeries()
-
-        # for x, y in zip(xdata, ydata):
-        #     series.append(x, y)
-        #     series1.append(x, y)
-
-
-
-
-
-        
-        # self.mapper = QVXYModelMapper(self)
-        # self.mapper.setXColumn(1)
-        # self.mapper.setYColumn(2)
-        # self.mapper.setSeries(series)
-        # self.mapper.setModel(model)
         model = TimePointsTableModel(xdata, ydata)
         self.tableView_points.setModel(model)
-        # self.tableView_points.selected_row.connect(series._slot)
-        
-        self.chart.set_data(xdata, ydata)
+        self.chart.setModel(model)
         self.chart.selected_point.connect(self.tableView_points.selectRow)
+        self.tableView_points.changed_rows.connect(self.chart._slot_update_pointConf)
+        self.tableView_points.selected_row.connect(self.chart._update_focus_point)
         
-
-
     def _setup(self):
         self.slices = 0
 
@@ -214,10 +191,7 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
             self.widget_center.setVisible(True)
             self.widget_load.setEnabled(False)
             self.widget_load.setVisible(False)
-
             self._setupUI()
-
-
 
     @property
     def ROI_color(self) -> QColor:

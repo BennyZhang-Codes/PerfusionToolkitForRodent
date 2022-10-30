@@ -6,16 +6,20 @@ from PySide6.QtGui import *
 import numpy as np
 
 class TimePointsTableModel(QAbstractTableModel):
+    Color_Background_Default = QColor(0,82,157,255)
+    Color_Background_S0 = QColor(186,42,23,255)
+    Color_Background_Delete = QColor(151,153,151,255)
+
+    Color_chart_Default = QColor(0,82,157,255)
+    Color_chart_S0 = QColor(186,42,23,255)
+    Color_chart_Delete = QColor(151,153,151,255)
     def __init__(self, TimePoint, SignalValue, parent=None) -> None:
         super().__init__(parent)
         self.headers = ['Point', 'Time (s)', 'Value']
         self._signalvalue = SignalValue
         self._timepoint = TimePoint
         self._S0 = np.zeros_like(TimePoint).astype(np.bool8)
-        self._S0[:5] = np.ones((5)).astype(np.bool8)
-
         self._Contained = np.ones_like(TimePoint).astype(np.bool8)
-        # print(self._S0)
 
     def rowCount(self, parent) -> int:
         return len(self._timepoint)
@@ -23,11 +27,9 @@ class TimePointsTableModel(QAbstractTableModel):
     def columnCount(self, parent) -> int:
         return len(self.headers)
 
-
     def headerData(self, section, orientation, role):
         if role != Qt.DisplayRole:
             return None
-
         if orientation == Qt.Horizontal:
             return self.headers[section]
         else:
@@ -44,23 +46,34 @@ class TimePointsTableModel(QAbstractTableModel):
                 return float(self.TimePoints[index.row()])
             elif index.column() == 2:
                 return float(self.SignalValue[index.row()])
-        if role == Qt.TextAlignmentRole:
+        elif role == Qt.TextAlignmentRole:
             return Qt.AlignCenter
 
-        if role == Qt.BackgroundRole:
+        elif role == Qt.BackgroundRole:
             if self.Contained[index.row()]:
                 if self.S0[index.row()]:
-                    return QColor(255,244,23,128)
+                    return self.Color_Background_S0
                 else:
-                    return QColor(45,167,222,128)
+                    return self.Color_Background_Default
             else:
-                return QColor(45,45,45,128)
-            # if index.column() == 0:
-            #     return QColor(255,244,23,128)
-            # elif index.column() == 1:
-            #     return QColor(255,244,23,128)
-            # elif index.column() == 2:
-            #     return QColor(255,244,23,128)
+                return self.Color_Background_Delete
+
+    def getColor(self, row: int) -> QColor:
+        if self.Contained[row]:
+            if self.S0[row]:
+                return self.Color_chart_S0
+            else:
+                return self.Color_chart_Default
+        else:
+            return self.Color_chart_Delete
+
+    def set_S0(self, indexes: np.array, select: bool) -> None:
+        for idx in indexes:
+            self.S0[idx] = select
+
+    def set_delete(self, indexes: np.array, delete: bool) -> None:
+        for idx in indexes:
+            self.Contained[idx] = delete
 
     @property 
     def SignalValue(self) -> np.array:
@@ -81,7 +94,6 @@ class TimePointsTableModel(QAbstractTableModel):
     @property 
     def S0(self) -> np.array:
         return self._S0
-
 
     @property 
     def Contained(self) -> np.array:
