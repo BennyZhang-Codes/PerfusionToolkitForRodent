@@ -13,7 +13,6 @@ class MTableView(QTableView):
         self.setFocusPolicy(Qt.NoFocus)
         self.verticalHeader().setStretchLastSection(True)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
-
         self._menu = QMenu(self)
         self.setup_menu()
 
@@ -27,21 +26,15 @@ class MTableView(QTableView):
     def mousePressEvent(self, event: QMouseEvent) -> None:
         print(event)
         print(self.selectedIndexes())
-
-        # print(self.selectedIndexes()[0].row())
-        # self.selected_row.emit(self.selectedIndexes()[0].row())
         return super().mousePressEvent(event)
 
     def mouseDoubleClickEvent(self, event: QMouseEvent) -> None:
-        
         return super().mouseDoubleClickEvent(event)
 
 
     def contextMenuEvent(self, arg__1: QContextMenuEvent) -> None:
         self.Menu.exec_(QCursor.pos())
-        
         print(QCursor.pos())
-        # return super().contextMenuEvent(arg__1)
 
 
     def setup_menu(self) -> None:

@@ -194,7 +194,7 @@ class Read_Bruker_TimeSeries(MAbstractDicomReader):
         time_points_num = int(res[0][0])
         time_points = res[0][1]
         time_points = (time_points.strip()).replace('\n', '').split(' ')
-        time_points = np.array([float(time)*1000 for time in time_points])
+        time_points = np.array([float(time) for time in time_points])
         if time_points_num != time_points.__len__():
             raise ValueError('Times points number not match!')
         return slice_num, time_points_num, time_points

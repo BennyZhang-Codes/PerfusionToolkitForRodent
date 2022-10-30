@@ -12,7 +12,7 @@ from modules.dcmreader.read_DSC_DCE import Read_Bruker_TimeSeries
 
 from modules.utils.shape import shape_to_mask, get_index_of_mask
 from MyWidgets.Mmodel.TabelModel import TimePointsTableModel
-from MyWidgets.MChart.MChart import MChart, MLineSeries
+from MyWidgets.MChart.MChart import MChart
 
 class Widget_DSC(QWidget, Ui_Widget_DSC):
 
@@ -35,12 +35,9 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
 
     def _setupUI(self):
         self.chart = MChart()
-        self.chart.setTheme(QChart.ChartThemeDark)
-        self.chart.legend().hide()
-        
-        self.chart.setAnimationOptions(QChart.SeriesAnimations)
-        self.chartView.setRenderHint(QPainter.Antialiasing)
         self.chartView.setChart(self.chart)
+        
+        self.chartView.setRenderHint(QPainter.Antialiasing)
 
         self.graphicsView.set_mainwindow(self.mainwindow)
         self.graphicsView.DicomReader = self.dicom_reader
@@ -164,30 +161,32 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         self.__curve(xdata, ydata)
 
     def __curve(self, xdata: np.array, ydata: np.array) -> None:
-        self.chart.removeAllSeries()
-        series = MLineSeries()
-        series1 = QScatterSeries()
+        # self.chart.removeAllSeries()
+        # series = MLineSeries()
+        # series1 = QScatterSeries()
 
-        for x, y in zip(xdata, ydata):
-            series.append(x, y)
-            series1.append(x, y)
-
-
+        # for x, y in zip(xdata, ydata):
+        #     series.append(x, y)
+        #     series1.append(x, y)
 
 
 
-        model = TimePointsTableModel(xdata, ydata)
+
+
+        
         # self.mapper = QVXYModelMapper(self)
         # self.mapper.setXColumn(1)
         # self.mapper.setYColumn(2)
         # self.mapper.setSeries(series)
         # self.mapper.setModel(model)
+        model = TimePointsTableModel(xdata, ydata)
         self.tableView_points.setModel(model)
-        self.tableView_points.selected_row.connect(series._slot)
+        # self.tableView_points.selected_row.connect(series._slot)
+        
+        self.chart.set_data(xdata, ydata)
+        self.chart.selected_point.connect(self.tableView_points.selectRow)
+        
 
-        self.chart.addSeries(series)
-        self.chart.addSeries(series1)
-        self.chart.createDefaultAxes()
 
     def _setup(self):
         self.slices = 0
