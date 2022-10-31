@@ -1,12 +1,13 @@
 
-from types import NoneType
+from re import T
+from time import thread_time
 import numpy as np
 import matplotlib.pyplot as plt
+from PIL import Image
 
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
-from PySide6.QtCharts import QChart, QChartView, QLineSeries, QScatterSeries, QVXYModelMapper
 
 from UI.ui_Widget_DSC import Ui_Widget_DSC
 from modules.dcmreader.read_DSC_DCE import Read_Bruker_TimeSeries
@@ -14,12 +15,13 @@ from modules.dcmreader.read_DSC_DCE import Read_Bruker_TimeSeries
 from modules.utils.shape import shape_to_mask, get_index_of_mask
 from MyWidgets.Mmodel.TabelModel import TimePointsTableModel
 from MyWidgets.MChart.MChart import MChart
+from modules.threads.TimeSeries_correction import Thread_TimeSeries_correction
+
+
 
 class Widget_DSC(QWidget, Ui_Widget_DSC):
-
     GroupSlice = 'Slice'
     GroupTime = 'Time'
-
     def __init__(self, dicom_dir, mainwindow):
         super().__init__()
         self.mainwindow = mainwindow
@@ -38,14 +40,23 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         self._ROI_color = QColor(118,185,172,196)
         
     def _setupUI(self):
+
+        # correction
+        self.widget_correction_after.setVisible(False)
+        self.widget_correction_after.setEnabled(False)
+        self.progressBar_correction.setVisible(False)
+        self.radioButton_showcorrected.setEnabled(False)
+        self.radioButton_showcorrected.setVisible(False)
+        
         self.chart = MChart()
         self.chartView.setChart(self.chart)
 
         self.graphicsView.set_mainwindow(self.mainwindow)
         self.graphicsView.DicomReader = self.dicom_reader
-        # self.graphicsView.set_scene(0)
         self.graphicsView.update_scene_Rect()
         item_img = self.graphicsView.mscene.item_img
+        item_img.signal.WW_changed.connect(self.spinBox_WW.setValue)
+        item_img.signal.WL_changed.connect(self.spinBox_WL.setValue)
         self.graphicsView._idx_changed.connect(self.__slot_graphicsView_idx_changed)
         self.graphicsView.mscene.signal_ROI_point.connect(self.__slot_ROI_point)
         self.graphicsView.mscene.signal_ROI.connect(self.__slot_ROI)
@@ -68,11 +79,6 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         self.spinBox_column.setMaximum(self.dicom_reader.ColNum)
         self.spinBox_column.setMinimum(1)
 
-
-        
-        item_img.signal.WW_changed.connect(self.spinBox_WW.setValue)
-        item_img.signal.WL_changed.connect(self.spinBox_WL.setValue)
-
         img = item_img.img
         max_value = np.max(img)
         min_value = np.min(img)
@@ -86,16 +92,36 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         self.spinBox_WL.setMinimum(item_img.WL_min)
         self.spinBox_WL.setValue(WL)
 
+        row, col = img.shape
+        center_row = row//2
+        center_col = col//2
+        center_slice = self.dicom_reader.SliceNum//2
+        self.spinBox_row.setValue(center_row)
+        self.spinBox_column.setValue(center_col)
 
-    def __slot_ROI_point(self, pos: QPoint):
-        row = pos.y()
-        col = pos.x()
-        self.spinBox_row.setValue(row)
-        self.spinBox_column.setValue(col)
+        imgall = self.dicom_reader.imgAll[center_slice::self.dicom_reader.SliceNum]
+        img_qc = imgall[:,:,center_col].T
 
-        ydata = self.dicom_reader.img_GroupBySlice[:, row - 1, col - 1]
-        xdata = self.dicom_reader.TimePoints
-        self.__curve(xdata, ydata)
+        img = img_qc
+        img = ((img - img.min()) / max(1, img.max() - img.min()))*255
+        img = img.astype(np.uint8)
+        image = Image.fromarray(img)
+        pix = image.toqpixmap()
+        self.label_correction_before_col.setPixmap(pix)
+        self.label_correction_before_col.setScaledContents(True)
+
+        img_qc = imgall[:,center_row,:].T
+
+        img = img_qc
+        img = ((img - img.min()) / max(1, img.max() - img.min()))*255
+        img = img.astype(np.uint8)
+        image = Image.fromarray(img)
+        pix = image.toqpixmap()
+        self.label_correction_before_row.setPixmap(pix)
+        self.label_correction_before_row.setScaledContents(True)
+
+
+
 
     def __curve(self, xdata: np.array, ydata: np.array) -> None:
         model = TimePointsTableModel(xdata, ydata)
@@ -133,80 +159,28 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
             self.widget_load.setVisible(False)
             self._setupUI()
 
-    @property
-    def ROI_color(self) -> QColor:
-        return self._ROI_color
-
-    @ROI_color.setter
-    def ROI_color(self, color: QColor) -> None:
-        self._ROI_color = color
-            
       
-    def __slot_ROI(self, data: tuple):
-        path, item_pix = data
-        w = item_pix.width()
-        h = item_pix.height()
-        pix = QPixmap(w, h)
-        pix.fill(QColor(0,0,0,255))
-
-        
-        pen = QPen()
-        pen.setWidthF(0)
-        pen.setColor(QColor(0,0,0,0))
-
-        painter_item_pix = QPainter(item_pix)
-        painter_item_pix.setPen(pen)
-        painter_item_pix.setBrush(self.ROI_color)
-        painter_item_pix.drawPath(path)
-        painter_item_pix.end()
-
-        painter_pix = QPainter(pix)
-        painter_pix.setPen(pen)
-        painter_pix.setBrush(QColor(255,255,255,255))
-        painter_pix.drawPath(path)
-        painter_pix.end()
-
-
-        img = pix.toImage()
-        b = img.bits()
-        img_array = np.frombuffer(b, np.uint8).reshape((pix.height(), pix.width(), 4))
-        mask = img_array[:,:,-2].astype(bool)
-        plt.imsave('mask.jpg', mask, cmap='gray')
-
-        index = get_index_of_mask(mask)
-        ydata = []
-        for idx in index:
-            ydata.append(self.dicom_reader.img_GroupBySlice[:, idx[0], idx[1]])
-
-        ydata = np.array(ydata)
-        xdata = self.dicom_reader.TimePoints
-        self.__curve(xdata, np.mean(ydata, axis=0))
-
-        self.label_mask.setPixmap(pix.scaled(512,512, Qt.KeepAspectRatio, Qt.FastTransformation))
-
-        self.label_mask_img.setPixmap(item_pix.scaled(512,512, Qt.KeepAspectRatio, Qt.FastTransformation))
-
-    def __slot_ROI_color(self, color: QColor) -> None:
-        self.ROI_color = color
-        
     def __slot_graphicsView_idx_changed(self, idx: int):
         self.verticalScrollBar.setValue(idx+1)
 
     @Slot(int)
     def on_spinBox_timepoint_valueChanged(self, value: int):
-        self.graphicsView.set_scene(value-1)
-        self.verticalScrollBar.setValue(value)
-
+        self.dicom_reader.CurrentTimePoint = value - 1 
+        if self.GroupBy == self.GroupSlice:
+            self.verticalScrollBar.setValue(value)
+            self.graphicsView.set_scene(value-1)
+        elif self.GroupBy == self.GroupTime:
+            self.graphicsView.set_scene(self.graphicsView.idx)
+        
     @Slot(int)
     def on_spinBox_slice_valueChanged(self, value: int):
         self.dicom_reader.CurrentSlice = value - 1
-        self.graphicsView.set_scene(self.graphicsView.idx)
-        row = self.spinBox_row.value()
-        col = self.spinBox_column.value()
-        ydata = self.dicom_reader.img_GroupBySlice[:, row - 1, col - 1]
-        xdata = self.dicom_reader.TimePoints
-        self.__curve(xdata, ydata)
-
+        if self.GroupBy == self.GroupTime:
+            self.verticalScrollBar.setValue(value)
+            self.graphicsView.set_scene(value - 1)
+        if self.GroupBy == self.GroupSlice:
+            self.graphicsView.set_scene(self.graphicsView.idx)
+        
     @Slot(int)
     def on_verticalScrollBar_valueChanged(self, value: int):
         if self.GroupBy == self.GroupSlice:
@@ -233,19 +207,22 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
     @Slot(int)
     def on_spinBox_WL_valueChanged(self, value: int):
         self.graphicsView.mscene.item_img.WL = value
-        self.graphicsView.set_scene(self.spinBox_timepoint.value()-1)
+        self.update_graphicsView()
 
     @Slot(int)
     def on_spinBox_WW_valueChanged(self, value: int):
         self.graphicsView.mscene.item_img.WW = value
-        self.graphicsView.set_scene(self.spinBox_timepoint.value()-1)
+        self.update_graphicsView()
 
     @Slot(int)
     def on_comboBox_currentIndexChanged(self, value: int) -> None:
         self.GroupBy = value
-        self.verticalScrollBar.setMaximum(self.dicom_reader.len)
-        self.verticalScrollBar.setMinimum(1)
-        self.verticalScrollBar.setValue(self.graphicsView.idx + 1)
+
+    def update_graphicsView(self) -> None:
+        if self.GroupBy == self.GroupSlice:
+            self.graphicsView.set_scene(self.spinBox_timepoint.value()-1)
+        elif self.GroupBy == self.GroupTime:
+            self.graphicsView.set_scene(self.spinBox_slice.value()-1)
 
     @property
     def GroupBy(self) -> str:
@@ -257,5 +234,150 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
             self._groupby = 'Slice'
         if value == 1:
             self._groupby = 'Time'
+
+        CurrentSlice = self.dicom_reader.CurrentSlice
+        CurrentTimePoint = self.dicom_reader.CurrentTimePoint
+
         self.dicom_reader.GroupBy = self._groupby
+        self.verticalScrollBar.setMaximum(self.dicom_reader.len)
+        self.verticalScrollBar.setMinimum(1)
+        if self._groupby == self.GroupSlice:
+            self.verticalScrollBar.setValue(CurrentTimePoint+1)
+        elif self._groupby == self.GroupTime:
+            self.verticalScrollBar.setValue(CurrentSlice+1)
+        
+
+### ROI
+    def __slot_ROI_point(self, pos: QPoint):
+        row = pos.y()
+        col = pos.x()
+        self.spinBox_row.setValue(row)
+        self.spinBox_column.setValue(col)
+
+        ydata = self.dicom_reader.img_GroupBySlice[:, row - 1, col - 1]
+        xdata = self.dicom_reader.TimePoints
+        self.__curve(xdata, ydata)
+    @property
+    def ROI_color(self) -> QColor:
+        return self._ROI_color
+
+    @ROI_color.setter
+    def ROI_color(self, color: QColor) -> None:
+        self._ROI_color = color
+
+    @property
+    def maskIndex(self) -> np.array:
+        return self._mask_index
+
+    def __slot_ROI(self, data: tuple):
+        path, item_pix = data
+        w = item_pix.width()
+        h = item_pix.height()
+        pix = QPixmap(w, h)
+        pix.fill(QColor(0,0,0,255))
+
+        pen = QPen()
+        pen.setWidthF(0)
+        pen.setColor(QColor(0,0,0,0))
+
+        painter_item_pix = QPainter(item_pix)
+        painter_item_pix.setPen(pen)
+        painter_item_pix.setBrush(self.ROI_color)
+        painter_item_pix.drawPath(path)
+        painter_item_pix.end()
+
+        painter_pix = QPainter(pix)
+        painter_pix.setPen(pen)
+        painter_pix.setBrush(QColor(255,255,255,255))
+        painter_pix.drawPath(path)
+        painter_pix.end()
+
+
+        img = pix.toImage()
+        b = img.bits()
+        img_array = np.frombuffer(b, np.uint8).reshape((pix.height(), pix.width(), 4))
+        mask = img_array[:,:,-2].astype(bool)
+        plt.imsave('mask.jpg', mask, cmap='gray')
+
+        self._mask_index = get_index_of_mask(mask)
+        ydata = []
+        for idx in self._mask_index:
+            ydata.append(self.dicom_reader.img_GroupBySlice[:, idx[0], idx[1]])
+
+        ydata = np.array(ydata)
+        xdata = self.dicom_reader.TimePoints
+        self.__curve(xdata, np.mean(ydata, axis=0))
+
+        self.label_mask.setPixmap(pix.scaled(512,512, Qt.KeepAspectRatio, Qt.FastTransformation))
+
+        self.label_mask_img.setPixmap(item_pix.scaled(512,512, Qt.KeepAspectRatio, Qt.FastTransformation))
+
+    def __slot_ROI_color(self, color: QColor) -> None:
+        self.ROI_color = color
+  
+
+### Correction
+    @Slot()
+    def on_pushButton_correction_clicked(self) -> None:
+        self.Thread_correction = Thread_TimeSeries_correction()
+        self.Thread_correction.set_DicomReader(self.dicom_reader)
+        self.Thread_correction.signal_start.connect(self.__slot_correction_start)
+        self.Thread_correction.signal_processing.connect(self.__slot_correction_processing)
+        self.Thread_correction.signal_end.connect(self.__slot_correction_end)
+        self.Thread_correction.start()
+
+    def __slot_correction_start(self, start: bool) -> None:
+        if start:
+            self.progressBar_correction.setMinimum(0)
+            self.progressBar_correction.setMaximum(self.dicom_reader.TimePointsNum)
+            self.progressBar_correction.setVisible(True)
+            self.progressBar_correction.setEnabled(True)
+            self.pushButton_correction.setEnabled(False)
+            self.pushButton_correction.setVisible(False)
+
+    def __slot_correction_processing(self, value: int) -> None:
+        self.progressBar_correction.setValue(value)
+
+    def __slot_correction_end(self, end: bool) -> None:
+        if end:
+            self.progressBar_correction.setVisible(False)
+            self.progressBar_correction.setEnabled(False)
+            self.pushButton_correction.setEnabled(True)
+            self.pushButton_correction.setVisible(True)
+
+            self.radioButton_showcorrected.setEnabled(True)
+            self.radioButton_showcorrected.setVisible(True)
+
+            row, col = self.graphicsView.mscene.item_img.img.shape
+            center_row = row//2
+            center_col = col//2
+            center_slice = self.dicom_reader.SliceNum//2
+
+            imgall = self.dicom_reader._img_corrected[center_slice::self.dicom_reader.SliceNum]
+            
+            img_qc = imgall[:,:,center_col].T
+            img = img_qc
+            img = ((img - img.min()) / max(1, img.max() - img.min()))*255
+            img = img.astype(np.uint8)
+            image = Image.fromarray(img)
+            pix = image.toqpixmap()
+            self.label_correction_after_col.setPixmap(pix)
+            self.label_correction_after_col.setScaledContents(True)
+
+            img_qc = imgall[:,center_row,:].T
+            img = img_qc
+            img = ((img - img.min()) / max(1, img.max() - img.min()))*255
+            img = img.astype(np.uint8)
+            image = Image.fromarray(img)
+            pix = image.toqpixmap()
+            self.label_correction_after_row.setPixmap(pix)
+            self.label_correction_after_row.setScaledContents(True)
+
+            self.widget_correction_after.setVisible(True)
+            self.widget_correction_after.setEnabled(True)
+
+
+    @Slot(bool)
+    def on_radioButton_showcorrected_clicked(self, clicked: bool) -> None:
+        self.dicom_reader.ShowCorrected = self.radioButton_showcorrected.isChecked()
         

@@ -19,6 +19,7 @@ class Read_Bruker_TimeSeries(MAbstractDicomReader):
 
     GroupByTime = 'Time'
     GroupBySlice = 'Slice'
+    
     def __init__(self, dicom_dir: str) -> None:
         super().__init__()
         self.setDicomRoot(dicom_dir)
@@ -33,6 +34,8 @@ class Read_Bruker_TimeSeries(MAbstractDicomReader):
         self._current_timepoint = 0
         self._img_all: np.array = None
         self._dss_all: np.array = None
+        self._img_corrected: np.array = None
+        self._showcorrected = False
         
     def __get_dcm_list(self) -> list:
         DCM_list = glob.glob('*.dcm', root_dir=self.dicom_path)
@@ -77,7 +80,7 @@ class Read_Bruker_TimeSeries(MAbstractDicomReader):
 
     @CurrentSlice.setter
     def CurrentSlice(self, idx: int) -> None:
-        self._current_slice = self.__check_index(idx, 0, self.SliceNum)
+        self._current_slice = self.__check_index(idx, 0, self.SliceNum-1)
 
     @property
     def CurrentTimePoint(self) -> int:
@@ -85,7 +88,7 @@ class Read_Bruker_TimeSeries(MAbstractDicomReader):
 
     @CurrentTimePoint.setter
     def CurrentTimePoint(self, idx: int) -> None:
-        self._current_timepoint = self.__check_index(idx, 0, self.TimePointsNum)
+        self._current_timepoint = self.__check_index(idx, 0, self.TimePointsNum-1)
 
     @property
     def DicomList(self) -> list:
@@ -99,12 +102,28 @@ class Read_Bruker_TimeSeries(MAbstractDicomReader):
     def ColNum(self) -> int:
         return self._col
 
-    @property
-    def imgAll(self) -> int:
-        return self._img_all
 
     @property
-    def dssAll(self) -> int:
+    def ShowCorrected(self) -> bool:
+        return self._showcorrected
+
+    @ShowCorrected.setter
+    def ShowCorrected(self, show: bool) -> None:
+        if show and self._img_corrected is not None:
+            self._showcorrected = True
+            print('yes')
+        else:
+            self._showcorrected = False
+
+    @property
+    def imgAll(self) -> np.array:
+        if self.ShowCorrected and self._img_corrected is not None:
+            return self._img_corrected
+        else:
+            return self._img_all
+
+    @property
+    def dssAll(self) -> np.array:
         return self._dss_all
 
     @property
@@ -150,11 +169,11 @@ class Read_Bruker_TimeSeries(MAbstractDicomReader):
 
     @property
     def img_GroupByTime(self) -> np.array:
-        return self.imgAll[self.CurrentTimePoint::self.TimePointsNum]
+        return self.imgAll[self.SliceNum * self.CurrentTimePoint : self.SliceNum * (self.CurrentTimePoint+1)]
         
     @property 
     def dss_GroupByTime(self) -> np.array:
-        return self.dssAll[self.CurrentTimePoint::self.TimePointsNum]
+        return self.dssAll[self.SliceNum * self.CurrentTimePoint : self.SliceNum * (self.CurrentTimePoint+1)]
 
     @property
     def SliceNum(self) -> int:

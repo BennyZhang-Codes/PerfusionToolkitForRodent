@@ -43,8 +43,12 @@ class read_Dicom_folder(MAbstractDicomReader):
     def len(self) -> int:
         return len(self.dcm_list)
         
+
+
+
+    @property
     def min_idx(self) -> int:
         return 0
-
+    @property
     def max_idx(self) -> int:
         return self.len() - 1

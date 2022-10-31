@@ -25,7 +25,6 @@ class MGraphicsScene(QGraphicsScene):
     signal_ROI = Signal(tuple)  # mask np.array  index np.array
     signal_ROI_point = Signal(QPoint)
     signal_ROI_color = Signal(QColor)
-    _ds_idxchange = Signal(int)
     def __init__(self, *args, **kargs):
         super().__init__(*args, **kargs)
         self.setup()

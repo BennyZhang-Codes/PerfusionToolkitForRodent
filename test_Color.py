@@ -24,8 +24,9 @@ class Example(QMainWindow):
         
         img = np.clip(ds.pixel_array, a_min=100, a_max=2000)
         img = ((img - img.min()) / max(1, img.max() - img.min()))*255
+        img = img.astype(np.uint8)
 
-        a = cv2.applyColorMap(img.astype(np.uint8), cv2.COLORMAP_RAINBOW)
+        a = cv2.applyColorMap(img, cv2.COLORMAP_RAINBOW)
         img = Image.fromarray(a)
         pix = img.toqpixmap()
         

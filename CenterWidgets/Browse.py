@@ -39,8 +39,8 @@ class Widget_Browse(QWidget, Ui_Widget_Browse):
         self.WW = 10000
         self.idw = self._set_IDW()
         self.verticalScrollBar_Image.setMaximum(self.dicom_reader.len())
-        self.verticalScrollBar_Image.setMinimum(self.graphicsView.DicomReader.min_idx()+1)
-        self.verticalScrollBar_Image.setValue(self.graphicsView.DicomReader.min_idx()+1)
+        self.verticalScrollBar_Image.setMinimum(self.graphicsView.DicomReader.min_idx+1)
+        self.verticalScrollBar_Image.setValue(self.graphicsView.DicomReader.min_idx+1)
         self.threadiconlist = ThreadIconlist(self)
         self.threadiconlist.loading_signal.connect(self._slot_loading)
         self.threadiconlist.loaded_signal.connect(self._slot_loaded)

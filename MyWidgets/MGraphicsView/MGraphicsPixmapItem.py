@@ -14,6 +14,7 @@ from MyWidgets.MGraphicsView.MGraphicsItem import MGraphicsItem
 class PixmapItem_Signal(QObject):
     WW_changed = Signal(int)
     WL_changed = Signal(int)
+    _idxchange = Signal(int)
     def __init__(self, *args, **kargs) -> None:
         super().__init__(*args, **kargs)
 
@@ -135,17 +136,12 @@ class MGraphicsPixmapItem(QGraphicsPixmapItem, MGraphicsItem):
                 self.x_init = event.scenePos().x()
                 self.y_init = event.scenePos().y()
             elif self.func == self.Func_Series:
-                print('series')
-                pass
-                    # self.y_end = pos.y()
-                    # y_diff = (self.y_end - self.y_init)
-                    # # totalnum = 100
-                    # # height_per_img = self.height() / totalnum
-                    # height_per_img = 10
-                    # if abs(y_diff) > height_per_img:
-                    #     self.y_init = self.y_end
-                    #     self._ds_idxchange.emit(int(y_diff/abs(y_diff)))
-                    #     print(int(y_diff/abs(y_diff)))
+                self.y_end = event.scenePos().y()
+                y_diff = (self.y_end - self.y_init)
+                height_per_img = 10
+                if abs(y_diff) > height_per_img:
+                    self.y_init = self.y_end
+                    self.signal._idxchange.emit(int(y_diff/abs(y_diff)))
 
     def mouseReleaseEvent(self, event: QGraphicsSceneMouseEvent) -> None:
         return None

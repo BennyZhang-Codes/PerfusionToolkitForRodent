@@ -8,7 +8,7 @@ from PySide6.QtWidgets import *
 from pydicom import FileDataset
 
 from modules.dcmreader.Read_dcm import MAbstractDicomReader
-from modules.dcmreader.read_Dicom import read_Dicom_folder
+from modules.dcmreader.read_DSC_DCE import Read_Bruker_TimeSeries
 from MyWidgets.MGraphicsView.MGraphicsScene import MGraphicsScene
 
 class MGraphicsView(QGraphicsView):
@@ -25,11 +25,11 @@ class MGraphicsView(QGraphicsView):
         self._setupUI()
 
     @property
-    def DicomReader(self) -> MAbstractDicomReader:
+    def DicomReader(self) -> Read_Bruker_TimeSeries:
         return self._dicom_reader
 
     @DicomReader.setter
-    def DicomReader(self, dr: MAbstractDicomReader) -> None:
+    def DicomReader(self, dr: Read_Bruker_TimeSeries) -> None:
         self._dicom_reader = dr
 
     def set_mainwindow(self, mainwindow) -> None:
@@ -53,29 +53,28 @@ class MGraphicsView(QGraphicsView):
     def __setup_scene(self):
         self.mscene = MGraphicsScene(self)
         self.mscene.signal_ROI.connect(self.__mask)
-        self.mscene._ds_idxchange.connect(self.__ds_idx_change)
+        self.mscene.item_img.signal._idxchange.connect(self.__ds_idx_change)
         self.setScene(self.mscene)
 
     def __mask(self, index):
         pass
 
-    def __ds_idx_change(self, idx: int) -> None:
-        idx = self.idx + idx
+    def __ds_idx_change(self, change: int) -> None:
+        idx = self.idx + change
         idx = self._check_idx(idx)
         self.set_scene(idx)
-        self.idx = idx
-
-
+        self._idx_changed.emit(idx)
+        
     def set_scene(self, idx: int) -> None:
         ds = self.DicomReader.get_ds(idx)
         self.mscene.set_scene(ds)
-
+        self.idx = idx
 
     def _check_idx(self, idx: int) -> int:
-        if idx < self.DicomReader.min_idx():
-            idx = self.DicomReader.min_idx()
-        if idx > self.DicomReader.max_idx():
-            idx = self.DicomReader.max_idx()
+        if idx < self.DicomReader.min_idx:
+            idx = self.DicomReader.min_idx
+        if idx > self.DicomReader.max_idx:
+            idx = self.DicomReader.max_idx
         return idx
 
     def resizeEvent(self, event: QResizeEvent) -> None:
