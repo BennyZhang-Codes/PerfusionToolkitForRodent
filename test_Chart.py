@@ -6,8 +6,6 @@ from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 from PySide6.QtCharts import *
 
-
-
 class InteractScatterChart(QChartView):
     def __init__(self):
         super().__init__()
@@ -41,7 +39,6 @@ class InteractScatterChart(QChartView):
         chart.createDefaultAxes()
         chart.axes(Qt.Horizontal)[0].setRange(0, 4.5)
         chart.axes(Qt.Vertical)[0].setRange(0, 4.5)
-
         return chart
 
     def handleClickedPoint(self, clickedPoint: QPointF, series_old: QScatterSeries, series_new: QScatterSeries):
@@ -59,11 +56,9 @@ class InteractScatterChart(QChartView):
             if currentDistance < distance:
                 distance = currentDistance
                 closest = currentPoint
-
         # Remove the closes point from series 1 and append it to series 2
         series_old.remove(closest)
         series_new.append(closest)
-
 
 class Example(QMainWindow):
     def __init__(self):
@@ -72,7 +67,6 @@ class Example(QMainWindow):
         self.setCentralWidget(scatter)
         self.resize(500, 300)
         self.setWindowTitle('InteractScatterChart')
-
 
 def main():
     app = QApplication(sys.argv)

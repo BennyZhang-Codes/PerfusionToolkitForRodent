@@ -1,4 +1,5 @@
 
+from types import NoneType
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -16,6 +17,9 @@ from MyWidgets.MChart.MChart import MChart
 
 class Widget_DSC(QWidget, Ui_Widget_DSC):
 
+    GroupSlice = 'Slice'
+    GroupTime = 'Time'
+
     def __init__(self, dicom_dir, mainwindow):
         super().__init__()
         self.mainwindow = mainwindow
@@ -25,6 +29,7 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         self.dicom_reader = Read_Bruker_TimeSeries(self.root)
         if self.comboBox.currentText() == 'Slice':
             self.dicom_reader.GroupBy = 'Slice'
+            self._groupby = 'Slice'
 
         self.dicom_reader.signal_loadstart.connect(self.__slot_loadstart)
         self.dicom_reader.signal_loading.connect(self.__slot_loading)
@@ -32,23 +37,25 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         
         self._ROI_color = QColor(118,185,172,196)
         
-
     def _setupUI(self):
         self.chart = MChart()
         self.chartView.setChart(self.chart)
 
         self.graphicsView.set_mainwindow(self.mainwindow)
         self.graphicsView.DicomReader = self.dicom_reader
+        # self.graphicsView.set_scene(0)
+        self.graphicsView.update_scene_Rect()
+        item_img = self.graphicsView.mscene.item_img
         self.graphicsView._idx_changed.connect(self.__slot_graphicsView_idx_changed)
         self.graphicsView.mscene.signal_ROI_point.connect(self.__slot_ROI_point)
         self.graphicsView.mscene.signal_ROI.connect(self.__slot_ROI)
         self.graphicsView.mscene.signal_ROI_color.connect(self.__slot_ROI_color)
         
-        self.spinBox_timepoint.setMaximum(self.dicom_reader.max_idx + 1)
-        self.spinBox_timepoint.setMinimum(self.dicom_reader.min_idx + 1)
+        self.spinBox_timepoint.setMaximum(self.dicom_reader.len)
+        self.spinBox_timepoint.setMinimum(1)
         self.spinBox_timepoint.setValue(self.graphicsView.idx + 1)
-        self.verticalScrollBar.setMaximum(self.dicom_reader.max_idx + 1)
-        self.verticalScrollBar.setMinimum(self.dicom_reader.min_idx + 1)
+        self.verticalScrollBar.setMaximum(self.dicom_reader.len)
+        self.verticalScrollBar.setMinimum(1)
         self.verticalScrollBar.setValue(self.graphicsView.idx + 1)
 
         self.spinBox_slice.setMaximum(self.dicom_reader.SliceNum)
@@ -61,6 +68,80 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         self.spinBox_column.setMaximum(self.dicom_reader.ColNum)
         self.spinBox_column.setMinimum(1)
 
+
+        
+        item_img.signal.WW_changed.connect(self.spinBox_WW.setValue)
+        item_img.signal.WL_changed.connect(self.spinBox_WL.setValue)
+
+        img = item_img.img
+        max_value = np.max(img)
+        min_value = np.min(img)
+        WL = (max_value+min_value)/2
+        WW = max(0, max_value-min_value)
+        self.spinBox_WW.setMaximum(item_img.WW_max)
+        self.spinBox_WW.setMinimum(item_img.WW_min)
+        self.spinBox_WW.setValue(WW)
+
+        self.spinBox_WL.setMaximum(item_img.WL_max)
+        self.spinBox_WL.setMinimum(item_img.WL_min)
+        self.spinBox_WL.setValue(WL)
+
+
+    def __slot_ROI_point(self, pos: QPoint):
+        row = pos.y()
+        col = pos.x()
+        self.spinBox_row.setValue(row)
+        self.spinBox_column.setValue(col)
+
+        ydata = self.dicom_reader.img_GroupBySlice[:, row - 1, col - 1]
+        xdata = self.dicom_reader.TimePoints
+        self.__curve(xdata, ydata)
+
+    def __curve(self, xdata: np.array, ydata: np.array) -> None:
+        model = TimePointsTableModel(xdata, ydata)
+        self.tableView.setModel(model)
+        self.chart.setModel(model)
+        self.chart.selected_point.connect(self.tableView.selectRow)
+        self.tableView.changed_rows.connect(self.chart._slot_update_pointConf)
+        self.tableView.selected_row.connect(self.chart._update_focus_point)
+        
+    def _setup(self):
+        self.slices = 0
+
+    def __slot_loadstart(self, start: bool):
+        if start:
+            self.widget_center.setEnabled(False)
+            self.widget_center.setVisible(False)
+            self.widget_load.setEnabled(True)
+            self.widget_load.setVisible(True)
+
+            self.load_progressBar.setMinimum(1)
+            slice_num = self.dicom_reader.SliceNum
+            timepoints_num = self.dicom_reader.TimePointsNum
+            self.load_progressBar.setMaximum(slice_num*timepoints_num)
+            self.load_label.setText('Loading ...')
+
+    def __slot_loading(self, value: int):
+        self.load_progressBar.setValue(value)
+
+    def __slot_loaded(self, loaded: bool):
+        if loaded:
+            self.load_label.setText('Loaded')
+            self.widget_center.setEnabled(True)
+            self.widget_center.setVisible(True)
+            self.widget_load.setEnabled(False)
+            self.widget_load.setVisible(False)
+            self._setupUI()
+
+    @property
+    def ROI_color(self) -> QColor:
+        return self._ROI_color
+
+    @ROI_color.setter
+    def ROI_color(self, color: QColor) -> None:
+        self._ROI_color = color
+            
+      
     def __slot_ROI(self, data: tuple):
         path, item_pix = data
         w = item_pix.width()
@@ -104,13 +185,12 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         self.label_mask.setPixmap(pix.scaled(512,512, Qt.KeepAspectRatio, Qt.FastTransformation))
 
         self.label_mask_img.setPixmap(item_pix.scaled(512,512, Qt.KeepAspectRatio, Qt.FastTransformation))
-        # self.label_mask_img.setScaledContents(True)
+
     def __slot_ROI_color(self, color: QColor) -> None:
         self.ROI_color = color
         
     def __slot_graphicsView_idx_changed(self, idx: int):
         self.verticalScrollBar.setValue(idx+1)
-
 
     @Slot(int)
     def on_spinBox_timepoint_valueChanged(self, value: int):
@@ -129,7 +209,10 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
 
     @Slot(int)
     def on_verticalScrollBar_valueChanged(self, value: int):
-        self.spinBox_timepoint.setValue(value)
+        if self.GroupBy == self.GroupSlice:
+            self.spinBox_timepoint.setValue(value)
+        elif self.GroupBy == self.GroupTime:
+            self.spinBox_slice.setValue(value)
 
     @Slot(int)
     def on_spinBox_row_valueChanged(self, value: int):
@@ -147,61 +230,32 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         xdata = self.dicom_reader.TimePoints
         self.__curve(xdata, ydata)
 
-    def __slot_ROI_point(self, pos: QPoint):
-        row = pos.y()
-        col = pos.x()
-        self.spinBox_row.setValue(row)
-        self.spinBox_column.setValue(col)
+    @Slot(int)
+    def on_spinBox_WL_valueChanged(self, value: int):
+        self.graphicsView.mscene.item_img.WL = value
+        self.graphicsView.set_scene(self.spinBox_timepoint.value()-1)
 
-        ydata = self.dicom_reader.img_GroupBySlice[:, row - 1, col - 1]
-        xdata = self.dicom_reader.TimePoints
-        self.__curve(xdata, ydata)
+    @Slot(int)
+    def on_spinBox_WW_valueChanged(self, value: int):
+        self.graphicsView.mscene.item_img.WW = value
+        self.graphicsView.set_scene(self.spinBox_timepoint.value()-1)
 
-    def __curve(self, xdata: np.array, ydata: np.array) -> None:
-        model = TimePointsTableModel(xdata, ydata)
-        self.tableView_points.setModel(model)
-        self.chart.setModel(model)
-        self.chart.selected_point.connect(self.tableView_points.selectRow)
-        self.tableView_points.changed_rows.connect(self.chart._slot_update_pointConf)
-        self.tableView_points.selected_row.connect(self.chart._update_focus_point)
-        
-    def _setup(self):
-        self.slices = 0
-
-    def __slot_loadstart(self, start: bool):
-        if start:
-            self.widget_center.setEnabled(False)
-            self.widget_center.setVisible(False)
-            self.widget_load.setEnabled(True)
-            self.widget_load.setVisible(True)
-
-            self.load_progressBar.setMinimum(1)
-            slice_num = self.dicom_reader.SliceNum
-            timepoints_num = self.dicom_reader.TimePointsNum
-            self.load_progressBar.setMaximum(slice_num*timepoints_num)
-            self.load_label.setText('Loading ...')
-
-    def __slot_loading(self, value: int):
-        self.load_progressBar.setValue(value)
-
-    def __slot_loaded(self, loaded: bool):
-        if loaded:
-            self.load_label.setText('Loaded')
-            self.widget_center.setEnabled(True)
-            self.widget_center.setVisible(True)
-            self.widget_load.setEnabled(False)
-            self.widget_load.setVisible(False)
-            self._setupUI()
+    @Slot(int)
+    def on_comboBox_currentIndexChanged(self, value: int) -> None:
+        self.GroupBy = value
+        self.verticalScrollBar.setMaximum(self.dicom_reader.len)
+        self.verticalScrollBar.setMinimum(1)
+        self.verticalScrollBar.setValue(self.graphicsView.idx + 1)
 
     @property
-    def ROI_color(self) -> QColor:
-        return self._ROI_color
+    def GroupBy(self) -> str:
+        return self._groupby
 
-    @ROI_color.setter
-    def ROI_color(self, color: QColor) -> None:
-        self._ROI_color = color
-            
-      
-
-
+    @GroupBy.setter
+    def GroupBy(self, value: int) -> None:
+        if value == 0:
+            self._groupby = 'Slice'
+        if value == 1:
+            self._groupby = 'Time'
+        self.dicom_reader.GroupBy = self._groupby
         

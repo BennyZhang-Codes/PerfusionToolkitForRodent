@@ -9,7 +9,6 @@ from PySide6.QtGui import *
 from UI.ui_Main_Window import Ui_MainWindow
 import qdarkstyle
 
-
 from DockWidgets.Start import DockWidget_FAIR, DockWidget_Start
 import CenterWidgets.Browse as Browse
 import CenterWidgets.DSC as DSC
@@ -24,8 +23,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.add_dockWidgets()
         self._setup()
         self.statusBar().showMessage('Ready')
-        # self.setStyleSheet(qdarkstyle.load_stylesheet_pyside2())
-        self.theme()
+        self.setStyleSheet(qdarkstyle.load_stylesheet_pyside2())
+        # self.theme()
 
     def theme(self):
         themeFile = 'dark.qss'

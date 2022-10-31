@@ -79,10 +79,14 @@ class MGraphicsView(QGraphicsView):
         return idx
 
     def resizeEvent(self, event: QResizeEvent) -> None:
+        self.update_scene_Rect()
+
+    def update_scene_Rect(self) -> None:
         if self.DicomReader is not None:
             self.mscene.setSceneRect(self.geometry())
             self.set_scene(self.idx)
             self.mscene.resizeevent()
+
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         return super().mousePressEvent(event)

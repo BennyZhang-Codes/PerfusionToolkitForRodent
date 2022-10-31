@@ -58,4 +58,4 @@ class Thread_load_DSC_DCE(QThread):
         self.DicomReader = parent
 
     def run(self):
-        
+        pass

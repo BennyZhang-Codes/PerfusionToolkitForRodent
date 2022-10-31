@@ -1,4 +1,5 @@
 from math import ceil
+from tokenize import Single
 from matplotlib.pyplot import sca
 
 import numpy as np
@@ -9,6 +10,12 @@ from PySide6.QtWidgets import *
 
 from MyWidgets.MGraphicsView.MGraphicsItem import MGraphicsItem
 
+
+class PixmapItem_Signal(QObject):
+    WW_changed = Signal(int)
+    WL_changed = Signal(int)
+    def __init__(self, *args, **kargs) -> None:
+        super().__init__(*args, **kargs)
 
 class MGraphicsPixmapItem(QGraphicsPixmapItem, MGraphicsItem):
     Func_Window = 'window'
@@ -22,9 +29,14 @@ class MGraphicsPixmapItem(QGraphicsPixmapItem, MGraphicsItem):
         self.__init_MGraphicsItem__()
         self.ItemType = 'image' 
         self.__init_scale = 1
-        self.__WW = 2000
-        self.__WL = 1000
+        self._WW = 2000
+        self._WL = 1000
+        self._WW_max = 60000
+        self._WW_min = 2
+        self._WL_max = 30000
+        self._WL_min = -30000
         self.__func = 'window'
+        self.signal = PixmapItem_Signal()
 
     def update_item(self, img: np.array=None):
         if img is None:
@@ -186,27 +198,31 @@ class MGraphicsPixmapItem(QGraphicsPixmapItem, MGraphicsItem):
 
     @property
     def WW(self) -> float:
-        return self.__WW
+        return self._WW
 
     @WW.setter
     def WW(self, ww: float):
-        if ww > 30000:
-            ww = 30000
-        if ww < 2:
-            ww = 2
-        self.__WW = ww
+        if ww > self._WW_max:
+            ww = self._WW_max
+        if ww < self._WW_min:
+            ww = self._WW_min
+        if self._WW != ww:
+            self.signal.WW_changed.emit(ww)
+        self._WW = ww
 
     @property
     def WL(self) -> float:
-        return self.__WL
+        return self._WL
 
     @WL.setter
     def WL(self, wl: float) -> None:
-        if wl > 30000:
-            wl = 30000
-        if wl < -1000:
-            wl = -1000
-        self.__WL = wl
+        if wl > self._WL_max:
+            wl = self._WL_max
+        if wl < self._WL_min:
+            wl = self._WL_min
+        if self._WL != wl:
+            self.signal.WL_changed.emit(wl)
+        self._WL = wl
 
     @property
     def IDW(self) -> dict:
@@ -234,4 +250,18 @@ class MGraphicsPixmapItem(QGraphicsPixmapItem, MGraphicsItem):
     @initPos.setter
     def initPos(self, Pos: QPointF) -> None:
         self.__init_Pos = Pos
+
+    @property
+    def WW_max(self) -> int:
+        return self._WW_max
+
+    @property
+    def WW_min(self) -> int:
+        return self._WW_min
+    @property
+    def WL_max(self) -> int:
+        return self._WL_max
+    @property
+    def WL_min(self) -> int:
+        return self._WL_min
 

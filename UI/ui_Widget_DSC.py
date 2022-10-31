@@ -145,30 +145,32 @@ class Ui_Widget_DSC(object):
         self.horizontalLayout_16.setObjectName(u"horizontalLayout_16")
         self.horizontalLayout_13 = QHBoxLayout()
         self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
-        self.label_6 = QLabel(self.layoutWidget1)
-        self.label_6.setObjectName(u"label_6")
+        self.label_WL = QLabel(self.layoutWidget1)
+        self.label_WL.setObjectName(u"label_WL")
 
-        self.horizontalLayout_13.addWidget(self.label_6)
+        self.horizontalLayout_13.addWidget(self.label_WL)
 
-        self.spinBox = QSpinBox(self.layoutWidget1)
-        self.spinBox.setObjectName(u"spinBox")
+        self.spinBox_WL = QSpinBox(self.layoutWidget1)
+        self.spinBox_WL.setObjectName(u"spinBox_WL")
+        self.spinBox_WL.setSingleStep(50)
 
-        self.horizontalLayout_13.addWidget(self.spinBox)
+        self.horizontalLayout_13.addWidget(self.spinBox_WL)
 
 
         self.horizontalLayout_16.addLayout(self.horizontalLayout_13)
 
         self.horizontalLayout_14 = QHBoxLayout()
         self.horizontalLayout_14.setObjectName(u"horizontalLayout_14")
-        self.label_7 = QLabel(self.layoutWidget1)
-        self.label_7.setObjectName(u"label_7")
+        self.label_WW = QLabel(self.layoutWidget1)
+        self.label_WW.setObjectName(u"label_WW")
 
-        self.horizontalLayout_14.addWidget(self.label_7)
+        self.horizontalLayout_14.addWidget(self.label_WW)
 
-        self.spinBox_2 = QSpinBox(self.layoutWidget1)
-        self.spinBox_2.setObjectName(u"spinBox_2")
+        self.spinBox_WW = QSpinBox(self.layoutWidget1)
+        self.spinBox_WW.setObjectName(u"spinBox_WW")
+        self.spinBox_WW.setSingleStep(50)
 
-        self.horizontalLayout_14.addWidget(self.spinBox_2)
+        self.horizontalLayout_14.addWidget(self.spinBox_WW)
 
 
         self.horizontalLayout_16.addLayout(self.horizontalLayout_14)
@@ -225,27 +227,48 @@ class Ui_Widget_DSC(object):
         self.splitter.addWidget(self.layoutWidget1)
         self.toolBox = QToolBox(self.splitter)
         self.toolBox.setObjectName(u"toolBox")
-        self.page = QWidget()
-        self.page.setObjectName(u"page")
-        self.page.setGeometry(QRect(0, 0, 265, 116))
-        self.verticalLayout_4 = QVBoxLayout(self.page)
+        self.page_correction = QWidget()
+        self.page_correction.setObjectName(u"page_correction")
+        self.page_correction.setGeometry(QRect(0, 0, 248, 119))
+        self.verticalLayout_9 = QVBoxLayout(self.page_correction)
+        self.verticalLayout_9.setObjectName(u"verticalLayout_9")
+        self.scrollArea_2 = QScrollArea(self.page_correction)
+        self.scrollArea_2.setObjectName(u"scrollArea_2")
+        self.scrollArea_2.setWidgetResizable(True)
+        self.scrollAreaWidgetContents_2 = QWidget()
+        self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
+        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 228, 69))
+        self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents_2)
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.label_motion = QLabel(self.scrollAreaWidgetContents_2)
+        self.label_motion.setObjectName(u"label_motion")
+
+        self.verticalLayout_3.addWidget(self.label_motion)
+
+        self.scrollArea_2.setWidget(self.scrollAreaWidgetContents_2)
+
+        self.verticalLayout_9.addWidget(self.scrollArea_2)
+
+        self.pushButton = QPushButton(self.page_correction)
+        self.pushButton.setObjectName(u"pushButton")
+
+        self.verticalLayout_9.addWidget(self.pushButton)
+
+        self.toolBox.addItem(self.page_correction, u"Correction")
+        self.page_roi = QWidget()
+        self.page_roi.setObjectName(u"page_roi")
+        self.page_roi.setGeometry(QRect(0, 0, 248, 73))
+        self.verticalLayout_4 = QVBoxLayout(self.page_roi)
         self.verticalLayout_4.setSpacing(0)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
-        self.listWidget = QListWidget(self.page)
+        self.listWidget = QListWidget(self.page_roi)
         self.listWidget.setObjectName(u"listWidget")
 
         self.verticalLayout_4.addWidget(self.listWidget)
 
         self.verticalLayout_4.setStretch(0, 5)
-        self.toolBox.addItem(self.page, u"ROI")
-        self.page_2 = QWidget()
-        self.page_2.setObjectName(u"page_2")
-        self.page_2.setGeometry(QRect(0, 0, 265, 116))
-        self.pushButton = QPushButton(self.page_2)
-        self.pushButton.setObjectName(u"pushButton")
-        self.pushButton.setGeometry(QRect(20, 50, 75, 24))
-        self.toolBox.addItem(self.page_2, u"Correction")
+        self.toolBox.addItem(self.page_roi, u"ROI")
         self.splitter.addWidget(self.toolBox)
 
         self.verticalLayout_7.addWidget(self.splitter)
@@ -267,17 +290,17 @@ class Ui_Widget_DSC(object):
         self.horizontalLayout_5.setSpacing(0)
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.horizontalLayout_5.setContentsMargins(0, 0, 0, 0)
-        self.tableView_points = MTableView(self.widget_chart)
-        self.tableView_points.setObjectName(u"tableView_points")
-        sizePolicy.setHeightForWidth(self.tableView_points.sizePolicy().hasHeightForWidth())
-        self.tableView_points.setSizePolicy(sizePolicy)
-        self.tableView_points.setMinimumSize(QSize(0, 0))
-        self.tableView_points.setMaximumSize(QSize(200, 16777215))
-        self.tableView_points.setEditTriggers(QAbstractItemView.AnyKeyPressed|QAbstractItemView.DoubleClicked|QAbstractItemView.EditKeyPressed|QAbstractItemView.SelectedClicked)
-        self.tableView_points.setTextElideMode(Qt.ElideMiddle)
-        self.tableView_points.verticalHeader().setVisible(False)
+        self.tableView = MTableView(self.widget_chart)
+        self.tableView.setObjectName(u"tableView")
+        sizePolicy.setHeightForWidth(self.tableView.sizePolicy().hasHeightForWidth())
+        self.tableView.setSizePolicy(sizePolicy)
+        self.tableView.setMinimumSize(QSize(0, 0))
+        self.tableView.setMaximumSize(QSize(200, 16777215))
+        self.tableView.setEditTriggers(QAbstractItemView.AnyKeyPressed|QAbstractItemView.DoubleClicked|QAbstractItemView.EditKeyPressed|QAbstractItemView.SelectedClicked)
+        self.tableView.setTextElideMode(Qt.ElideMiddle)
+        self.tableView.verticalHeader().setVisible(False)
 
-        self.horizontalLayout_5.addWidget(self.tableView_points)
+        self.horizontalLayout_5.addWidget(self.tableView)
 
         self.chartView = MChartView(self.widget_chart)
         self.chartView.setObjectName(u"chartView")
@@ -408,6 +431,7 @@ class Ui_Widget_DSC(object):
 
         self.retranslateUi(Widget_DSC)
 
+        self.comboBox.setCurrentIndex(0)
         self.toolBox.setCurrentIndex(0)
 
 
@@ -422,15 +446,16 @@ class Ui_Widget_DSC(object):
 
         self.label.setText(QCoreApplication.translate("Widget_DSC", u"Slice", None))
         self.label_2.setText(QCoreApplication.translate("Widget_DSC", u"Time point", None))
-        self.label_6.setText(QCoreApplication.translate("Widget_DSC", u"Window level", None))
-        self.label_7.setText(QCoreApplication.translate("Widget_DSC", u"Window width", None))
+        self.label_WL.setText(QCoreApplication.translate("Widget_DSC", u"Window level", None))
+        self.label_WW.setText(QCoreApplication.translate("Widget_DSC", u"Window width", None))
         self.label_3.setText(QCoreApplication.translate("Widget_DSC", u"Row", None))
         self.label_4.setText(QCoreApplication.translate("Widget_DSC", u"Column", None))
         self.spinBox_column.setSuffix("")
         self.spinBox_column.setPrefix("")
-        self.toolBox.setItemText(self.toolBox.indexOf(self.page), QCoreApplication.translate("Widget_DSC", u"ROI", None))
+        self.label_motion.setText("")
         self.pushButton.setText(QCoreApplication.translate("Widget_DSC", u"PushButton", None))
-        self.toolBox.setItemText(self.toolBox.indexOf(self.page_2), QCoreApplication.translate("Widget_DSC", u"Correction", None))
+        self.toolBox.setItemText(self.toolBox.indexOf(self.page_correction), QCoreApplication.translate("Widget_DSC", u"Correction", None))
+        self.toolBox.setItemText(self.toolBox.indexOf(self.page_roi), QCoreApplication.translate("Widget_DSC", u"ROI", None))
         self.label_mask.setText("")
         self.label_mask_img.setText("")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabWidgetPage1), QCoreApplication.translate("Widget_DSC", u"ROI", None))
