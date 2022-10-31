@@ -38,7 +38,6 @@ class Thread_DSC(QThread):
 
 
     def run(self):
-
         imgs = self.DicomReader.imgAll
         points = self.Model.Contained
         S0 = self.Model.S0

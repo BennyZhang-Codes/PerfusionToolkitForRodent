@@ -44,15 +44,27 @@ class Read_Bruker_TimeSeries(MAbstractDicomReader):
         dcm_list.sort()
         return dcm_list
 
-    def get_ds(self, idx: int) -> FileDataset:
-        '''get ds::FileDataset'''
+    def get_data(self, idx: int) -> tuple:
+        """obtain data
+
+        Input
+        -------
+        idx : int
+
+        Output
+        --------
+        ds : FileDataset
+        img: ndarray
+        """
         if self.GroupBy == self.GroupByTime:
             self.CurrentSlice = idx
             ds = self.dss_GroupByTime[self.CurrentSlice]
+            img = self.img_GroupByTime[self.CurrentSlice]
         elif self.GroupBy == self.GroupBySlice:
             self.CurrentTimePoint = idx
             ds = self.dss_GroupBySlice[self.CurrentTimePoint]
-        return ds
+            img = self.img_GroupBySlice[self.CurrentTimePoint]
+        return ds, img
 
     def get_array(self, index: int) -> np.array:
         ds = self.get_ds(index)

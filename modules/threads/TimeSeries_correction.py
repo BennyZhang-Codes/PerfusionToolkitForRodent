@@ -15,14 +15,19 @@ class DSC_Registration:
         self._R.SetInterpolator(sitk.sitkLinear)
 
         self._resampler = sitk.ResampleImageFilter()
-        self._resampler.SetInterpolator(sitk.sitkNearestNeighbor)
+        self._resampler.SetInterpolator(sitk.sitkLinear)
         self._resampler.SetDefaultPixelValue(0)
+
+        self.x = True
+        self.y = True
+        self.z = True
 
     def Execute(self, moving: np.array) -> np.array:
         moving = self.array_to_sitk(moving)
         outTx = self.R.Execute(self.fixed, moving)
         offset = outTx.GetOffset()
-        outTx.SetOffset((offset[0], offset[1], 0.0))
+        offset = tuple(np.array(offset) * self.Translation_Direction)
+        outTx.SetOffset(offset)
         self.resampler.SetTransform(outTx)
         out = self.resampler.Execute(moving)
         return self.sitk_to_array(out)
@@ -52,6 +57,10 @@ class DSC_Registration:
         self._fixed = self.array_to_sitk(img)
         self._resampler.SetReferenceImage(self._fixed)
 
+    @property
+    def Translation_Direction(self) -> np.array:
+        return np.array([self.x, self.y, self.z])
+
 class Thread_TimeSeries_correction(QThread):
     signal_start = Signal(bool)
     signal_processing = Signal(int)
@@ -63,13 +72,16 @@ class Thread_TimeSeries_correction(QThread):
     def set_DicomReader(self, DicomReader: Read_Bruker_TimeSeries) -> None:
         self.DicomReader = DicomReader
         self.imgAll = self.DicomReader.imgAll
+
+    def set_FixedPoint(self, point: int) -> None:
+        self.fixedpoint = point - 1
         
     def run(self):
         self.signal_start.emit(True)
         SliceNum = self.DicomReader.SliceNum
         TimePointsNum = self.DicomReader.TimePointsNum
 
-        self.TimeSeries_registration.fixed = self.imgAll[SliceNum * TimePointsNum//2 : SliceNum * (TimePointsNum//2+1)]
+        self.TimeSeries_registration.fixed = self.imgAll[SliceNum * self.fixedpoint : SliceNum * (self.fixedpoint+1)]
 
 
         res = np.zeros_like(self.imgAll)

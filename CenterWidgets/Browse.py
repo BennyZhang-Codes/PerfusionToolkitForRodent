@@ -72,7 +72,7 @@ class Widget_Browse(QWidget, Ui_Widget_Browse):
         self.graphicsView.set_scene(idx-1)
 
     def iconlist(self, idx):
-        ds, img = self.dicom_reader.get_ds_and_array(idx)
+        ds, img = self.dicom_reader.get_data(idx)
         try:
             img = np.clip(img, a_min=ds.SmallestImagePixelValue, a_max=ds.LargestImagePixelValue)
         except:

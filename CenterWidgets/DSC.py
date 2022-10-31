@@ -1,6 +1,3 @@
-
-from re import T
-from time import thread_time
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
@@ -16,6 +13,7 @@ from modules.utils.shape import shape_to_mask, get_index_of_mask
 from MyWidgets.Mmodel.TabelModel import TimePointsTableModel
 from MyWidgets.MChart.MChart import MChart
 from modules.threads.TimeSeries_correction import Thread_TimeSeries_correction
+from modules.threads.DSC import Thread_DSC
 
 
 
@@ -40,13 +38,10 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         self._ROI_color = QColor(118,185,172,196)
         
     def _setupUI(self):
+        # DSC
+        self.progressBar_DSC.setVisible(False)
 
-        # correction
-        self.widget_correction_after.setVisible(False)
-        self.widget_correction_after.setEnabled(False)
-        self.progressBar_correction.setVisible(False)
-        self.radioButton_showcorrected.setEnabled(False)
-        self.radioButton_showcorrected.setVisible(False)
+
         
         self.chart = MChart()
         self.chartView.setChart(self.chart)
@@ -62,6 +57,8 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         self.graphicsView.mscene.signal_ROI.connect(self.__slot_ROI)
         self.graphicsView.mscene.signal_ROI_color.connect(self.__slot_ROI_color)
         
+
+        # Basic
         self.spinBox_timepoint.setMaximum(self.dicom_reader.len)
         self.spinBox_timepoint.setMinimum(1)
         self.spinBox_timepoint.setValue(self.graphicsView.idx + 1)
@@ -122,8 +119,21 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
 
 
 
+        # correction
+        self.widget_correction_after.setVisible(False)
+        self.widget_correction_after.setEnabled(False)
+        self.progressBar_correction.setVisible(False)
+        self.radioButton_usecorrected.setEnabled(False)
+        self.spinBox_correction.setValue(self.dicom_reader.TimePointsNum//2)
+        self.spinBox_correction.setMinimum(1)
+        self.spinBox_correction.setMaximum(self.dicom_reader.TimePointsNum)
+
+
+
 
     def __curve(self, xdata: np.array, ydata: np.array) -> None:
+        self.xdata = xdata
+        self.ydata = ydata
         model = TimePointsTableModel(xdata, ydata)
         self.tableView.setModel(model)
         self.chart.setModel(model)
@@ -160,6 +170,7 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
             self._setupUI()
 
       
+    ### Basic
     def __slot_graphicsView_idx_changed(self, idx: int):
         self.verticalScrollBar.setValue(idx+1)
 
@@ -246,7 +257,6 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         elif self._groupby == self.GroupTime:
             self.verticalScrollBar.setValue(CurrentSlice+1)
         
-
 ### ROI
     def __slot_ROI_point(self, pos: QPoint):
         row = pos.y()
@@ -315,16 +325,26 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
     def __slot_ROI_color(self, color: QColor) -> None:
         self.ROI_color = color
   
-
 ### Correction
     @Slot()
     def on_pushButton_correction_clicked(self) -> None:
-        self.Thread_correction = Thread_TimeSeries_correction()
-        self.Thread_correction.set_DicomReader(self.dicom_reader)
-        self.Thread_correction.signal_start.connect(self.__slot_correction_start)
-        self.Thread_correction.signal_processing.connect(self.__slot_correction_processing)
-        self.Thread_correction.signal_end.connect(self.__slot_correction_end)
-        self.Thread_correction.start()
+        x = self.checkBox_correction_x.isChecked()
+        y = self.checkBox_correction_y.isChecked()
+        z = self.checkBox_correction_z.isChecked()
+        fixedpoint = self.spinBox_correction.value()
+
+        if x or y or z:
+            self.Thread_correction = Thread_TimeSeries_correction()
+            self.Thread_correction.TimeSeries_registration.x = x
+            self.Thread_correction.TimeSeries_registration.y = y
+            self.Thread_correction.TimeSeries_registration.z = z
+
+            self.Thread_correction.set_FixedPoint(fixedpoint)
+            self.Thread_correction.set_DicomReader(self.dicom_reader)
+            self.Thread_correction.signal_start.connect(self.__slot_correction_start)
+            self.Thread_correction.signal_processing.connect(self.__slot_correction_processing)
+            self.Thread_correction.signal_end.connect(self.__slot_correction_end)
+            self.Thread_correction.start()
 
     def __slot_correction_start(self, start: bool) -> None:
         if start:
@@ -345,8 +365,7 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
             self.pushButton_correction.setEnabled(True)
             self.pushButton_correction.setVisible(True)
 
-            self.radioButton_showcorrected.setEnabled(True)
-            self.radioButton_showcorrected.setVisible(True)
+            self.radioButton_usecorrected.setEnabled(True)
 
             row, col = self.graphicsView.mscene.item_img.img.shape
             center_row = row//2
@@ -378,6 +397,56 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
 
 
     @Slot(bool)
-    def on_radioButton_showcorrected_clicked(self, clicked: bool) -> None:
-        self.dicom_reader.ShowCorrected = self.radioButton_showcorrected.isChecked()
+    def on_radioButton_usecorrected_clicked(self, clicked: bool) -> None:
+        self.dicom_reader.ShowCorrected = self.radioButton_usecorrected.isChecked()
         
+
+
+### DSC
+    @Slot()
+    def on_pushButton_DSC_set_AIF_clicked(self) -> None:
+        self.AIF = self.ydata
+
+    @Slot(float)
+    def on_doubleSpinBox_DSC_TR_valueChanged(self, value: float) -> None:
+        self.TR = self.doubleSpinBox_DSC_TR.value() / 1000
+        print(self.TR)
+
+    @Slot(float)
+    def on_doubleSpinBox_DSC_TE_valueChanged(self, value: float) -> None:
+        self.TE = self.doubleSpinBox_DSC_TE.value() / 1000
+        print(self.TE)
+
+    @Slot()
+    def on_pushButton_DSC_run_clicked(self) -> None:
+        self.Thread_DSC = Thread_DSC()
+
+        self.Thread_DSC.signal_start.connect(self.__slot_DSC_start)
+        self.Thread_DSC.signal_processing.connect(self.__slot_DSC_processing)
+        self.Thread_DSC.signal_end.connect(self.__slot_DSC_end)
+
+
+
+    def __slot_DSC_start(self, start: bool) -> None:
+        if start:
+            self.progressBar_DSC.setMinimum(0)
+            # self.progressBar_DSC.setMaximum(self.dicom_reader.TimePointsNum)
+            self.progressBar_DSC.setVisible(True)
+            self.progressBar_DSC.setEnabled(True)
+            self.pushButton_DSC_run.setEnabled(False)
+            self.pushButton_DSC_run.setVisible(False)
+
+    def __slot_DSC_processing(self, value: int) -> None:
+        self.progressBar_DSC.setValue(value)
+
+    def __slot_DSC_end(self, end: bool) -> None:
+        if end:
+            self.progressBar_DSC.setVisible(False)
+            self.progressBar_DSC.setEnabled(False)
+            self.pushButton_DSC_run.setEnabled(True)
+            self.pushButton_DSC_run.setVisible(True)
+
+    
+
+    
+

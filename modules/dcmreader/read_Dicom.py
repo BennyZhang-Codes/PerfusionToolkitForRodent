@@ -32,14 +32,11 @@ class read_Dicom_folder(MAbstractDicomReader):
         ds = self.get_ds(index)
         return ds.pixel_array
 
-    def get_ds(self, index: int) -> FileDataset:
+    def get_data(self, index: int) -> tuple:
         dcm_path = self._get_path(index)
-        return dcmread(dcm_path)
-
-    def get_ds_and_array(self, index: int) -> tuple:
-        ds = self.get_ds(index)
+        ds = dcmread(dcm_path)
         return ds, ds.pixel_array
-         
+
     def len(self) -> int:
         return len(self.dcm_list)
         

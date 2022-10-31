@@ -324,9 +324,9 @@ class MGraphicsScene(QGraphicsScene):
         return draw
     
     
-    def set_scene(self, ds: FileDataset) -> None:
+    def set_scene(self, ds: FileDataset, img: np.array) -> None:
         self.ds = ds
-        self.item_img.update_item(self.ds.pixel_array)
+        self.item_img.update_item(img)
         self._prep_item_info(self.ds)
         self.InfoHide = self.InfoHide
         

@@ -66,8 +66,8 @@ class MGraphicsView(QGraphicsView):
         self._idx_changed.emit(idx)
         
     def set_scene(self, idx: int) -> None:
-        ds = self.DicomReader.get_ds(idx)
-        self.mscene.set_scene(ds)
+        ds, img = self.DicomReader.get_data(idx)
+        self.mscene.set_scene(ds, img)
         self.idx = idx
 
     def _check_idx(self, idx: int) -> int:
