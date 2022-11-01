@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 import sys
 
 from PySide6.QtCore import *
@@ -5,25 +6,62 @@ from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 from PySide6.QtCharts import *
 
-from PIL import Image, ImageColor
+from PIL import Image
 from pydicom import dcmread
 import numpy as np
 import cv2
 
 from MyWidgets.MWidget import MResult
+from modules.utils.colormap import MColorMap
 
 class Example(QMainWindow):
     def __init__(self):
         super().__init__()
 
-
+        img = MResult(self)
         ds = dcmread(r'E:\A30\DSC\Im00008.dcm')
+        img.setImgArray(ds.pixel_array)
 
-
-        res = MResult(self)
-        res.setImgArray(ds.pixel_array)
+        combox = QComboBox()
         
-        self.setCentralWidget(res)
+
+        self.ColorMap = MColorMap()
+
+        a = np.expand_dims(np.arange(256), axis=0)
+        cb = [a for i in range(25)]
+        cb = np.concatenate(cb, axis=0).astype(np.uint8)
+        cb = self.ColorMap.applyColorMap(cb)
+        cb = Image.fromarray(cb)
+        cb = cb.toqpixmap()
+
+
+        combox.addItem(cb, None)
+
+        combox.setIconSize(QSize(200, 25))
+        combox.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+
+
+
+
+        self.w = QWidget()
+        layout = QVBoxLayout()
+        layout.addWidget(combox)
+        layout.addWidget(img)
+        layout.setStretch(0,1)
+        layout.setStretch(1,5)
+
+        self.w.setLayout(layout)
+
+
+        xdata = np.arange(20)
+        ydata = np.arange(20)**2
+        
+        
+
+
+
+
+        self.setCentralWidget(self.w)
         self.resize(500, 300)
         self.setWindowTitle('Color')
 

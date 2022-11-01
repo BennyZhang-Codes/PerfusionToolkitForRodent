@@ -318,9 +318,8 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         xdata = self.dicom_reader.TimePoints
         self.__curve(xdata, np.mean(ydata, axis=0))
 
-        self.label_mask.setPixmap(pix.scaled(512,512, Qt.KeepAspectRatio, Qt.FastTransformation))
-
-        self.label_mask_img.setPixmap(item_pix.scaled(512,512, Qt.KeepAspectRatio, Qt.FastTransformation))
+        self.widget_mask.setPixmap(pix)
+        self.widget_mask_img.setPixmap(item_pix)
 
     def __slot_ROI_color(self, color: QColor) -> None:
         self.ROI_color = color

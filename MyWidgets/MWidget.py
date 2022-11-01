@@ -10,31 +10,103 @@ from PySide6.QtCharts import *
 
 from modules.utils.colormap import MColorMap
 
+class MROI(QWidget):
+    Func_Window = 'window'
+    Func_Move = 'move'
+    Func_ColorMap = 'colormap'
+    Func_Save = 'save'
+    def __init__(self, parent) -> None:
+        super().__init__(parent)
+        self.setMouseTracking(True)
+        self.setEnabled(False)
+
+        self.x_diff = 0
+        self.y_diff = 0
+
+        self._pix_image = None
+        self.ColorMap = MColorMap()
+        self.ColorMap.idx = 0
+
+    def setPixmap(self, pix: QPixmap) -> None:
+        self.PixImage = pix
+
+    @property
+    def PixImage(self) -> QPixmap:
+        return self._pix_image
+
+    @PixImage.setter
+    def PixImage(self, pix: QPixmap) -> None:
+        self._pix_image = pix
+        self.update()
+        self.setEnabled(True)
+
+    def paintEvent(self, event: QPaintEvent) -> None:
+        img = self.PixImage
+        if img is not None:
+            
+            img = img.scaled(self.width(), self.height(), Qt.KeepAspectRatio, Qt.FastTransformation)
+            x = (self.width() - img.width()) // 2 + self.x_diff
+            y = (self.height() - img.height()) // 2 + self.y_diff
+            painter = QPainter()
+            painter.begin(self)
+            painter.drawPixmap(x, y, img)
+            painter.end()
+        return super().paintEvent(event)
+
+
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.x_init = event.position().x()
+            self.y_init = event.position().y()
+        return super().mousePressEvent(event)
+
+    def mouseMoveEvent(self, event: QMouseEvent) -> None:
+        pos = event.position()
+        if event.buttons() == Qt.LeftButton | event.button() == Qt.MouseButton.LeftButton:
+            x_diff = pos.x() - self.x_init
+            y_diff = pos.y() - self.y_init
+            self.x_diff = self.x_diff + x_diff
+            self.y_diff = self.y_diff + y_diff
+            self.x_init = pos.x()
+            self.y_init = pos.y()
+            self.update()
+        return super().mouseMoveEvent(event)
+
+    def mouseDoubleClickEvent(self, event: QMouseEvent) -> None:
+        self.x_diff = 0
+        self.y_diff = 0
+        self.update()
+        return super().mouseDoubleClickEvent(event)
+    
+
+    def resizeEvent(self, event: QResizeEvent) -> None:
+        self.update()
+        return super().resizeEvent(event)
+
+
+
 class MResult(QWidget):
     Func_Window = 'window'
     Func_Move = 'move'
     Func_ColorMap = 'colormap'
     Func_Save = 'save'
-
-
-
-
     def __init__(self, parent) -> None:
         super().__init__(parent)
         self.setMouseTracking(True)
         self.__func = self.Func_Window
+        self.setEnabled(False)
 
         self._WW = 2000
         self._WL = 1000
-        self._WW_max = 60000
         self._WW_min = 2
+        self._WW_max = 60000
         self._WL_max = 30000
         self._WL_min = -30000
         self._x_diff = 0
         self._y_diff = 0
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.show_context_menu)
-        self._pix_image = QPixmap()
+        self._pix_image = None
 
         self.ColorMap = MColorMap()
         self.ColorMap.idx = 0
@@ -46,6 +118,7 @@ class MResult(QWidget):
         self.WW = vmax - vmin
         self.WL = (vmax - vmin) // 2 + vmin
         self.PixImage = self.update_PixImage()
+        self.setEnabled(True)
 
     def update_PixImage(self) -> QPixmap:
         img = self.img.copy()
@@ -65,37 +138,30 @@ class MResult(QWidget):
     def PixImage(self, pix: QPixmap) -> None:
         self._pix_image = pix
 
-    @property
-    def PixImage_show(self) -> QPixmap:
-        img = self.PixImage
-        return img.scaled(self.width(), self.height(), Qt.KeepAspectRatio, Qt.FastTransformation)
-
-    @property
-    def Pos_image(self) -> QPointF:
-        pos = QPointF()
-        img = self.PixImage_show
-        x = (self.width() - img.width()) // 2
-        y = (self.height() - img.height()) // 2
-        pos.setX(x + self._x_diff)
-        pos.setY(y + self._y_diff)
-        return pos
 
     def paintEvent(self, event: QPaintEvent) -> None:
-        img = self.PixImage_show
-        cb = self.PixColorBar.scaled(img.width()//5,img.height(), Qt.KeepAspectRatio, Qt.FastTransformation)
+        img = self.PixImage
+        if img is not None:
+            img = img.scaled(self.width(), self.height(), Qt.KeepAspectRatio, Qt.FastTransformation)
+            cb = self.PixColorBar.scaled(img.width()//5,img.height(), Qt.KeepAspectRatio, Qt.FastTransformation)
 
-        x_cb = self.width() - cb.width()
-        y_cb = (self.height() - cb.height()) // 2
-        painter = QPainter()
-        painter.begin(self)
-        painter.drawPixmap(self.Pos_image.x(), self.Pos_image.y(), img)
-        painter.drawPixmap(x_cb, y_cb, cb)
-        l1, l2, l3, l4 = self.linsofcolorbar(x_cb, y_cb, cb)
-        painter.drawLine(l1)
-        painter.drawLine(l2)
-        painter.drawLine(l3)
-        painter.drawLine(l4)
-        painter.end()
+            x = (self.width() - img.width()) // 2 + self._x_diff
+            y = (self.height() - img.height()) // 2 + self._y_diff
+
+
+
+            x_cb = self.width() - cb.width()
+            y_cb = (self.height() - cb.height()) // 2
+            painter = QPainter()
+            painter.begin(self)
+            painter.drawPixmap(x, y, img)
+            painter.drawPixmap(x_cb, y_cb, cb)
+            l1, l2, l3, l4 = self.linsofcolorbar(x_cb, y_cb, cb)
+            painter.drawLine(l1)
+            painter.drawLine(l2)
+            painter.drawLine(l3)
+            painter.drawLine(l4)
+            painter.end()
         return super().paintEvent(event)
 
     def linsofcolorbar(self, x: float, y: float, cb: QPixmap) -> tuple:
