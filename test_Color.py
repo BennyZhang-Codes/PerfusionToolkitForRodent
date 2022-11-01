@@ -10,30 +10,26 @@ from pydicom import dcmread
 import numpy as np
 import cv2
 
+from MyWidgets.MWidget import MResult
+
 class Example(QMainWindow):
     def __init__(self):
         super().__init__()
-        label = QLabel()
-        g = QLinearGradient()
-        g.setColorAt(0, Qt.red)
-        g.setColorAt(1, Qt.blue)
 
 
         ds = dcmread(r'E:\A30\DSC\Im00008.dcm')
 
-        
-        img = np.clip(ds.pixel_array, a_min=100, a_max=2000)
-        img = ((img - img.min()) / max(1, img.max() - img.min()))*255
-        img = img.astype(np.uint8)
 
-        a = cv2.applyColorMap(img, cv2.COLORMAP_RAINBOW)
-        img = Image.fromarray(a)
-        pix = img.toqpixmap()
+        res = MResult(self)
+        res.setImgArray(ds.pixel_array)
         
-        label.setPixmap(pix)
-        self.setCentralWidget(label)
+        self.setCentralWidget(res)
         self.resize(500, 300)
         self.setWindowTitle('Color')
+
+
+
+
 
 
 def main():
