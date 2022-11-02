@@ -18,7 +18,7 @@ class MROI(QWidget):
     def __init__(self, parent) -> None:
         super().__init__(parent)
         self.setMouseTracking(True)
-        self.setEnabled(False)
+        # self.setEnabled(False)
 
         self.x_diff = 0
         self.y_diff = 0
@@ -107,9 +107,8 @@ class MColorBar(QWidget):
 
     def paintEvent(self, event: QPaintEvent) -> None:
         img = self.PixImage
-        if img is not None:
+        if img is not None and self.isEnabled():
             cb = img.scaled(self.width(), self.height(), Qt.IgnoreAspectRatio, Qt.FastTransformation)
-
             x_cb = self.width() - cb.width()
             y_cb = (self.height() - cb.height()) // 2
             painter = QPainter()

@@ -2,6 +2,8 @@ import numpy as np
 import cv2
 import matplotlib.colors as colors
 
+
+
 class MColorMap:
     N = 256
     def __init__(self) -> None:
@@ -10,11 +12,15 @@ class MColorMap:
         self.cmap = self.colormap
     
     def applyColorMap(self, img: np.array) -> np.array:
-        cmap = self.cmap
-        r = cv2.applyColorMap(img, cmap[:,0])
-        g = cv2.applyColorMap(img, cmap[:,1])
-        b = cv2.applyColorMap(img, cmap[:,2])
-        return np.stack([r,g,b], axis=-1)
+        if self.cmap is None:
+            out = cv2.applyColorMap(img, self.idx)
+        else:
+            cmap = self.cmap
+            r = cv2.applyColorMap(img, cmap[:,0])
+            g = cv2.applyColorMap(img, cmap[:,1])
+            b = cv2.applyColorMap(img, cmap[:,2])
+            out = np.stack([r,g,b], axis=-1)
+        return out
 
     def _list2map(self, colorlist: list) -> np.array:
         cmap = colors.LinearSegmentedColormap.from_list('CBFcmap', colorlist, N=self.N)
@@ -33,18 +39,24 @@ class MColorMap:
 
     @idx.setter
     def idx(self, i: int) -> None:
-        if i < 0 or i > len(self.colorlists) - 1:
+        if i < 0 or i >  len(self.colorlists) + 22 - 1:
             raise ValueError('ColorMap: index of colormap out of reasonable range!')
-        self._colormap_idx = i
-        self.cmap = self.colormap
+        if i > len(self.colorlists) - 1:
+            self.cmap = None
+            self._colormap_idx = i - len(self.colorlists)
+        else:
+            self._colormap_idx = i
+            self.cmap = self.colormap
+        
 
     def setup(self) -> None:
         self.colorlists = [
-            ['black','#0D8BF3','#34F065','#F6E43C','#EE1A26'],
-            ['black','#0D0003','#34F005','#F6E43C','#EE1A26'],
-            ['black','#0D8BF3','#34F065','#F6E43C','#EE1A26'],
-
+            ['black', '#0D8BF3', '#34F065', '#F6E43C', '#EE1A26'],
+            ['black', '#FFFFFF'],
+            ['#FFFFFF', 'black'],
+            ['black','#00C1FC','#FFFFFF'],
         ]
+
 
 
 

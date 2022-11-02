@@ -12,8 +12,6 @@ from modules.utils.colormap import MColorMap
 from ToolWidgets.Widget_Results import Widget_Results
 
 
-
-
 class Example(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -28,16 +26,10 @@ class Example(QMainWindow):
         self.resize(500, 300)
         self.setWindowTitle('Color')
 
-
-
-
-
-
 def main():
     app = QApplication(sys.argv)
     ex = Example()
     ex.show()
     sys.exit(app.exec())
-
 
 main()

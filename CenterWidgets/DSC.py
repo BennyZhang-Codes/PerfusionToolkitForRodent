@@ -36,13 +36,15 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         self.dicom_reader.signal_loaded.connect(self.__slot_loaded)
         
         self._ROI_color = QColor(118,185,172,196)
+
+        self._mask_index = None
+        self._aif = None
         
     def _setupUI(self):
         # DSC
         self.progressBar_DSC.setVisible(False)
 
 
-        
         self.chart = MChart()
         self.chartView.setChart(self.chart)
 
@@ -117,8 +119,6 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         self.label_correction_before_row.setPixmap(pix)
         self.label_correction_before_row.setScaledContents(True)
 
-
-
         # correction
         self.widget_correction_after.setVisible(False)
         self.widget_correction_after.setEnabled(False)
@@ -128,15 +128,20 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         self.spinBox_correction.setMinimum(1)
         self.spinBox_correction.setMaximum(self.dicom_reader.TimePointsNum)
 
+        # results
+        self.groupBox_ROI.setEnabled(False)
+        self.groupBox_Results.setEnabled(False)
 
-
+        self.widget_result_CBF.label.setText('CBF')
+        self.widget_result_CBV.label.setText('CBV')
+        self.widget_result_MTT.label.setText('MTT')
 
     def __curve(self, xdata: np.array, ydata: np.array) -> None:
         self.xdata = xdata
         self.ydata = ydata
-        model = TimePointsTableModel(xdata, ydata)
-        self.tableView.setModel(model)
-        self.chart.setModel(model)
+        self.model = TimePointsTableModel(xdata, ydata)
+        self.tableView.setModel(self.model)
+        self.chart.setModel(self.model)
         self.chart.selected_point.connect(self.tableView.selectRow)
         self.tableView.changed_rows.connect(self.chart._slot_update_pointConf)
         self.tableView.selected_row.connect(self.chart._update_focus_point)
@@ -281,6 +286,8 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
 
     def __slot_ROI(self, data: tuple):
         path, item_pix = data
+        self.groupBox_ROI.setEnabled(True)
+
         w = item_pix.width()
         h = item_pix.height()
         pix = QPixmap(w, h)
@@ -402,6 +409,14 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
 
 
 ### DSC
+    @property
+    def AIF(self) -> np.array:
+        return self._aif
+    
+    @AIF.setter
+    def AIF(self, aif: np.array) -> None:
+        self._aif = aif
+
     @Slot()
     def on_pushButton_DSC_set_AIF_clicked(self) -> None:
         self.AIF = self.ydata
@@ -420,10 +435,17 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
     def on_pushButton_DSC_run_clicked(self) -> None:
         self.Thread_DSC = Thread_DSC()
 
+        print(self.model.S0)
+        print(self.model.Contained)
+        print(self.model.S0 * self.model.Contained)
+        print(self.maskIndex)
+        print(self.doubleSpinBox_DSC_TR)
+        print(self.doubleSpinBox_DSC_TE)
+        print(self.AIF)
+
         self.Thread_DSC.signal_start.connect(self.__slot_DSC_start)
         self.Thread_DSC.signal_processing.connect(self.__slot_DSC_processing)
         self.Thread_DSC.signal_end.connect(self.__slot_DSC_end)
-
 
 
     def __slot_DSC_start(self, start: bool) -> None:
@@ -445,7 +467,34 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
             self.pushButton_DSC_run.setEnabled(True)
             self.pushButton_DSC_run.setVisible(True)
 
-    
 
+### ROI
+    @Slot()
+    def on_pushButton_Save_mask_clicked(self) -> None:
+        dialog = QFileDialog(self, 'Save File')
+        dialog.setMimeTypeFilters(['image/png', 'image/jpeg', 'image/bmp', 'image/tiff'])
+        dialog.setFileMode(QFileDialog.AnyFile)
+        dialog.setAcceptMode(QFileDialog.AcceptSave)
+        dialog.setDefaultSuffix("png")
+        dialog.setDirectory(
+            QStandardPaths.writableLocation(QStandardPaths.DesktopLocation)
+        )
+        if dialog.exec() == QFileDialog.Accepted:
+            a = dialog.selectedFiles()[0]
+            self.widget_mask.PixImage.save(a)
+
+    @Slot()
+    def on_pushButton_Save_overlap_clicked(self) -> None:
+        dialog = QFileDialog(self, 'Save File')
+        dialog.setMimeTypeFilters(['image/png', 'image/jpeg', 'image/bmp', 'image/tiff'])
+        dialog.setFileMode(QFileDialog.AnyFile)
+        dialog.setAcceptMode(QFileDialog.AcceptSave)
+        dialog.setDefaultSuffix("png")
+        dialog.setDirectory(
+            QStandardPaths.writableLocation(QStandardPaths.DesktopLocation)
+        )
+        if dialog.exec() == QFileDialog.Accepted:
+            a = dialog.selectedFiles()[0]
+            self.widget_mask_img.PixImage.save(a)
     
 

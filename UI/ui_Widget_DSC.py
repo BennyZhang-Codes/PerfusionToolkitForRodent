@@ -25,7 +25,8 @@ from PySide6.QtWidgets import (QAbstractItemView, QAbstractSpinBox, QApplication
 from MyWidgets.MChart.MChart import MChartView
 from MyWidgets.MGraphicsView.MGraphicsView_TimeSeries import MGraphicsView_TimeSeries
 from MyWidgets.MView.MTableView import MTableView
-from MyWidgets.MWidget import (MROI, MResult)
+from MyWidgets.MWidget import MROI
+from ToolWidgets.Widget_Results import Widget_Results
 
 class Ui_Widget_DSC(object):
     def setupUi(self, Widget_DSC):
@@ -92,7 +93,7 @@ class Ui_Widget_DSC(object):
         self.scrollArea_2.setWidgetResizable(True)
         self.scrollAreaWidgetContents_2 = QWidget()
         self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
-        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 289, 480))
+        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 306, 687))
         self.verticalLayout_4 = QVBoxLayout(self.scrollAreaWidgetContents_2)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.verticalLayout_4.setContentsMargins(5, 5, 5, 5)
@@ -656,15 +657,15 @@ class Ui_Widget_DSC(object):
         self.splitter_3 = QSplitter(self.widget_4)
         self.splitter_3.setObjectName(u"splitter_3")
         self.splitter_3.setOrientation(Qt.Horizontal)
-        self.groupBox_4 = QGroupBox(self.splitter_3)
-        self.groupBox_4.setObjectName(u"groupBox_4")
-        self.verticalLayout_5 = QVBoxLayout(self.groupBox_4)
+        self.groupBox_ROI = QGroupBox(self.splitter_3)
+        self.groupBox_ROI.setObjectName(u"groupBox_ROI")
+        self.verticalLayout_5 = QVBoxLayout(self.groupBox_ROI)
         self.verticalLayout_5.setSpacing(3)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
         self.verticalLayout_5.setContentsMargins(3, 3, 3, 3)
         self.horizontalLayout_35 = QHBoxLayout()
         self.horizontalLayout_35.setObjectName(u"horizontalLayout_35")
-        self.label_17 = QLabel(self.groupBox_4)
+        self.label_17 = QLabel(self.groupBox_ROI)
         self.label_17.setObjectName(u"label_17")
 
         self.horizontalLayout_35.addWidget(self.label_17)
@@ -673,7 +674,7 @@ class Ui_Widget_DSC(object):
 
         self.horizontalLayout_35.addItem(self.horizontalSpacer_16)
 
-        self.pushButton_Save_mask = QPushButton(self.groupBox_4)
+        self.pushButton_Save_mask = QPushButton(self.groupBox_ROI)
         self.pushButton_Save_mask.setObjectName(u"pushButton_Save_mask")
 
         self.horizontalLayout_35.addWidget(self.pushButton_Save_mask)
@@ -681,7 +682,7 @@ class Ui_Widget_DSC(object):
 
         self.verticalLayout_5.addLayout(self.horizontalLayout_35)
 
-        self.frame = QFrame(self.groupBox_4)
+        self.frame = QFrame(self.groupBox_ROI)
         self.frame.setObjectName(u"frame")
         sizePolicy4 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy4.setHorizontalStretch(0)
@@ -705,7 +706,7 @@ class Ui_Widget_DSC(object):
 
         self.horizontalLayout_38 = QHBoxLayout()
         self.horizontalLayout_38.setObjectName(u"horizontalLayout_38")
-        self.label_18 = QLabel(self.groupBox_4)
+        self.label_18 = QLabel(self.groupBox_ROI)
         self.label_18.setObjectName(u"label_18")
 
         self.horizontalLayout_38.addWidget(self.label_18)
@@ -714,7 +715,7 @@ class Ui_Widget_DSC(object):
 
         self.horizontalLayout_38.addItem(self.horizontalSpacer_17)
 
-        self.pushButton_Save_overlap = QPushButton(self.groupBox_4)
+        self.pushButton_Save_overlap = QPushButton(self.groupBox_ROI)
         self.pushButton_Save_overlap.setObjectName(u"pushButton_Save_overlap")
 
         self.horizontalLayout_38.addWidget(self.pushButton_Save_overlap)
@@ -722,7 +723,7 @@ class Ui_Widget_DSC(object):
 
         self.verticalLayout_5.addLayout(self.horizontalLayout_38)
 
-        self.frame_2 = QFrame(self.groupBox_4)
+        self.frame_2 = QFrame(self.groupBox_ROI)
         self.frame_2.setObjectName(u"frame_2")
         sizePolicy4.setHeightForWidth(self.frame_2.sizePolicy().hasHeightForWidth())
         self.frame_2.setSizePolicy(sizePolicy4)
@@ -744,14 +745,14 @@ class Ui_Widget_DSC(object):
 
         self.verticalLayout_5.addWidget(self.frame_2)
 
-        self.splitter_3.addWidget(self.groupBox_4)
-        self.groupBox_5 = QGroupBox(self.splitter_3)
-        self.groupBox_5.setObjectName(u"groupBox_5")
-        self.horizontalLayout_10 = QHBoxLayout(self.groupBox_5)
+        self.splitter_3.addWidget(self.groupBox_ROI)
+        self.groupBox_Results = QGroupBox(self.splitter_3)
+        self.groupBox_Results.setObjectName(u"groupBox_Results")
+        self.horizontalLayout_10 = QHBoxLayout(self.groupBox_Results)
         self.horizontalLayout_10.setSpacing(3)
         self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
         self.horizontalLayout_10.setContentsMargins(3, 3, 3, 3)
-        self.frame_3 = QFrame(self.groupBox_5)
+        self.frame_3 = QFrame(self.groupBox_Results)
         self.frame_3.setObjectName(u"frame_3")
         sizePolicy4.setHeightForWidth(self.frame_3.sizePolicy().hasHeightForWidth())
         self.frame_3.setSizePolicy(sizePolicy4)
@@ -761,17 +762,17 @@ class Ui_Widget_DSC(object):
         self.verticalLayout_15.setSpacing(0)
         self.verticalLayout_15.setObjectName(u"verticalLayout_15")
         self.verticalLayout_15.setContentsMargins(0, 0, 0, 0)
-        self.widget_mask_3 = MResult(self.frame_3)
-        self.widget_mask_3.setObjectName(u"widget_mask_3")
-        sizePolicy3.setHeightForWidth(self.widget_mask_3.sizePolicy().hasHeightForWidth())
-        self.widget_mask_3.setSizePolicy(sizePolicy3)
+        self.widget_result_CBF = Widget_Results(self.frame_3)
+        self.widget_result_CBF.setObjectName(u"widget_result_CBF")
+        sizePolicy3.setHeightForWidth(self.widget_result_CBF.sizePolicy().hasHeightForWidth())
+        self.widget_result_CBF.setSizePolicy(sizePolicy3)
 
-        self.verticalLayout_15.addWidget(self.widget_mask_3)
+        self.verticalLayout_15.addWidget(self.widget_result_CBF)
 
 
         self.horizontalLayout_10.addWidget(self.frame_3)
 
-        self.frame_4 = QFrame(self.groupBox_5)
+        self.frame_4 = QFrame(self.groupBox_Results)
         self.frame_4.setObjectName(u"frame_4")
         sizePolicy4.setHeightForWidth(self.frame_4.sizePolicy().hasHeightForWidth())
         self.frame_4.setSizePolicy(sizePolicy4)
@@ -781,15 +782,15 @@ class Ui_Widget_DSC(object):
         self.verticalLayout_16.setSpacing(0)
         self.verticalLayout_16.setObjectName(u"verticalLayout_16")
         self.verticalLayout_16.setContentsMargins(0, 0, 0, 0)
-        self.widget_mask_4 = MResult(self.frame_4)
-        self.widget_mask_4.setObjectName(u"widget_mask_4")
+        self.widget_result_CBV = Widget_Results(self.frame_4)
+        self.widget_result_CBV.setObjectName(u"widget_result_CBV")
 
-        self.verticalLayout_16.addWidget(self.widget_mask_4)
+        self.verticalLayout_16.addWidget(self.widget_result_CBV)
 
 
         self.horizontalLayout_10.addWidget(self.frame_4)
 
-        self.frame_5 = QFrame(self.groupBox_5)
+        self.frame_5 = QFrame(self.groupBox_Results)
         self.frame_5.setObjectName(u"frame_5")
         sizePolicy4.setHeightForWidth(self.frame_5.sizePolicy().hasHeightForWidth())
         self.frame_5.setSizePolicy(sizePolicy4)
@@ -799,15 +800,15 @@ class Ui_Widget_DSC(object):
         self.verticalLayout_17.setSpacing(0)
         self.verticalLayout_17.setObjectName(u"verticalLayout_17")
         self.verticalLayout_17.setContentsMargins(0, 0, 0, 0)
-        self.widget_mask_5 = MResult(self.frame_5)
-        self.widget_mask_5.setObjectName(u"widget_mask_5")
+        self.widget_result_MTT = Widget_Results(self.frame_5)
+        self.widget_result_MTT.setObjectName(u"widget_result_MTT")
 
-        self.verticalLayout_17.addWidget(self.widget_mask_5)
+        self.verticalLayout_17.addWidget(self.widget_result_MTT)
 
 
         self.horizontalLayout_10.addWidget(self.frame_5)
 
-        self.splitter_3.addWidget(self.groupBox_5)
+        self.splitter_3.addWidget(self.groupBox_Results)
 
         self.horizontalLayout_11.addWidget(self.splitter_3)
 
@@ -949,12 +950,12 @@ class Ui_Widget_DSC(object):
         self.label_correction_after_row.setText("")
         self.label_12.setText(QCoreApplication.translate("Widget_DSC", u"Center Col", None))
         self.label_correction_after_col.setText("")
-        self.groupBox_4.setTitle(QCoreApplication.translate("Widget_DSC", u"ROI", None))
+        self.groupBox_ROI.setTitle(QCoreApplication.translate("Widget_DSC", u"ROI", None))
         self.label_17.setText(QCoreApplication.translate("Widget_DSC", u"Mask", None))
         self.pushButton_Save_mask.setText(QCoreApplication.translate("Widget_DSC", u"Save", None))
         self.label_18.setText(QCoreApplication.translate("Widget_DSC", u"Overlap", None))
         self.pushButton_Save_overlap.setText(QCoreApplication.translate("Widget_DSC", u"Save", None))
-        self.groupBox_5.setTitle(QCoreApplication.translate("Widget_DSC", u"Results", None))
+        self.groupBox_Results.setTitle(QCoreApplication.translate("Widget_DSC", u"Results", None))
         self.load_label.setText(QCoreApplication.translate("Widget_DSC", u"TextLabel", None))
     # retranslateUi
 
