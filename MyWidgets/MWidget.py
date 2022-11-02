@@ -83,9 +83,64 @@ class MROI(QWidget):
         self.update()
         return super().resizeEvent(event)
 
+class MColorBar(QWidget):
+    def __init__(self, parent) -> None:
+        super().__init__(parent)
+        self.setMouseTracking(True)
+        self.setEnabled(False)
+        self.ColorMap = MColorMap()
+        self._pix_image = None
 
+    def setPixmap(self, pix: QPixmap) -> None:
+        self.PixImage = pix
+        self.setEnabled(True)
+        self.update()
+
+    @property
+    def PixImage(self) -> QPixmap:
+        return self._pix_image
+
+    @PixImage.setter
+    def PixImage(self, pix: QPixmap) -> None:
+        self._pix_image = pix
+
+
+    def paintEvent(self, event: QPaintEvent) -> None:
+        img = self.PixImage
+        if img is not None:
+            cb = img.scaled(self.width(), self.height(), Qt.IgnoreAspectRatio, Qt.FastTransformation)
+
+            x_cb = self.width() - cb.width()
+            y_cb = (self.height() - cb.height()) // 2
+            painter = QPainter()
+            painter.begin(self)
+            painter.drawPixmap(x_cb, y_cb, cb)
+            l1, l2, l3, l4 = self.linsofcolorbar(x_cb, y_cb, cb)
+            painter.drawLine(l1)
+            painter.drawLine(l2)
+            painter.drawLine(l3)
+            painter.drawLine(l4)
+            painter.end()
+        return super().paintEvent(event)
+
+    def linsofcolorbar(self, x: float, y: float, cb: QPixmap) -> tuple:
+        l1 = QLine()
+        l1.setLine(x, y, x, y+ cb.height()-1)
+        l2 = QLine()
+        l2.setLine(x, y, x+cb.width()-1, y)
+        l3 = QLine()
+        l3.setLine(x+cb.width()-1, y, x+cb.width()-1, y+ cb.height()-1)
+        l4 = QLine()
+        l4.setLine(x, y+ cb.height()-1, x+cb.width()-1, y+ cb.height()-1)
+        return l1, l2, l3, l4
+
+    def resizeEvent(self, event: QResizeEvent) -> None:
+        return super().resizeEvent(event)
 
 class MResult(QWidget):
+    Vmax = Signal(float)
+    Vmin = Signal(float)
+
     Func_Window = 'window'
     Func_Move = 'move'
     Func_ColorMap = 'colormap'
@@ -113,11 +168,11 @@ class MResult(QWidget):
 
     def setImgArray(self, img: np.array) -> None:
         self.img = img
-        vmin = img.min()
-        vmax = img.max()
-        self.WW = vmax - vmin
-        self.WL = (vmax - vmin) // 2 + vmin
-        self.PixImage = self.update_PixImage()
+        self.vmin = img.min()
+        self.vmax = img.max()
+        self.WW = self.vmax - self.vmin
+        self.WL = (self.vmax - self.vmin) // 2 + self.vmin
+        self.update_PixImage()
         self.setEnabled(True)
 
     def update_PixImage(self) -> QPixmap:
@@ -128,7 +183,8 @@ class MResult(QWidget):
 
         a = self.ColorMap.applyColorMap(img)
         img = Image.fromarray(a)
-        return img.toqpixmap()
+        img = img.toqpixmap()
+        self.PixImage = img
 
     @property
     def PixImage(self) -> QPixmap:
@@ -143,37 +199,15 @@ class MResult(QWidget):
         img = self.PixImage
         if img is not None:
             img = img.scaled(self.width(), self.height(), Qt.KeepAspectRatio, Qt.FastTransformation)
-            cb = self.PixColorBar.scaled(img.width()//5,img.height(), Qt.KeepAspectRatio, Qt.FastTransformation)
 
             x = (self.width() - img.width()) // 2 + self._x_diff
             y = (self.height() - img.height()) // 2 + self._y_diff
 
-
-
-            x_cb = self.width() - cb.width()
-            y_cb = (self.height() - cb.height()) // 2
             painter = QPainter()
             painter.begin(self)
             painter.drawPixmap(x, y, img)
-            painter.drawPixmap(x_cb, y_cb, cb)
-            l1, l2, l3, l4 = self.linsofcolorbar(x_cb, y_cb, cb)
-            painter.drawLine(l1)
-            painter.drawLine(l2)
-            painter.drawLine(l3)
-            painter.drawLine(l4)
             painter.end()
         return super().paintEvent(event)
-
-    def linsofcolorbar(self, x: float, y: float, cb: QPixmap) -> tuple:
-        l1 = QLine()
-        l1.setLine(x, y, x, y+ cb.height()-1)
-        l2 = QLine()
-        l2.setLine(x, y, x+cb.width()-1, y)
-        l3 = QLine()
-        l3.setLine(x+cb.width()-1, y, x+cb.width()-1, y+ cb.height()-1)
-        l4 = QLine()
-        l4.setLine(x, y+ cb.height()-1, x+cb.width()-1, y+ cb.height()-1)
-        return l1, l2, l3, l4
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         if event.button() == Qt.MouseButton.LeftButton:
@@ -193,7 +227,7 @@ class MResult(QWidget):
                 self.WL = (self.WL + 1000 * (y_diff / self.height()))
                 self.x_init = self.x_end
                 self.y_init = self.y_end
-                self.PixImage = self.update_PixImage()
+                self.update_PixImage()
             elif self.func == self.Func_Move:
                 x_diff = pos.x() - self.x_init
                 y_diff = pos.y() - self.y_init
@@ -211,7 +245,7 @@ class MResult(QWidget):
             vmax = self.img.max()
             self.WW = vmax - vmin
             self.WL = (vmax - vmin) // 2 + vmin
-            self.PixImage = self.update_PixImage()
+            self.update_PixImage()
         if self.func == self.Func_Move:
             self._x_diff = 0
             self._y_diff = 0
@@ -237,6 +271,7 @@ class MResult(QWidget):
         if ww < self._WW_min:
             ww = self._WW_min
         self._WW = ww
+        self.emit_ValueRange()
 
     @property
     def WL(self) -> float:
@@ -249,6 +284,28 @@ class MResult(QWidget):
         if wl < self._WL_min:
             wl = self._WL_min
         self._WL = wl
+        self.emit_ValueRange()
+
+
+    def setVmin(self, vmin: float) -> None:
+        self.vmin = vmin
+        self._WW = self.vmax - self.vmin
+        self._WL = (self.vmax - self.vmin) // 2 + self.vmin
+        self.update_PixImage()
+        self.update()
+
+    def setVmax(self, vmax: float) -> None:
+        self.vmax = vmax
+        self._WW = self.vmax - self.vmin
+        self._WL = (self.vmax - self.vmin) // 2 + self.vmin
+        self.update_PixImage()
+        self.update()
+
+    def emit_ValueRange(self) -> None:
+        vmax = self.WL + self.WW / 2 
+        vmin = self.WL - self.WW / 2
+        self.Vmax.emit(vmax)
+        self.Vmin.emit(vmin)
 
     @property
     def IDW(self) -> dict:
@@ -269,14 +326,6 @@ class MResult(QWidget):
     def func(self, func: str) -> None:
         self.__func = func
 
-    @property
-    def PixColorBar(self) -> QPixmap:
-        a = np.expand_dims(np.flipud(np.arange(256)), axis=0)
-        cb = [a for i in range(50)]
-        cb = np.concatenate(cb, axis=0).astype(np.uint8).T
-        cb = self.ColorMap.applyColorMap(cb)
-        cb = Image.fromarray(cb)
-        return cb.toqpixmap()
 
     def show_context_menu(self) -> None:
         menu = QMenu(self)

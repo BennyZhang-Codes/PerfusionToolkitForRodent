@@ -13,6 +13,7 @@ import cv2
 
 from MyWidgets.MWidget import MResult
 from modules.utils.colormap import MColorMap
+from MyWidgets.MComboBox.ColorMap import MColorMapComboBox
 
 class Example(QMainWindow):
     def __init__(self):
@@ -22,26 +23,10 @@ class Example(QMainWindow):
         ds = dcmread(r'E:\A30\DSC\Im00008.dcm')
         img.setImgArray(ds.pixel_array)
 
-        combox = QComboBox()
+        combox = MColorMapComboBox()
         
 
         self.ColorMap = MColorMap()
-
-        a = np.expand_dims(np.arange(256), axis=0)
-        cb = [a for i in range(25)]
-        cb = np.concatenate(cb, axis=0).astype(np.uint8)
-        cb = self.ColorMap.applyColorMap(cb)
-        cb = Image.fromarray(cb)
-        cb = cb.toqpixmap()
-
-
-        combox.addItem(cb, None)
-
-        combox.setIconSize(QSize(200, 25))
-        combox.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-
-
-
 
         self.w = QWidget()
         layout = QVBoxLayout()
