@@ -18,14 +18,13 @@ class MROI(QWidget):
     def __init__(self, parent) -> None:
         super().__init__(parent)
         self.setMouseTracking(True)
-        # self.setEnabled(False)
-
         self.x_diff = 0
         self.y_diff = 0
 
         self._pix_image = None
         self.ColorMap = MColorMap()
         self.ColorMap.idx = 0
+
 
     def setPixmap(self, pix: QPixmap) -> None:
         self.PixImage = pix
@@ -42,15 +41,20 @@ class MROI(QWidget):
 
     def paintEvent(self, event: QPaintEvent) -> None:
         img = self.PixImage
+
+        pix = QPixmap(self.width(), self.height())
+        pix.fill(QColor(0,0,0,255))
+
+        painter = QPainter()
+        painter.begin(self)
+        painter.drawPixmap(0,0,pix)
+
         if img is not None:
-            
             img = img.scaled(self.width(), self.height(), Qt.KeepAspectRatio, Qt.FastTransformation)
             x = (self.width() - img.width()) // 2 + self.x_diff
             y = (self.height() - img.height()) // 2 + self.y_diff
-            painter = QPainter()
-            painter.begin(self)
             painter.drawPixmap(x, y, img)
-            painter.end()
+        painter.end()
         return super().paintEvent(event)
 
 

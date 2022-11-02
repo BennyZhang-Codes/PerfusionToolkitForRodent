@@ -54,11 +54,11 @@ class MTableView(QTableView):
         action_deselect_s0 = self.Menu.addAction('Deselect as S0')
         action_deselect_s0.triggered.connect(self._action_deselect_s0)
 
-        action_delete = self.Menu.addAction('Delete')
-        action_delete.triggered.connect(self._action_delete)
+        # action_delete = self.Menu.addAction('Delete')
+        # action_delete.triggered.connect(self._action_delete)
 
-        action_delete_cancel = self.Menu.addAction('Delete cancel')
-        action_delete_cancel.triggered.connect(self._action_delete_cancel)
+        # action_delete_cancel = self.Menu.addAction('Delete cancel')
+        # action_delete_cancel.triggered.connect(self._action_delete_cancel)
         
     def _action_select_s0(self) -> None:
         rows = self._selectedRows()

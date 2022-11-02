@@ -1,18 +1,26 @@
 # -*- coding: utf-8 -*-
 import os
-from pyexpat import model
 import numpy as np
-from scipy.optimize import curve_fit
 from PySide6.QtCore import Signal, QThread
 
 from modules.dcmreader.read_DSC_DCE import Read_Bruker_TimeSeries
 from MyWidgets.Mmodel.TabelModel import TimePointsTableModel
+
+from modules.utils.shape import shape_to_mask, get_index_of_mask
+
+
 class Thread_DSC(QThread):
     signal_start = Signal(bool)
     signal_processing = Signal(int)
-    signal_end = Signal(bool)
+    signal_end = Signal(tuple)
     def __init__(self):
         super().__init__()
+
+        self._DicomReader = None
+        self._TR = None
+        self._TE = None
+        self._Model = None
+        self._maskIndex = None
 
 
     def set_DicomReader(self, dicomreader: Read_Bruker_TimeSeries) -> None:
@@ -21,8 +29,8 @@ class Thread_DSC(QThread):
     def set_model(self, model: TimePointsTableModel) -> None:
         self.Model = model
 
-    def set_ROI(self, roi: np.array) -> None:
-        self.ROI = roi
+    def set_maskIndex(self, roi: np.array) -> None:
+        self.maskIndex = roi
 
     def set_AIF(self, aif: np.array) -> None:
         self.AIF = aif
@@ -38,12 +46,38 @@ class Thread_DSC(QThread):
 
 
     def run(self):
-        imgs = self.DicomReader.imgAll
-        points = self.Model.Contained
+        self.signal_start.emit(True)
+
+        row = self.DicomReader.RowNum
+        col = self.DicomReader.ColNum
+        img = self.DicomReader.img_GroupBySlice
+        nt = self.DicomReader.TimePointsNum
+
         S0 = self.Model.S0
 
+        CBF = np.zeros((row, col))
+        CBV = np.zeros((row, col))
+        MTT = np.zeros((row, col))
+
+        if self.maskIndex is None:
+            self.maskIndex = get_index_of_mask(np.ones((row, col)))
+
+        for idx in range(len(self.maskIndex)):
+
+            print('DSC {}'.format(self.maskIndex[idx]))
+            self.signal_processing.emit(idx+1)
+            row_idx, col_idx = self.maskIndex[idx]
+            sig = img[:, row_idx, col_idx]
+
+            baseline_sig = np.sum(S0 * sig) / max(1, np.sum(S0))
+            dR2s_TIS = self.Sig2Conc(signal=sig, S0=baseline_sig, TE=self.TE)
+            dR2s_AIF = self.Sig2Conc(signal=self.AIF, S0=baseline_sig, TE=self.TE)
+            CBF[row_idx, col_idx], CBV[row_idx, col_idx], MTT[row_idx, col_idx] = self.DSC(dR2s_TIS, dR2s_AIF, self.TR, nt)
+
+        self.signal_end.emit((CBF, CBV, MTT))
+
     @staticmethod
-    def Sig2Conc(signal: np.array, S0: np.array, TE: int) -> np.array:
+    def Sig2Conc(signal: np.array, S0: np.array, TE: float) -> np.array:
         """Estimate R2* change.
 
         Input

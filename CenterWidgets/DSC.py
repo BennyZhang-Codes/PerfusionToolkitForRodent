@@ -435,23 +435,23 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
     def on_pushButton_DSC_run_clicked(self) -> None:
         self.Thread_DSC = Thread_DSC()
 
-        print(self.model.S0)
-        print(self.model.Contained)
-        print(self.model.S0 * self.model.Contained)
-        print(self.maskIndex)
-        print(self.doubleSpinBox_DSC_TR)
-        print(self.doubleSpinBox_DSC_TE)
-        print(self.AIF)
+        self.Thread_DSC.set_TR(self.doubleSpinBox_DSC_TR.value())
+        self.Thread_DSC.set_TE(self.doubleSpinBox_DSC_TE.value())
+        self.Thread_DSC.set_maskIndex(self.maskIndex)
+        self.Thread_DSC.set_AIF(self.AIF)
+        self.Thread_DSC.set_model(self.model)
+        self.Thread_DSC.set_DicomReader(self.dicom_reader)
 
         self.Thread_DSC.signal_start.connect(self.__slot_DSC_start)
         self.Thread_DSC.signal_processing.connect(self.__slot_DSC_processing)
         self.Thread_DSC.signal_end.connect(self.__slot_DSC_end)
-
+        self.Thread_DSC.start()
 
     def __slot_DSC_start(self, start: bool) -> None:
         if start:
-            self.progressBar_DSC.setMinimum(0)
-            # self.progressBar_DSC.setMaximum(self.dicom_reader.TimePointsNum)
+            self.progressBar_DSC.setMinimum(1)
+            self.progressBar_DSC.setMaximum(len(self.maskIndex))
+            
             self.progressBar_DSC.setVisible(True)
             self.progressBar_DSC.setEnabled(True)
             self.pushButton_DSC_run.setEnabled(False)
@@ -460,13 +460,18 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
     def __slot_DSC_processing(self, value: int) -> None:
         self.progressBar_DSC.setValue(value)
 
-    def __slot_DSC_end(self, end: bool) -> None:
-        if end:
-            self.progressBar_DSC.setVisible(False)
-            self.progressBar_DSC.setEnabled(False)
-            self.pushButton_DSC_run.setEnabled(True)
-            self.pushButton_DSC_run.setVisible(True)
+    def __slot_DSC_end(self, end: tuple) -> None:
+        self.progressBar_DSC.setVisible(False)
+        self.progressBar_DSC.setEnabled(False)
+        self.pushButton_DSC_run.setEnabled(True)
+        self.pushButton_DSC_run.setVisible(True)
 
+        CBF, CBV, MTT = end
+        self.widget_result_CBF.setImageArray(CBF)
+        self.widget_result_CBV.setImageArray(CBV)
+        self.widget_result_MTT.setImageArray(MTT)
+
+        self.groupBox_Results.setEnabled(True)
 
 ### ROI
     @Slot()
