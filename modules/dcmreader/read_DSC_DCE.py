@@ -189,7 +189,8 @@ class Read_Bruker_TimeSeries(MAbstractDicomReader):
 
     @property
     def SliceNum(self) -> int:
-        return self._slice_num
+        return 1 ### benny
+        # return self._slice_num 
 
     @property
     def TimePointsNum(self) -> int:

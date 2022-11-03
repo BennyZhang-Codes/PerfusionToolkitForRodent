@@ -62,17 +62,26 @@ class Thread_DSC(QThread):
         if self.maskIndex is None:
             self.maskIndex = get_index_of_mask(np.ones((row, col)))
 
+
+        # print(self.TR, np.arange(0, self.TR * nt, self.TR)[1])
+        # self.AIF = self.preclinicalAIF(5, np.arange(0, self.TR * nt, self.TR))
+
+
+        dR2s_AIF = self.Sig2Conc(signal=self.AIF, S0=np.sum(S0 * self.AIF) / max(1, np.sum(S0)), TE=self.TE)
+        A_mtx = self.AIF2matrix(dR2s_AIF, nt, self.TR)
+        U,S,V = np.linalg.svd(A_mtx)
+
         for idx in range(len(self.maskIndex)):
 
-            print('DSC {}'.format(self.maskIndex[idx]))
+            # print('DSC {}'.format(self.maskIndex[idx]))
             self.signal_processing.emit(idx+1)
             row_idx, col_idx = self.maskIndex[idx]
             sig = img[:, row_idx, col_idx]
 
             baseline_sig = np.sum(S0 * sig) / max(1, np.sum(S0))
             dR2s_TIS = self.Sig2Conc(signal=sig, S0=baseline_sig, TE=self.TE)
-            dR2s_AIF = self.Sig2Conc(signal=self.AIF, S0=baseline_sig, TE=self.TE)
-            CBF[row_idx, col_idx], CBV[row_idx, col_idx], MTT[row_idx, col_idx] = self.DSC(dR2s_TIS, dR2s_AIF, self.TR, nt)
+            
+            CBF[row_idx, col_idx], CBV[row_idx, col_idx], MTT[row_idx, col_idx] = self.DSC(dR2s_TIS, dR2s_AIF, self.TR, A_mtx, U, S, V, nt)
 
         self.signal_end.emit((CBF, CBV, MTT))
 
@@ -208,14 +217,35 @@ class Thread_DSC(QThread):
             mu_opt = u[k-1]
         return mu_opt
     
-    def DSC(self, dR2s_TIS: np.array, dR2s_AIF: np.array, TR: float, nt: int=None) -> tuple:
+    def DSC(self, dR2s_TIS: np.array, dR2s_AIF: np.array, TR: float, A_mtx, U, S, V, nt: int=None) -> tuple:
         if nt is None:
             nt = len(dR2s_TIS)
-        A_mtx = self.AIF2matrix(dR2s_AIF, nt, TR)
-        U,S,V = np.linalg.svd(A_mtx)
+
         B = np.transpose(U) @ dR2s_TIS
         mu_opt = self.lcurvereg(A_mtx, B, U, S)
         Bpi = np.multiply(np.divide(S,(np.power(S,2) + np.power(mu_opt,2))),B)
         residualFunction = np.transpose(V) @ Bpi
         CBF, CBV, MTT = self.DSCResults(residualFunction, dR2s_TIS, dR2s_AIF, TR)
         return CBF, CBV, MTT
+
+
+    def arr_shift(self, A,n):
+        shift = np.zeros(n)
+        A_shifted = np.insert(A,0,shift)
+        A_new = A_shifted[0:len(A)]
+        return(A_new)
+
+
+    def preclinicalAIF(self, t0, t):
+        # Model B - parameter values defined in table 1 (McGrath MRM 2009)
+        A1 = 3.4
+        A2 = 1.81
+        k1 = 0.045
+        k2 = 0.0015
+        t1 = 7
+        
+        # Eq. 5 (McGrath MRM 2009)     
+        Ca = [A1*(i/t1)+A2*(i/t1) if i<=t1 else A1*np.exp(-k1*(i-t1))+A2*np.exp(-k2*(i-t1)) for i in t]
+        # baseline shift
+        Ca = self.arr_shift(Ca,int(t0/t[1])-1)
+        return(Ca)  

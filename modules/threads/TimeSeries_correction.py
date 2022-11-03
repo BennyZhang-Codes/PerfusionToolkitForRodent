@@ -22,6 +22,8 @@ class DSC_Registration:
         self.y = True
         self.z = True
 
+        self.four = False
+
     def Execute(self, moving: np.array) -> np.array:
         moving = self.array_to_sitk(moving)
         outTx = self.R.Execute(self.fixed, moving)
@@ -32,13 +34,19 @@ class DSC_Registration:
         out = self.resampler.Execute(moving)
         return self.sitk_to_array(out)
 
-    @staticmethod
-    def array_to_sitk(img: np.array) -> sitk.Image:
+    def array_to_sitk(self, img: np.array) -> sitk.Image:
+        self.axis0 = img.shape[0]
+        if  self.axis0 < 4:
+            img = np.concatenate([img, img, img, img], axis=0)
+            self.four = True
         return sitk.GetImageFromArray(img.astype(np.float32))
 
-    @staticmethod
-    def sitk_to_array(image: sitk.Image) -> np.array:
-        return sitk.GetArrayFromImage(image).astype(np.int16)
+
+    def sitk_to_array(self, image: sitk.Image) -> np.array:
+        img = sitk.GetArrayFromImage(image).astype(np.int16)
+        if self.four:
+            img = img[:self.axis0]
+        return img
 
     @property
     def R(self) -> sitk.ImageRegistrationMethod:

@@ -16,7 +16,6 @@ from modules.threads.TimeSeries_correction import Thread_TimeSeries_correction
 from modules.threads.DSC import Thread_DSC
 
 
-
 class Widget_DSC(QWidget, Ui_Widget_DSC):
     GroupSlice = 'Slice'
     GroupTime = 'Time'
@@ -124,9 +123,10 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         self.widget_correction_after.setEnabled(False)
         self.progressBar_correction.setVisible(False)
         self.radioButton_usecorrected.setEnabled(False)
-        self.spinBox_correction.setValue(self.dicom_reader.TimePointsNum//2)
+        
         self.spinBox_correction.setMinimum(1)
         self.spinBox_correction.setMaximum(self.dicom_reader.TimePointsNum)
+        self.spinBox_correction.setValue(self.dicom_reader.TimePointsNum//2)
 
         # results
         self.groupBox_ROI.setEnabled(False)
@@ -309,24 +309,24 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
         painter_pix.drawPath(path)
         painter_pix.end()
 
-
         img = pix.toImage()
         b = img.bits()
         img_array = np.frombuffer(b, np.uint8).reshape((pix.height(), pix.width(), 4))
         mask = img_array[:,:,-2].astype(bool)
-        plt.imsave('mask.jpg', mask, cmap='gray')
+        # plt.imsave('mask.jpg', mask, cmap='gray')
 
-        self._mask_index = get_index_of_mask(mask)
-        ydata = []
-        for idx in self._mask_index:
-            ydata.append(self.dicom_reader.img_GroupBySlice[:, idx[0], idx[1]])
+        if self.pushButton_DSC_run.isEnabled():
+            self._mask_index = get_index_of_mask(mask)
+            ydata = []
+            for idx in self._mask_index:
+                ydata.append(self.dicom_reader.img_GroupBySlice[:, idx[0], idx[1]])
 
-        ydata = np.array(ydata)
-        xdata = self.dicom_reader.TimePoints
-        self.__curve(xdata, np.mean(ydata, axis=0))
+            ydata = np.array(ydata)
+            xdata = self.dicom_reader.TimePoints
+            self.__curve(xdata, np.mean(ydata, axis=0))
 
-        self.widget_mask.setPixmap(pix)
-        self.widget_mask_img.setPixmap(item_pix)
+            self.widget_mask.setPixmap(pix)
+            self.widget_mask_img.setPixmap(item_pix)
 
     def __slot_ROI_color(self, color: QColor) -> None:
         self.ROI_color = color
@@ -435,8 +435,8 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
     def on_pushButton_DSC_run_clicked(self) -> None:
         self.Thread_DSC = Thread_DSC()
 
-        self.Thread_DSC.set_TR(self.doubleSpinBox_DSC_TR.value())
-        self.Thread_DSC.set_TE(self.doubleSpinBox_DSC_TE.value())
+        self.Thread_DSC.set_TR(self.TR)
+        self.Thread_DSC.set_TE(self.TE)
         self.Thread_DSC.set_maskIndex(self.maskIndex)
         self.Thread_DSC.set_AIF(self.AIF)
         self.Thread_DSC.set_model(self.model)
