@@ -142,7 +142,7 @@ class Ui_Widget_Results(object):
 
         self.horizontalLayout.addWidget(self.widget_colorbar)
 
-        self.horizontalLayout.setStretch(0, 9)
+        self.horizontalLayout.setStretch(0, 12)
         self.horizontalLayout.setStretch(1, 1)
 
         self.verticalLayout.addLayout(self.horizontalLayout)

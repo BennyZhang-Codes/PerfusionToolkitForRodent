@@ -10,6 +10,7 @@ from UI.ui_Widget_Results import Ui_Widget_Results
 from modules.utils.colormap import MColorMap
 
 class Widget_Results(QWidget, Ui_Widget_Results):
+    value = Signal(float)
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self.setupUi(self)
@@ -27,6 +28,7 @@ class Widget_Results(QWidget, Ui_Widget_Results):
 
     def setImageArray(self, img: np.array) -> None:
         self.widget_result.setImgArray(img)
+        self.img = img
         self.setEnabled(True)
 
     @Slot(int)
@@ -49,6 +51,10 @@ class Widget_Results(QWidget, Ui_Widget_Results):
         if dialog.exec() == QFileDialog.Accepted:
             a = dialog.selectedFiles()[0]
             self.widget_result.PixImage.save(a)
+
+
+        
+
 
     @property
     def PixColorBar(self) -> QPixmap:

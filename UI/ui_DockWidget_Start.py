@@ -18,13 +18,17 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QDockWidget, QFrame,
     QHeaderView, QSizePolicy, QTreeView, QVBoxLayout,
     QWidget)
-import UI.icons_rc as icons_rc
+import UI.icons_rc
 
 class Ui_DockWidget_Start(object):
     def setupUi(self, DockWidget_Start):
         if not DockWidget_Start.objectName():
             DockWidget_Start.setObjectName(u"DockWidget_Start")
         DockWidget_Start.resize(461, 714)
+        DockWidget_Start.setMinimumSize(QSize(100, 110))
+        icon = QIcon()
+        icon.addFile(u":/\u65b0\u524d\u7f00/folder.png", QSize(), QIcon.Normal, QIcon.Off)
+        DockWidget_Start.setWindowIcon(icon)
         self.dockWidgetContents = QWidget()
         self.dockWidgetContents.setObjectName(u"dockWidgetContents")
         self.verticalLayout = QVBoxLayout(self.dockWidgetContents)
@@ -47,6 +51,6 @@ class Ui_DockWidget_Start(object):
     # setupUi
 
     def retranslateUi(self, DockWidget_Start):
-        DockWidget_Start.setWindowTitle(QCoreApplication.translate("DockWidget_Start", u"Start", None))
+        DockWidget_Start.setWindowTitle(QCoreApplication.translate("DockWidget_Start", u"Select Folder", None))
     # retranslateUi
 

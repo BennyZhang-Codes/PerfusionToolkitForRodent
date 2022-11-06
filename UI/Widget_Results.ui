@@ -163,7 +163,7 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="9,1">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="12,1">
      <item>
       <widget class="MResult" name="widget_result" native="true">
        <property name="sizePolicy">

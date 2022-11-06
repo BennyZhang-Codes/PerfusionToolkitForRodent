@@ -5,81 +5,98 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
+from PySide6.QtCharts import *
 from UI.ui_Widget_FAIR import Ui_Widget_FAIR
 from modules.dcmreader.read_FAIR import read_FAIR_folder
 from modules.threads.FAIR_CBF import Thread_FAIR_CBF_Calc
+from MyWidgets.MChart.MChart import MChart
+
 from modules.FAIR_CBF import _fig_FAIR_Images, _fig_Fitting, _fig_Results, Msel, Msel_abs
 from scipy.optimize import curve_fit
-import matplotlib.pyplot as plt
-
-class MyFigure(FigureCanvas):
-    def __init__(self, figure=None):
-        super().__init__(figure)
+from modules.utils.shape import get_index_of_mask
 
 class Widget_FAIR(QWidget, Ui_Widget_FAIR):
+    GroupSlice = 'Slice'
+    GroupTime = 'Time'
     def __init__(self, dicom_dir, mainwindow):
         super().__init__()
+        self.setupUi(self)
         self.mainwindow = mainwindow
         self.root = dicom_dir
-        self.dicom = read_FAIR_folder(self.root)
-        self.setupUi(self)
+        self.DicomReader = read_FAIR_folder(self.root)
+        if self.comboBox.currentText() == 'Slice':
+            self.DicomReader.GroupBy = 'Slice'
+            self._groupby = 'Slice'
+
+        
         self._setupUI()
 
+        self._ROI_color = QColor(118,185,172,196)
+
     def _setupUI(self):
-        self.graphicsView.set_root(self.root)
+        self.groupBox_ROI.setEnabled(False)
+
+        self.chart = QChart()
+        self.chart.setTheme(QChart.ChartThemeDark)
+        self.chart.legend().hide()
+        self.chart.setAnimationOptions(QChart.SeriesAnimations)
+
+        self.chartView.setChart(self.chart)
         self.graphicsView.set_mainwindow(self.mainwindow)
         self.graphicsView._location.connect(self._slot_location)
-        self.graphicsView.dicom_reader = read_FAIR_folder(self.root)
+        self.graphicsView.DicomReader = self.DicomReader
+        self.graphicsView.update_scene_Rect()
+        item_img = self.graphicsView.mscene.item_img
+        item_img.signal.WW_changed.connect(self.spinBox_WW.setValue)
+        item_img.signal.WL_changed.connect(self.spinBox_WL.setValue)
+        self.graphicsView._idx_changed.connect(self.__slot_graphicsView_idx_changed)
+        self.graphicsView.mscene.signal_ROI_point.connect(self.__slot_ROI_point)
+        self.graphicsView.mscene.signal_ROI.connect(self.__slot_ROI)
+        self.graphicsView.mscene.signal_ROI_color.connect(self.__slot_ROI_color)
+
+        # Basic
+        self.spinBox_timepoint.setMaximum(self.DicomReader.len)
+        self.spinBox_timepoint.setMinimum(1)
+        self.spinBox_timepoint.setValue(self.graphicsView.idx + 1)
+        self.verticalScrollBar.setMaximum(self.DicomReader.len)
+        self.verticalScrollBar.setMinimum(1)
+        self.verticalScrollBar.setValue(self.graphicsView.idx + 1)
+
+        self.spinBox_slice.setMaximum(self.DicomReader.SliceNum)
+        self.spinBox_slice.setMinimum(1)
+        self.spinBox_slice.setValue(self.DicomReader.CurrentSlice)
+
+        self.spinBox_row.setMaximum(self.DicomReader.RowNum)
+        self.spinBox_row.setMinimum(1)
+
+        self.spinBox_column.setMaximum(self.DicomReader.ColNum)
+        self.spinBox_column.setMinimum(1)
+
+        img = item_img.img
+        max_value = np.max(img)
+        min_value = np.min(img)
+        WL = (max_value+min_value)/2
+        WW = max(0, max_value-min_value)
+        self.spinBox_WW.setMaximum(item_img.WW_max)
+        self.spinBox_WW.setMinimum(item_img.WW_min)
+        self.spinBox_WW.setValue(WW)
+
+        self.spinBox_WL.setMaximum(item_img.WL_max)
+        self.spinBox_WL.setMinimum(item_img.WL_min)
+        self.spinBox_WL.setValue(WL)
+
+        row, col = img.shape
+        center_row = row//2
+        center_col = col//2
+        center_slice = self.DicomReader.SliceNum//2
+        self.spinBox_row.setValue(center_row)
+        self.spinBox_column.setValue(center_col)
 
     def _setup(self):
         self.slices = 0
 
     def _slot_location(self, pos):
-        dss_sel, dss_non = self.dicom.dss
-        img_sel = []
-        img_non = []
-        xdata = []
-        for ds_sel, ds_non in zip(dss_sel, dss_non):
-            xdata.append(ds_sel.InversionTime)
-            img_sel.append(np.expand_dims(ds_sel.pixel_array, axis=2))
-            img_non.append(np.expand_dims(ds_non.pixel_array, axis=2))
-        img_sel = np.concatenate(img_sel, axis=2)
-        img_non = np.concatenate(img_non, axis=2)
-        xdata = np.array(xdata)
-
-        x = pos[0] - 1
-        y = pos[1] - 1
-        fig = plt.figure(figsize=(5,5), facecolor='black')
-        ax = plt.subplot(111)
-        fig.canvas.manager.set_window_title('Fitting')
-        ydata_sel = img_sel[x, y]
-        ydata_non = img_non[x, y]
-        popt_sel, pcov_sel = curve_fit(Msel_abs, xdata, ydata_sel, p0=(1500,10000))
-        T1app, M0 = popt_sel
-        def Mnon(TI, f):
-            T1b = 2800
-            Ms = Msel(TI, T1app, M0)
-            M_diff = 2*M0*f/0.9 * ((np.exp(-TI/T1app)- np.exp(-TI/T1b))/(1/T1b-1/T1app))
-            return np.abs(Ms - M_diff)
-
-        popt_non, pcov_non = curve_fit(Mnon, xdata, ydata_non, p0=(1/60000), bounds=(0, 2000/60000/100))
-        f = popt_non*60000*100
-
-        ax.plot(np.arange(0,10000, 2), Msel_abs(np.arange(0, 10000, 2), T1app, M0), color='red', label='Sel', linewidth=1)
-        ax.plot(np.arange(0,10000, 2), Mnon(np.arange(0, 10000, 2), f/60000/100), color='yellow', label='Non', linestyle='--', linewidth=1)
-        ax.plot(xdata, img_sel[x, y], '*', color='red', label='measured Sel')
-        ax.plot(xdata, img_non[x, y], '*', color='yellow', label='measured Non')
-        ax.legend(loc='lower right', fontsize=7, labelcolor='w', facecolor='black', frameon=False)
-
-        ax.tick_params('both', colors='w', labelsize=8)
-        ax.set_facecolor('black')
-        for i in ['top', 'bottom', 'left', 'right']:
-            ax.spines[i].set_color('w')
-        fig.tight_layout(w_pad=0)
-        self.fig_curve = MyFigure(fig)
-        for i in range(self.verticalLayout_curve.count()): 
-            self.verticalLayout_curve.removeWidget(self.verticalLayout_curve.itemAt(i).widget())
-        self.verticalLayout_curve.addWidget(self.fig_curve)
+        pass
 
     @Slot()
     def on_pushButton_run_clicked(self):
@@ -92,22 +109,213 @@ class Widget_FAIR(QWidget, Ui_Widget_FAIR):
         self.thread_FAIR_CBF_Calc.start()
 
         Fig_FAIR_Images = _fig_FAIR_Images(dss)
-        Fig_images = MyFigure(Fig_FAIR_Images)
-        Fig_FAIR_Images
-
 
     def _slot_processing(self, idx):
-        progressBar = self.mainwindow._Status_progressBar
-        progressBar.progressBar.setValue(idx)        
+        pass
 
     def _slot_processed(self, res: tuple):
         self.img_sel, self.img_non, xdata, T1app_map, M0_map, cbf_map = res
         Fig_Results = _fig_Results(T1app_map.copy(), M0_map.copy(), cbf_map.copy())
         self.verticalLayout_results.addWidget(MyFigure(Fig_Results))
-        progressBar = self.mainwindow._Status_progressBar
-        progressBar.label.setText('Processed!')
-        progressBar.progressBar.setHidden(True)
         self.pushButton_run.setEnabled(True)
 
+    def __slot_loadstart(self, start: bool):
+        if start:
+            self.widget_center.setEnabled(False)
+            self.widget_center.setVisible(False)
+            self.widget_load.setEnabled(True)
+            self.widget_load.setVisible(True)
 
+            self.load_progressBar.setMinimum(1)
+            slice_num = self.dicom_reader.SliceNum
+            timepoints_num = self.dicom_reader.TimePointsNum
+            self.load_progressBar.setMaximum(slice_num*timepoints_num)
+            self.load_label.setText('Loading ...')
+
+    def __slot_loading(self, value: int):
+        self.load_progressBar.setValue(value)
+
+    def __slot_loaded(self, loaded: bool):
+        if loaded:
+            self.load_label.setText('Loaded')
+            self.widget_center.setEnabled(True)
+            self.widget_center.setVisible(True)
+            self.widget_load.setEnabled(False)
+            self.widget_load.setVisible(False)
+            self._setupUI()
+
+    def __slot_ROI(self, data: tuple):
+        path, item_pix = data
+        self.groupBox_ROI.setEnabled(True)
+
+        w = item_pix.width()
+        h = item_pix.height()
+        pix = QPixmap(w, h)
+        pix.fill(QColor(0,0,0,255))
+
+        pen = QPen()
+        pen.setWidthF(0)
+        pen.setColor(QColor(0,0,0,0))
+
+        painter_item_pix = QPainter(item_pix)
+        painter_item_pix.setPen(pen)
+        painter_item_pix.setBrush(self.ROI_color)
+        painter_item_pix.drawPath(path)
+        painter_item_pix.end()
+
+        painter_pix = QPainter(pix)
+        painter_pix.setPen(pen)
+        painter_pix.setBrush(QColor(255,255,255,255))
+        painter_pix.drawPath(path)
+        painter_pix.end()
+
+        img = pix.toImage()
+        b = img.bits()
+        img_array = np.frombuffer(b, np.uint8).reshape((pix.height(), pix.width(), 4))
+        mask = img_array[:,:,-2].astype(bool)
+        self._mask_index = get_index_of_mask(mask)
+        sel_ydata = []
+        non_ydata = []
+        for idx in self._mask_index:
+            sel_ydata.append(self.DicomReader._sel_img_all[:, idx[0], idx[1]])
+            non_ydata.append(self.DicomReader._non_img_all[:, idx[0], idx[1]])
+
+        sel_ydata = np.array(sel_ydata)
+        non_ydata = np.array(non_ydata)
+        xdata = self.DicomReader.TimePoints
+        self.__curve(xdata, np.mean(sel_ydata, axis=0), np.mean(non_ydata, axis=0))
+
+        self.widget_mask.setPixmap(pix)
+        self.widget_mask_img.setPixmap(item_pix)
+
+    def __slot_ROI_point(self, pos: QPoint):
+        row = pos.y()
+        col = pos.x()
+        self.spinBox_row.setValue(row)
+        self.spinBox_column.setValue(col)
+
+        sel_ydata = self.DicomReader._sel_img_all[:, row - 1, col - 1]
+        non_ydata = self.DicomReader._non_img_all[:, row - 1, col - 1]
+        xdata = self.DicomReader.TimePoints
+        self.__curve(xdata, sel_ydata, non_ydata)
+
+
+    def __slot_ROI_color(self, color: QColor) -> None:
+        self.ROI_color = color
         
+    @property
+    def ROI_color(self) -> QColor:
+        return self._ROI_color
+
+    @ROI_color.setter
+    def ROI_color(self, color: QColor) -> None:
+        self._ROI_color = color
+
+
+
+    ### Basic
+    def __slot_graphicsView_idx_changed(self, idx: int):
+        self.verticalScrollBar.setValue(idx+1)
+
+    @Slot(int)
+    def on_spinBox_timepoint_valueChanged(self, value: int):
+        self.DicomReader.CurrentTimePoint = value - 1 
+        if self.GroupBy == self.GroupSlice:
+            self.verticalScrollBar.setValue(value)
+            self.graphicsView.set_scene(value-1)
+        elif self.GroupBy == self.GroupTime:
+            self.graphicsView.set_scene(self.graphicsView.idx)
+        
+    @Slot(int)
+    def on_spinBox_slice_valueChanged(self, value: int):
+        self.DicomReader.CurrentSlice = value - 1
+        if self.GroupBy == self.GroupTime:
+            self.verticalScrollBar.setValue(value)
+            self.graphicsView.set_scene(value - 1)
+        if self.GroupBy == self.GroupSlice:
+            self.graphicsView.set_scene(self.graphicsView.idx)
+        
+    @Slot(int)
+    def on_verticalScrollBar_valueChanged(self, value: int):
+        if self.GroupBy == self.GroupSlice:
+            self.spinBox_timepoint.setValue(value)
+        elif self.GroupBy == self.GroupTime:
+            self.spinBox_slice.setValue(value)
+
+    @Slot(int)
+    def on_spinBox_row_valueChanged(self, value: int):
+        row = value
+        col = self.spinBox_column.value()
+        sel_ydata = self.DicomReader._sel_img_all[:, row - 1, col - 1]
+        non_ydata = self.DicomReader._non_img_all[:, row - 1, col - 1]
+        xdata = self.DicomReader.TimePoints
+        self.__curve(xdata, sel_ydata, non_ydata)
+
+    @Slot(int)
+    def on_spinBox_column_valueChanged(self, value: int):
+        row = self.spinBox_row.value()
+        col = value
+        sel_ydata = self.DicomReader._sel_img_all[:, row - 1, col - 1]
+        non_ydata = self.DicomReader._non_img_all[:, row - 1, col - 1]
+        xdata = self.DicomReader.TimePoints
+        self.__curve(xdata, sel_ydata, non_ydata)
+
+    @Slot(int)
+    def on_spinBox_WL_valueChanged(self, value: int):
+        self.graphicsView.mscene.item_img.WL = value
+        self.update_graphicsView()
+
+    @Slot(int)
+    def on_spinBox_WW_valueChanged(self, value: int):
+        self.graphicsView.mscene.item_img.WW = value
+        self.update_graphicsView()
+
+    @Slot(int)
+    def on_comboBox_currentIndexChanged(self, value: int) -> None:
+        self.GroupBy = value
+
+    def update_graphicsView(self) -> None:
+        if self.GroupBy == self.GroupSlice:
+            self.graphicsView.set_scene(self.spinBox_timepoint.value()-1)
+        elif self.GroupBy == self.GroupTime:
+            self.graphicsView.set_scene(self.spinBox_slice.value()-1)
+
+    @property
+    def GroupBy(self) -> str:
+        return self._groupby
+
+    @GroupBy.setter
+    def GroupBy(self, value: int) -> None:
+        if value == 0:
+            self._groupby = 'Slice'
+        if value == 1:
+            self._groupby = 'Time'
+
+        CurrentSlice = self.DicomReader.CurrentSlice
+        CurrentTimePoint = self.DicomReader.CurrentTimePoint
+
+        self.DicomReader.GroupBy = self._groupby
+        self.verticalScrollBar.setMaximum(self.DicomReader.len)
+        self.verticalScrollBar.setMinimum(1)
+        if self._groupby == self.GroupSlice:
+            self.verticalScrollBar.setValue(CurrentTimePoint+1)
+        elif self._groupby == self.GroupTime:
+            self.verticalScrollBar.setValue(CurrentSlice+1)
+
+
+
+    def __curve(self, xdata, sel_ydata, non_ydata) -> None:
+        
+        sel_scatter = QScatterSeries()
+        non_scatter = QScatterSeries()
+
+        for x, sel, non in zip(xdata, sel_ydata, non_ydata):
+            sel_scatter.append(QPointF(x, sel))
+            non_scatter.append(QPointF(x, non))
+
+
+        self.chart.removeAllSeries()
+        self.chart.addSeries(sel_scatter)
+        self.chart.addSeries(non_scatter)
+        self.chart.createDefaultAxes()
+    

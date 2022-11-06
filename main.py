@@ -9,22 +9,24 @@ from PySide6.QtGui import *
 from UI.ui_Main_Window import Ui_MainWindow
 import qdarkstyle
 
-from DockWidgets.Start import DockWidget_FAIR, DockWidget_Start
+from DockWidgets.Start import DockWidget_Start
 import CenterWidgets.Browse as Browse
 import CenterWidgets.DSC as DSC
 import CenterWidgets.FAIR as FAIR
-from MyWidgets.Status import Status_progressBar
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self) -> None:
         super().__init__()
 
         self.setupUi(self)
+
         self.add_dockWidgets()
         self._setup()
         self.statusBar().showMessage('Ready')
+
         self.setStyleSheet(qdarkstyle.load_stylesheet_pyside2())
         # self.theme()
+        # 
 
     def theme(self):
         themeFile = 'dark.qss'
@@ -36,16 +38,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # self.setStyleSheet('''MGraphicsView{background-color: rgb(0, 0, 0); padding: 0px; border: 0px}''')
 
     def _setup(self):
-        self._Status_progressBar = Status_progressBar(self.statusBar())
-        self._Status_progressBar.setHidden(True)
-        self.statusBar().addPermanentWidget(self._Status_progressBar)
-        root = r'E:\PySide6\examplefiles\E7_DCE_FLASH'
-        self.tabWidget.addTab(DSC.Widget_DSC(root, self), root)
 
-        root = r'E:\PySide6\examplefiles'
-        self.tabWidget.addTab(Browse.Widget_Browse(root, self), root)
-        # root = r'E:\A30\FAIR\19\pdata\1\dicom'
-        # self.tabWidget.addTab(Widget_FAIR(root, self), root)
+        # root = r'E:\ISMRM2023\Example\Example_mice_DSC'
+        # self.tabWidget.addTab(DSC.Widget_DSC(root, self), '(DSC) {}'.format(os.path.basename(root)))
+
+        # root = r'E:\PySide6\examplefiles\E7_DCE_FLASH'
+        # self.tabWidget.addTab(DSC.Widget_DSC(root, self), '(DSC) {}'.format(os.path.basename(root)))
+
+        # root = r'E:\ISMRM2023\Example\Example_mice_T2'
+        # self.tabWidget.addTab(Browse.Widget_Browse(root, self), '(Viewer) {}'.format(os.path.basename(root)))
+
+        root = r'E:\ISMRM2023\Example\Example_mice_FAIR\pdata\1\dicom'
+        self.tabWidget.addTab(FAIR.Widget_FAIR(root, self), root)
 
     @Slot(int)
     def on_tabWidget_tabCloseRequested(self, idx):
@@ -55,10 +59,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def add_dockWidgets(self):
         self.dockWidget_Start = DockWidget_Start(self)
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.dockWidget_Start)
-
-        self.dockWidget_FAIR = DockWidget_FAIR(self)
-        self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.dockWidget_FAIR)
-        self.dockWidget_FAIR.hide()
 
     @Slot()
     def on_actionStart_triggered(self):
@@ -82,7 +82,5 @@ window = MainWindow()
 
 # window.showMaximized()'
 window.show()
-
-
 
 sys.exit(app.exec())

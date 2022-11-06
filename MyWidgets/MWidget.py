@@ -1,6 +1,5 @@
 
 import numpy as np
-import cv2
 from PIL import Image
 
 from PySide6.QtCore import *
@@ -143,7 +142,6 @@ class MColorBar(QWidget):
 class MResult(QWidget):
     Vmax = Signal(float)
     Vmin = Signal(float)
-
     Func_Window = 'window'
     Func_Move = 'move'
     Func_ColorMap = 'colormap'
@@ -165,16 +163,20 @@ class MResult(QWidget):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.show_context_menu)
         self._pix_image = None
+        self._info = None
 
         self.ColorMap = MColorMap()
         self.ColorMap.idx = 0
 
+        self.vmax = 0
+        self.vmin = 0
+
     def setImgArray(self, img: np.array) -> None:
         self.img = img
-        self.vmin = img.min()
-        self.vmax = img.max()
-        self.WW = self.vmax - self.vmin
-        self.WL = (self.vmax - self.vmin) // 2 + self.vmin
+        vmin = img.min()
+        vmax = img.max()
+        self.WW = vmax - vmin
+        self.WL = (vmax - vmin) // 2 + vmin
         self.update_PixImage()
         self.setEnabled(True)
 
@@ -197,18 +199,23 @@ class MResult(QWidget):
     def PixImage(self, pix: QPixmap) -> None:
         self._pix_image = pix
 
+    @property
+    def ShowPixmap(self) -> QPixmap:
+        return self._ShowPixmap
+
 
     def paintEvent(self, event: QPaintEvent) -> None:
         img = self.PixImage
         if img is not None:
             img = img.scaled(self.width(), self.height(), Qt.KeepAspectRatio, Qt.FastTransformation)
-
+            self._ShowPixmap = img
             x = (self.width() - img.width()) // 2 + self._x_diff
             y = (self.height() - img.height()) // 2 + self._y_diff
 
             painter = QPainter()
             painter.begin(self)
             painter.drawPixmap(x, y, img)
+            painter.drawText(0,15, self.info)
             painter.end()
         return super().paintEvent(event)
 
@@ -219,7 +226,18 @@ class MResult(QWidget):
         return super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
+        img = self.ShowPixmap
+        origin_img = self.PixImage
+
         pos = event.position()
+        x = pos.x() - ((self.width() - img.width()) // 2 + self._x_diff)
+        y = pos.y() - ((self.height() - img.height()) // 2 + self._y_diff)
+        scale = img.width()/origin_img.width()
+        loc = QPoint()
+        loc.setX(np.ceil(x/scale))
+        loc.setY(np.ceil(y/scale))
+        self._update_value(loc)
+
         if event.buttons() == Qt.LeftButton | event.button() == Qt.MouseButton.LeftButton:
             if self.func == self.Func_Window:
                 self.x_end = event.position().x()
@@ -332,24 +350,37 @@ class MResult(QWidget):
 
     def show_context_menu(self) -> None:
         menu = QMenu(self)
+
         Window = menu.addAction('Window')
         Window.triggered.connect(self._action_Window)
         Move = menu.addAction('Move')
         Move.triggered.connect(self._action_Move)
-        ColorMap = menu.addAction('Color map')
-        ColorMap.triggered.connect(self._action_ColorMap)
-        Save = menu.addAction('Save')
-        Save.triggered.connect(self._action_Save)
         menu.exec_(QCursor.pos())
 
     def _action_Window(self) -> None:
         self.func = self.Func_Window
     
-    def _action_ColorMap(self) -> None:
-        self.func = self.Func_ColorMap
-    
     def _action_Move(self) -> None:
         self.func = self.Func_Move
 
-    def _action_Save(self) -> None:
-        self.func = self.Func_Save
+
+    def _update_value(self, point: QPoint) -> None:
+        row, col = self.img.shape
+        row_idx = point.y() - 1
+        col_idx = point.x() - 1
+        check_row = row_idx < 0 or row_idx > row - 1
+        check_col = col_idx < 0 or col_idx > col - 1
+        if check_col or check_row:
+            self.info = None
+        else:
+            self.info = str(self.img[row_idx, col_idx])
+        self.update()
+
+    @property
+    def info(self) -> str:
+        return self._info
+
+    @info.setter
+    def info(self, value: str) -> None:
+        self._info = value
+

@@ -9,7 +9,6 @@ import CenterWidgets.DSC as DSC
 import CenterWidgets.FAIR as FAIR
 
 from UI.ui_DockWidget_Start import Ui_DockWidget_Start
-from UI.ui_DockWidget_FAIR import Ui_DockWidget_FAIR
 
 class DockWidget_Start(QDockWidget, Ui_DockWidget_Start):
     def __init__(self, mainwindow) -> None:
@@ -41,29 +40,17 @@ class DockWidget_Start(QDockWidget, Ui_DockWidget_Start):
 
     def _action_fair(self):
         current_path = self.filesystem_model.filePath(self.treeView.currentIndex())
-        self.mainwindow.tabWidget.addTab(FAIR.Widget_FAIR(current_path, self.mainwindow), current_path)
+        self.mainwindow.tabWidget.addTab(FAIR.Widget_FAIR(current_path, self.mainwindow), '(FAIR) {}'.format(os.path.basename(current_path)))
 
     def _action_dsc(self):
         current_path = self.filesystem_model.filePath(self.treeView.currentIndex())
-        self.mainwindow.tabWidget.addTab(DSC.Widget_DSC(current_path, self.mainwindow), current_path)
+        self.mainwindow.tabWidget.addTab(DSC.Widget_DSC(current_path, self.mainwindow), '(DSC) {}'.format(os.path.basename(current_path)))
 
     def _action_opendicomfolder(self):
-        '''添加tab'''
         current_path = self.filesystem_model.filePath(self.treeView.currentIndex())
-        self.mainwindow.tabWidget.addTab(Browse.Widget_Browse(current_path, self.mainwindow), current_path)
+        self.mainwindow.tabWidget.addTab(Browse.Widget_Browse(current_path, self.mainwindow), '(Viewer) {}'.format(os.path.basename(current_path)))
 
     @Slot(QModelIndex)
     def on_treeView_clicked(self, Qmodelidx):
         self.mainwindow.statusBar().showMessage(self.filesystem_model.filePath(Qmodelidx))
 
-
-class DockWidget_FAIR(QDockWidget, Ui_DockWidget_FAIR):
-    def __init__(self, mainwindow) -> None:
-        super().__init__()
-        self.mainwindow = mainwindow
-        self.setupUi(self)
-        self.dcm_path = r'E:\A30\19\pdata\1\dicom'
-
-    @Slot()
-    def on_pushButton_RUN_clicked(self):
-        print('FAIR_pushButton_RUN')

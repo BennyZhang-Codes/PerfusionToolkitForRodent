@@ -10,8 +10,18 @@
     <height>714</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>100</width>
+    <height>110</height>
+   </size>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="icons.qrc">
+    <normaloff>:/新前缀/folder.png</normaloff>:/新前缀/folder.png</iconset>
+  </property>
   <property name="windowTitle">
-   <string>Start</string>
+   <string>Select Folder</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QVBoxLayout" name="verticalLayout">

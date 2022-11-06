@@ -16,7 +16,7 @@ class Thread_load_Bruker_TimeSeries(QThread):
         img = []
         dss = []
 
-        dcmlist = self.DicomReader.DicomList[7::16]
+        dcmlist = self.DicomReader.DicomList[8::16]
         for idx in range(len(dcmlist)):
             self._loading.emit(idx)
             ds = dcmread(self.DicomReader.dicom_path + '/' + dcmlist[idx])

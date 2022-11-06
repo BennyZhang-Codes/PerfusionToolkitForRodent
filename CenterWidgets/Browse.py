@@ -47,15 +47,11 @@ class Widget_Browse(QWidget, Ui_Widget_Browse):
         self.threadiconlist.start()
 
     def _slot_loaded(self):
-        self.mainwindow._Status_progressBar.label.setText('Loaded')
+        pass
+
     def _slot_loading(self, idx):
-        progressBar = self.mainwindow._Status_progressBar
-        if idx == 0:
-            progressBar.setHidden(False)
-            progressBar.progressBar.setMinimum(1)
-            progressBar.progressBar.setMaximum(self.dicom_reader.len())
-            progressBar.label.setText('Loading')
-        progressBar.progressBar.setValue(idx+1)
+        pass
+
 
     def _slot_idx(self, idx):
         self.verticalScrollBar_Image.setValue(idx+1)
@@ -120,4 +116,3 @@ class Widget_Browse(QWidget, Ui_Widget_Browse):
     def _listWidget_resizeEvent(self, event: QResizeEvent):
         width = self.listWidget.geometry().width()//4
         self.listWidget.setIconSize(QSize(width, width))
-        self.mainwindow.statusBar().showMessage('{}:: {}'.format(self.listWidget.objectName(), self.listWidget.geometry()))

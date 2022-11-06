@@ -9,17 +9,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1060</width>
-    <height>714</height>
+    <width>1044</width>
+    <height>707</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dicom</string>
+   <string>Rodent Perfusion Toolkit</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normalon>:/新前缀/qrc/GUI_Logo.ico</normalon>
-   </iconset>
+   <iconset resource="icons.qrc">
+    <normaloff>:/新前缀/GUI_Logo.ico</normaloff>:/新前缀/GUI_Logo.ico</iconset>
   </property>
   <property name="statusTip">
    <string/>
@@ -78,30 +77,12 @@
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QToolBar" name="toolBar">
-   <property name="windowTitle">
-    <string>toolBar</string>
-   </property>
-   <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonIconOnly</enum>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionSelect_Dicom_Folder"/>
-   <addaction name="separator"/>
-   <addaction name="actionStart"/>
-   <addaction name="actionFAIR"/>
-  </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1060</width>
+     <width>1044</width>
      <height>22</height>
     </rect>
    </property>
@@ -109,19 +90,11 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionSelect_Dicom_Folder"/>
+    <addaction name="actionStart"/>
     <addaction name="separator"/>
     <addaction name="actionEXit"/>
    </widget>
-   <widget class="QMenu" name="menuTools">
-    <property name="title">
-     <string>Tools</string>
-    </property>
-    <addaction name="actionStart"/>
-    <addaction name="actionFAIR"/>
-   </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuTools"/>
   </widget>
   <action name="actionSelect_Dicom_Folder">
    <property name="enabled">
@@ -138,9 +111,8 @@
   </action>
   <action name="actionEXit">
    <property name="icon">
-    <iconset>
-     <normalon>:/新前缀/qrc/Exit.png</normalon>
-    </iconset>
+    <iconset resource="icons.qrc">
+     <normaloff>:/新前缀/Exit.png</normaloff>:/新前缀/Exit.png</iconset>
    </property>
    <property name="text">
     <string>Exit</string>
@@ -152,8 +124,12 @@
    </property>
   </action>
   <action name="actionStart">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/新前缀/folder.png</normaloff>:/新前缀/folder.png</iconset>
+   </property>
    <property name="text">
-    <string>Start</string>
+    <string>Folder Browser</string>
    </property>
   </action>
  </widget>

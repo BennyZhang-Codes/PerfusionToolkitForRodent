@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import numpy as np
+from scipy.optimize import curve_fit
 from PySide6.QtCore import Signal, QThread
 
 from modules.dcmreader.read_DSC_DCE import Read_Bruker_TimeSeries
@@ -52,6 +53,7 @@ class Thread_DSC(QThread):
         col = self.DicomReader.ColNum
         img = self.DicomReader.img_GroupBySlice
         nt = self.DicomReader.TimePointsNum
+        nt = 200   ###
 
         S0 = self.Model.S0
 
@@ -65,21 +67,26 @@ class Thread_DSC(QThread):
 
         # print(self.TR, np.arange(0, self.TR * nt, self.TR)[1])
         # self.AIF = self.preclinicalAIF(5, np.arange(0, self.TR * nt, self.TR))
+        self.AIF = self.AIF[:200]   ###
+        S0 = S0[:200]      ###
 
+        x_data = np.arange(0, self.TR * nt, self.TR)
 
         dR2s_AIF = self.Sig2Conc(signal=self.AIF, S0=np.sum(S0 * self.AIF) / max(1, np.sum(S0)), TE=self.TE)
+        dR2s_AIF = self.AIF_fit(x_data, dR2s_AIF, shift=11)
+
         A_mtx = self.AIF2matrix(dR2s_AIF, nt, self.TR)
         U,S,V = np.linalg.svd(A_mtx)
 
         for idx in range(len(self.maskIndex)):
 
-            # print('DSC {}'.format(self.maskIndex[idx]))
             self.signal_processing.emit(idx+1)
             row_idx, col_idx = self.maskIndex[idx]
-            sig = img[:, row_idx, col_idx]
+            sig = img[:200, row_idx, col_idx]             ###
 
             baseline_sig = np.sum(S0 * sig) / max(1, np.sum(S0))
             dR2s_TIS = self.Sig2Conc(signal=sig, S0=baseline_sig, TE=self.TE)
+            dR2s_TIS = self.to_smoothed(x_data, dR2s_TIS, shift=11)
             
             CBF[row_idx, col_idx], CBV[row_idx, col_idx], MTT[row_idx, col_idx] = self.DSC(dR2s_TIS, dR2s_AIF, self.TR, A_mtx, U, S, V, nt)
 
@@ -249,3 +256,43 @@ class Thread_DSC(QThread):
         # baseline shift
         Ca = self.arr_shift(Ca,int(t0/t[1])-1)
         return(Ca)  
+
+
+    def AIF_fit(self, x_data, y_data, shift):
+        def smooth(points, scale, t1):
+            A1 = 3.4
+            A2 = 1.81
+            k1 = 0.045
+            k2 = 0.0015
+            Ca = np.zeros_like(points)
+            index = np.where(points<t1)
+            for i in range(len(Ca)):
+                if i in list(index[0]):
+                    Ca[i] = A1*(points[i]/t1)+A2*(points[i]/t1)
+                else:
+                    Ca[i] = A1*np.exp(-k1*(points[i]-t1))+A2*np.exp(-k2*(points[i]-t1))
+    
+            Ca = Ca+(0-min(Ca))  # limitation of non-negative
+            Ca = Ca*(max(y_data) / max(Ca))
+            return self.arr_shift(Ca, shift)
+        popt_non, pcov_non = curve_fit(smooth, xdata=x_data, ydata=y_data, bounds=(0, [100, 5]))
+        smoothed = smooth(x_data,popt_non[0],popt_non[1])
+        return smoothed
+
+
+
+    def to_smoothed(self, x_data, y_data, shift) -> np.array:
+        def smooth(points, scale, A1, A2, k1, k2, t1):
+            Ca = np.zeros_like(points)
+            index = np.where(points<t1)
+            for i in range(len(Ca)):
+                if i in list(index[0]):
+                    Ca[i] = A1*(points[i]/t1)+A2*(points[i]/t1)
+                else:
+                    Ca[i] = A1*np.exp(-k1*(points[i]-t1))+A2*np.exp(-k2*(points[i]-t1))
+    
+            Ca = Ca+(0-min(Ca))  # limitation of non-negative
+            return self.arr_shift(Ca*scale, shift)
+        popt_non, pcov_non = curve_fit(smooth, xdata=x_data, ydata=y_data, bounds=(0, [1000, 1000, 1000, 1, 1, 5]))
+        smoothed = smooth(x_data,popt_non[0],popt_non[1],popt_non[2],popt_non[3],popt_non[4], popt_non[5])
+        return smoothed
