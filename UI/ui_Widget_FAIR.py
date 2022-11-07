@@ -15,10 +15,11 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractSpinBox, QApplication, QComboBox, QFrame,
-    QGroupBox, QHBoxLayout, QLabel, QPushButton,
-    QScrollArea, QScrollBar, QSizePolicy, QSpacerItem,
-    QSpinBox, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractSpinBox, QApplication, QComboBox, QDoubleSpinBox,
+    QFrame, QGroupBox, QHBoxLayout, QLabel,
+    QProgressBar, QPushButton, QScrollArea, QScrollBar,
+    QSizePolicy, QSpacerItem, QSpinBox, QVBoxLayout,
+    QWidget)
 
 from MyWidgets.MChart.MChart import MChartView
 from MyWidgets.MGraphicsView.MGraphicsView import MGraphicsView
@@ -65,10 +66,10 @@ class Ui_Widget_FAIR(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 248, 346))
-        self.verticalLayout_4 = QVBoxLayout(self.scrollAreaWidgetContents)
-        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
-        self.verticalLayout_4.setContentsMargins(5, 5, 5, 5)
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 287, 346))
+        self.verticalLayout_6 = QVBoxLayout(self.scrollAreaWidgetContents)
+        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
+        self.verticalLayout_6.setContentsMargins(5, 5, 5, 5)
         self.groupBox = QGroupBox(self.scrollAreaWidgetContents)
         self.groupBox.setObjectName(u"groupBox")
         self.verticalLayout_13 = QVBoxLayout(self.groupBox)
@@ -221,11 +222,66 @@ class Ui_Widget_FAIR(object):
         self.verticalLayout_13.addLayout(self.horizontalLayout_34)
 
 
-        self.verticalLayout_4.addWidget(self.groupBox)
+        self.verticalLayout_6.addWidget(self.groupBox)
+
+        self.groupBox_FAIR = QGroupBox(self.scrollAreaWidgetContents)
+        self.groupBox_FAIR.setObjectName(u"groupBox_FAIR")
+        self.verticalLayout_4 = QVBoxLayout(self.groupBox_FAIR)
+        self.verticalLayout_4.setSpacing(3)
+        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+        self.verticalLayout_4.setContentsMargins(3, 3, 3, 3)
+        self.horizontalLayout_11 = QHBoxLayout()
+        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
+        self.label_T1blood = QLabel(self.groupBox_FAIR)
+        self.label_T1blood.setObjectName(u"label_T1blood")
+
+        self.horizontalLayout_11.addWidget(self.label_T1blood)
+
+        self.doubleSpinBox_T1blood = QDoubleSpinBox(self.groupBox_FAIR)
+        self.doubleSpinBox_T1blood.setObjectName(u"doubleSpinBox_T1blood")
+        self.doubleSpinBox_T1blood.setMaximum(10000.000000000000000)
+        self.doubleSpinBox_T1blood.setSingleStep(10.000000000000000)
+
+        self.horizontalLayout_11.addWidget(self.doubleSpinBox_T1blood)
+
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_11.addItem(self.horizontalSpacer)
+
+
+        self.verticalLayout_4.addLayout(self.horizontalLayout_11)
+
+        self.horizontalLayout_10 = QHBoxLayout()
+        self.horizontalLayout_10.setSpacing(0)
+        self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_10.addItem(self.horizontalSpacer_2)
+
+        self.progressBar_FAIR = QProgressBar(self.groupBox_FAIR)
+        self.progressBar_FAIR.setObjectName(u"progressBar_FAIR")
+        self.progressBar_FAIR.setValue(0)
+
+        self.horizontalLayout_10.addWidget(self.progressBar_FAIR)
+
+        self.pushButton_FAIR_run = QPushButton(self.groupBox_FAIR)
+        self.pushButton_FAIR_run.setObjectName(u"pushButton_FAIR_run")
+
+        self.horizontalLayout_10.addWidget(self.pushButton_FAIR_run)
+
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_10.addItem(self.horizontalSpacer_3)
+
+
+        self.verticalLayout_4.addLayout(self.horizontalLayout_10)
+
+
+        self.verticalLayout_6.addWidget(self.groupBox_FAIR)
 
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-        self.verticalLayout_4.addItem(self.verticalSpacer)
+        self.verticalLayout_6.addItem(self.verticalSpacer)
 
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
 
@@ -386,18 +442,22 @@ class Ui_Widget_FAIR(object):
     def retranslateUi(self, Widget_FAIR):
         Widget_FAIR.setWindowTitle(QCoreApplication.translate("Widget_FAIR", u"Form", None))
         self.groupBox.setTitle(QCoreApplication.translate("Widget_FAIR", u"Basic", None))
-        self.label_5.setText(QCoreApplication.translate("Widget_FAIR", u"Group By", None))
-        self.comboBox.setItemText(0, QCoreApplication.translate("Widget_FAIR", u"Slice", None))
-        self.comboBox.setItemText(1, QCoreApplication.translate("Widget_FAIR", u"Time point", None))
+        self.label_5.setText(QCoreApplication.translate("Widget_FAIR", u"show", None))
+        self.comboBox.setItemText(0, QCoreApplication.translate("Widget_FAIR", u"Selective Inversion", None))
+        self.comboBox.setItemText(1, QCoreApplication.translate("Widget_FAIR", u"Non-Selective Inversion", None))
 
         self.label.setText(QCoreApplication.translate("Widget_FAIR", u"Slice", None))
         self.label_2.setText(QCoreApplication.translate("Widget_FAIR", u"Time point", None))
-        self.label_WL.setText(QCoreApplication.translate("Widget_FAIR", u"WL", None))
-        self.label_WW.setText(QCoreApplication.translate("Widget_FAIR", u"WW", None))
+        self.label_WL.setText(QCoreApplication.translate("Widget_FAIR", u"WW", None))
+        self.label_WW.setText(QCoreApplication.translate("Widget_FAIR", u"WL", None))
         self.label_3.setText(QCoreApplication.translate("Widget_FAIR", u"Row", None))
         self.label_4.setText(QCoreApplication.translate("Widget_FAIR", u"Column", None))
         self.spinBox_column.setSuffix("")
         self.spinBox_column.setPrefix("")
+        self.groupBox_FAIR.setTitle(QCoreApplication.translate("Widget_FAIR", u"FAIR", None))
+        self.label_T1blood.setText(QCoreApplication.translate("Widget_FAIR", u"T1 of blood", None))
+        self.doubleSpinBox_T1blood.setSuffix(QCoreApplication.translate("Widget_FAIR", u" ms", None))
+        self.pushButton_FAIR_run.setText(QCoreApplication.translate("Widget_FAIR", u"Run", None))
         self.groupBox_ROI.setTitle(QCoreApplication.translate("Widget_FAIR", u"ROI", None))
         self.label_17.setText(QCoreApplication.translate("Widget_FAIR", u"Mask", None))
         self.pushButton_Save_mask.setText(QCoreApplication.translate("Widget_FAIR", u"Save", None))

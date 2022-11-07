@@ -13,7 +13,6 @@ from MyWidgets.MGraphicsView.MGraphicsScene import MGraphicsScene
 
 class MGraphicsView(QGraphicsView):
     _idx_changed = Signal(int)
-    _location = Signal(tuple)
 
     def __init__(self, parent: QWidget=None):
         super().__init__(parent)

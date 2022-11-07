@@ -13,8 +13,9 @@ class read_FAIR_folder(MAbstractDicomReader):
     signal_loading = Signal(int)
     signal_loaded = Signal(bool)
 
-    GroupByTime = 'Time'
-    GroupBySlice = 'Slice'
+    ShowSel = 'Selective'
+    ShowNon = 'Non-Selective'
+
     def __init__(self, dicom_dir: str=None) -> None:
         super().__init__()
         self.setDicomRoot(dicom_dir)
@@ -24,11 +25,9 @@ class read_FAIR_folder(MAbstractDicomReader):
         self.setup()
 
     def setup(self) -> None:
-        self._group_mode = self.GroupByTime 
+        self._show_mode = self.ShowSel
         self._current_slice = 0
         self._current_timepoint = 0
-        # self._img_all: np.array = None
-        # self._dss_all: np.array = None
 
     def get_data(self, idx: int) -> tuple:
         """obtain data
@@ -42,15 +41,29 @@ class read_FAIR_folder(MAbstractDicomReader):
         ds : FileDataset
         img: ndarray
         """
-        if self.GroupBy == self.GroupByTime:
-            self.CurrentSlice = idx
-            ds = self.dss_GroupByTime[self.CurrentSlice]
-            img = self.img_GroupByTime[self.CurrentSlice]
-        elif self.GroupBy == self.GroupBySlice:
-            self.CurrentTimePoint = idx
-            ds = self.dss_GroupBySlice[self.CurrentTimePoint]
-            img = self.img_GroupBySlice[self.CurrentTimePoint]
+        self.CurrentTimePoint = idx
+        if self.ShowMode == self.ShowSel:
+            ds = self.dssAll_Sel[self.CurrentTimePoint]
+            img = self.imgAll_Sel[self.CurrentTimePoint]
+        elif self.ShowMode == self.ShowNon:
+            ds = self.dssAll_Non[self.CurrentTimePoint]
+            img = self.imgAll_Non[self.CurrentTimePoint]
         return ds, img
+
+    @property
+    def ShowMode(self) -> str:
+        return self._show_mode
+
+    @ShowMode.setter
+    def ShowMode(self, mode: str) -> None:
+        if mode in [
+            self.ShowSel,
+            self.ShowNon,
+        ]:
+            self._show_mode = mode
+        else:
+            raise ValueError('Unsupported Group mode: {}'.format(mode))
+
 
     @property
     def RowNum(self) -> int:
@@ -70,7 +83,7 @@ class read_FAIR_folder(MAbstractDicomReader):
 
     @property
     def TimePoints(self) -> np.array:
-        return self._time_points
+        return self._InversionTime
 
     @property
     def DicomRoot(self) -> str:
@@ -82,10 +95,10 @@ class read_FAIR_folder(MAbstractDicomReader):
             raise FileNotFoundError('Dicom root does not exist: {}'.format(root))
         else:
             self._dicom_root = root
-            self.__read_FAIR_dicom(root)
+            self._img_all, self._dss_all, self._SliceLocation, self._InversionTime = self.__read_FAIR_dicom(root)
             self._slice_num = len(self._SliceLocation)
             self._time_points_num = len(self._InversionTime)
-            self._time_points = self._InversionTime
+            
             self._row, self._col = self._img_all[0,:,:].shape
 
             self._sel_img_all = self._img_all[0::2]
@@ -115,7 +128,6 @@ class read_FAIR_folder(MAbstractDicomReader):
             ds = dcmread(dcm_path)
             SliceLocation.add(ds.SliceLocation)
             InversionTime.add(ds.InversionTime)
-            print(InversionTime)
             dss.append(ds)
             img.append(ds.pixel_array)
 
@@ -123,45 +135,35 @@ class read_FAIR_folder(MAbstractDicomReader):
         SliceLocation.sort()
         InversionTime = [float(time) for time in InversionTime]
         InversionTime.sort()
+        return np.array(img), np.array(dss), SliceLocation, InversionTime
 
-        self._img_all = np.array(img)
-        self._dss_all = np.array(dss)
-        self._SliceLocation = SliceLocation
-        self._InversionTime = InversionTime
-
-    @property
-    def img_GroupBySlice(self) -> np.array:
-        return self.imgAll[self.CurrentSlice::self.SliceNum]
-        
-    @property 
-    def dss_GroupBySlice(self) -> np.array:
-        return self.dssAll[self.CurrentSlice::self.SliceNum]
-
-    @property
-    def img_GroupByTime(self) -> np.array:
-        return self.imgAll[self.SliceNum * self.CurrentTimePoint : self.SliceNum * (self.CurrentTimePoint+1)]
-        
-    @property 
-    def dss_GroupByTime(self) -> np.array:
-        return self.dssAll[self.SliceNum * self.CurrentTimePoint : self.SliceNum * (self.CurrentTimePoint+1)]
-    
     @property
     def imgAll(self) -> np.array:
-        return self._sel_img_all
+        return self._img_all
+
+    @property
+    def imgAll_Sel(self) -> np.array:
+        return self.imgAll[0::2]
+        
+    @property
+    def imgAll_Non(self) -> np.array:
+        return self.imgAll[1::2]
 
     @property
     def dssAll(self) -> np.array:
         return self._dss_all
 
-
+    @property
+    def dssAll_Sel(self) -> np.array:
+        return self.dssAll[0::2]
+        
+    @property
+    def dssAll_Non(self) -> np.array:
+        return self.dssAll[1::2]
 
     @property
     def len(self) -> int:
-        if self.GroupBy == self.GroupBySlice:
-            number = self.TimePointsNum
-        elif self.GroupBy == self.GroupByTime:
-            number = self.SliceNum
-        return number
+        return self.TimePointsNum
         
     @property
     def min_idx(self) -> int:
@@ -187,20 +189,6 @@ class read_FAIR_folder(MAbstractDicomReader):
     def CurrentTimePoint(self, idx: int) -> None:
         self._current_timepoint = self.__check_index(idx, 0, self.TimePointsNum-1)
 
-    @property
-    def GroupBy(self) -> str:
-        return self._group_mode
-
-    @GroupBy.setter
-    def GroupBy(self, mode: str) -> None:
-        if mode in [
-            self.GroupByTime,
-            self.GroupBySlice,
-        ]:
-            self._group_mode = mode
-        else:
-            raise ValueError('Unsupported Group mode: {}'.format(mode))
-
     @staticmethod
     def __check_index(para: int, min: int, max: int) -> int:
         if para < min:
@@ -208,8 +196,6 @@ class read_FAIR_folder(MAbstractDicomReader):
         elif para >= max:
             para = max
         return para
-
-
 
     def __slot_loadstart(self, start: bool):
         '''Slot function for dicom read thread'''

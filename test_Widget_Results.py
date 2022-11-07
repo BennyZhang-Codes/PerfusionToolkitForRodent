@@ -26,6 +26,15 @@ class Example(QMainWindow):
         self.resize(500, 300)
         self.setWindowTitle('Color')
 
+        msgBox = QMessageBox()
+        msgBox.setWindowTitle('Warning')
+        msgBox.setText('T1 of blood should not be 0!')
+
+        msgBox.setStandardButtons(QMessageBox.Ok)
+        msgBox.setDefaultButton(QMessageBox.Ok)
+        msgBox.setIcon(QMessageBox.Warning)
+        msgBox.exec()
+
 def main():
     app = QApplication(sys.argv)
     ex = Example()
