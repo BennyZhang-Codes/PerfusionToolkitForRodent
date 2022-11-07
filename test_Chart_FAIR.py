@@ -6,21 +6,19 @@ from PySide6.QtWidgets import *
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtCharts import *
-from jupyter_client import BlockingKernelClient
-from matplotlib.pyplot import scatter
+
 import numpy as np
 
 
 
-from MyWidgets.MChart.MChart import MChartView, MChart
-from MyWidgets.MView.MTableView import MTableView
+from MyWidgets.MChart.MChart_FAIR import MChartView, MChart_FAIR
 from MyWidgets.Mmodel.TabelModel import TimePointsTableModel
 
 
 class InteractScatterChart(MChartView):
     def __init__(self):
         super().__init__()
-        self.Mchart = MChart()
+        self.Mchart = MChart_FAIR()
         self.setChart(self.Mchart)
 
         self.setRenderHint(QPainter.Antialiasing)
@@ -36,34 +34,24 @@ class Example(QMainWindow):
         self.scatter = InteractScatterChart()
         scatter = self.scatter
 
-        tableview = MTableView()
-
 
         self.w = QWidget()
         layout = QHBoxLayout()
-        layout.addWidget(tableview)
         layout.addWidget(scatter)
         layout.setStretch(0,2)
-        layout.setStretch(1,5)
+
         self.w.setLayout(layout)
 
 
         xdata = np.arange(20)
         ydata = np.arange(20)**2
         
-        
-
-
-        self.model = TimePointsTableModel(xdata, ydata)
-        tableview.setModel(self.model)
-        scatter.Mchart.setModel(self.model)
-        scatter.Mchart.selected_point.connect(tableview.selectRow)
-        tableview.changed_rows.connect(scatter.Mchart._slot_update_pointConf)
-        tableview.selected_row.connect(scatter.Mchart._update_focus_point)
-
+        scatter.Mchart.setData(xdata, ydata, ydata+10)
         self.setCentralWidget(self.w)
         self.resize(500, 300)
         self.setWindowTitle('InteractScatterChart')
+        print(scatter.Mchart.LineSeries_Non.color())
+        print(scatter.Mchart.LineSeries_Sel.color())
 
         
 

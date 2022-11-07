@@ -7,7 +7,7 @@ from PySide6.QtCharts import *
 from UI.ui_Widget_FAIR import Ui_Widget_FAIR
 from modules.dcmreader.read_FAIR import read_FAIR_folder
 from modules.threads.FAIR import Thread_FAIR_CBF
-from MyWidgets.MChart.MChart import MChart
+from MyWidgets.MChart.MChart_FAIR import MChart_FAIR
 
 from modules.FAIR_CBF import _fig_FAIR_Images, _fig_Fitting, _fig_Results, Msel, Msel_abs
 from scipy.optimize import curve_fit
@@ -29,9 +29,8 @@ class Widget_FAIR(QWidget, Ui_Widget_FAIR):
     def _setupUI(self):
         self.groupBox_ROI.setEnabled(False)
 
-        self.chart = QChart()
+        self.chart = MChart_FAIR()
         self.chart.setTheme(QChart.ChartThemeDark)
-        self.chart.legend().hide()
         self.chart.setAnimationOptions(QChart.SeriesAnimations)
 
         self.chartView.setChart(self.chart)
@@ -311,18 +310,19 @@ class Widget_FAIR(QWidget, Ui_Widget_FAIR):
         self.graphicsView.set_scene(self.spinBox_timepoint.value()-1)
 
     def __curve(self, xdata, sel_ydata, non_ydata) -> None:
+        self.chart.setData(xdata, sel_ydata, non_ydata)
         
-        sel_scatter = QScatterSeries()
-        non_scatter = QScatterSeries()
+        # sel_scatter = QScatterSeries()
+        # non_scatter = QScatterSeries()
 
-        for x, sel, non in zip(xdata, sel_ydata, non_ydata):
-            sel_scatter.append(QPointF(x, sel))
-            non_scatter.append(QPointF(x, non))
+        # for x, sel, non in zip(xdata, sel_ydata, non_ydata):
+        #     sel_scatter.append(QPointF(x, sel))
+        #     non_scatter.append(QPointF(x, non))
 
-        self.chart.removeAllSeries()
-        self.chart.addSeries(sel_scatter)
-        self.chart.addSeries(non_scatter)
-        self.chart.createDefaultAxes()
+        # self.chart.removeAllSeries()
+        # self.chart.addSeries(sel_scatter)
+        # self.chart.addSeries(non_scatter)
+        # self.chart.createDefaultAxes()
     
 
 

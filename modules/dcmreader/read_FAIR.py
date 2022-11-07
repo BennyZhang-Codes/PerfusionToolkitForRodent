@@ -64,7 +64,6 @@ class read_FAIR_folder(MAbstractDicomReader):
         else:
             raise ValueError('Unsupported Group mode: {}'.format(mode))
 
-
     @property
     def RowNum(self) -> int:
         return self._row
@@ -135,7 +134,7 @@ class read_FAIR_folder(MAbstractDicomReader):
         SliceLocation.sort()
         InversionTime = [float(time) for time in InversionTime]
         InversionTime.sort()
-        return np.array(img), np.array(dss), SliceLocation, InversionTime
+        return np.array(img), np.array(dss), np.array(SliceLocation), np.array(InversionTime)
 
     @property
     def imgAll(self) -> np.array:
