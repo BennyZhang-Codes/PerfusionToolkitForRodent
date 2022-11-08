@@ -9,8 +9,6 @@ from modules.dcmreader.read_FAIR import read_FAIR_folder
 from modules.threads.FAIR import Thread_FAIR_CBF
 from MyWidgets.MChart.MChart_FAIR import MChart_FAIR
 
-from modules.FAIR_CBF import _fig_FAIR_Images, _fig_Fitting, _fig_Results, Msel, Msel_abs
-from scipy.optimize import curve_fit
 from modules.utils.shape import get_index_of_mask
 
 class Widget_FAIR(QWidget, Ui_Widget_FAIR):
