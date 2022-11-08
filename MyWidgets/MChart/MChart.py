@@ -148,6 +148,9 @@ class MChart(QChart):
     def contextMenuEvent(self, event: QGraphicsSceneContextMenuEvent) -> None:
         return super().contextMenuEvent(event)
 
+    def wheelEvent(self, event: QWheelEvent) -> None:
+        pass
+
     @property
     def Model(self) -> TimePointsTableModel:
         return self._model

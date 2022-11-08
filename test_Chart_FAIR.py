@@ -21,16 +21,11 @@ class InteractScatterChart(MChartView):
         self.Mchart = MChart_FAIR()
         self.setChart(self.Mchart)
 
-        self.setRenderHint(QPainter.Antialiasing)
-
-
-
-
 class Example(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setMinimumHeight(500)
-        self.setMinimumWidth(1200)
+        # self.setMinimumHeight(500)
+        # self.setMinimumWidth(1200)
         self.scatter = InteractScatterChart()
         scatter = self.scatter
 
@@ -45,10 +40,18 @@ class Example(QMainWindow):
 
         xdata = np.arange(20)
         ydata = np.arange(20)**2
-        
+        line = QLineSeries()
+
+        for x, y in zip(xdata, ydata):
+            line.append(QPointF(x, y))
+
+
         scatter.Mchart.setData(xdata, ydata, ydata+10)
+
+        # scatter.Mchart.removeAllSeries()
+        # scatter.Mchart.addSeries(line)
         self.setCentralWidget(self.w)
-        self.resize(500, 300)
+        # self.resize(500, 300)
         self.setWindowTitle('InteractScatterChart')
         print(scatter.Mchart.LineSeries_Non.color())
         print(scatter.Mchart.LineSeries_Sel.color())

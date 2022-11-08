@@ -36,6 +36,7 @@ class Ui_Widget_FAIR(object):
         self.verticalLayout_5.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_9 = QHBoxLayout()
         self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
+        self.horizontalLayout_9.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_5 = QHBoxLayout()
         self.horizontalLayout_5.setSpacing(0)
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
@@ -298,8 +299,9 @@ class Ui_Widget_FAIR(object):
 
         self.verticalLayout_5.addLayout(self.horizontalLayout_9)
 
-        self.horizontalLayout_4 = QHBoxLayout()
-        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.horizontalLayout_12 = QHBoxLayout()
+        self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
+        self.horizontalLayout_12.setContentsMargins(6, 6, 6, 6)
         self.groupBox_ROI = QGroupBox(Widget_FAIR)
         self.groupBox_ROI.setObjectName(u"groupBox_ROI")
         self.horizontalLayout_3 = QHBoxLayout(self.groupBox_ROI)
@@ -401,9 +403,15 @@ class Ui_Widget_FAIR(object):
         self.horizontalLayout_3.addLayout(self.verticalLayout)
 
 
-        self.horizontalLayout_4.addWidget(self.groupBox_ROI)
+        self.horizontalLayout_12.addWidget(self.groupBox_ROI)
 
-        self.frame_3 = QFrame(Widget_FAIR)
+        self.groupBox_Results = QGroupBox(Widget_FAIR)
+        self.groupBox_Results.setObjectName(u"groupBox_Results")
+        self.horizontalLayout_4 = QHBoxLayout(self.groupBox_Results)
+        self.horizontalLayout_4.setSpacing(5)
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.horizontalLayout_4.setContentsMargins(5, 5, 5, 5)
+        self.frame_3 = QFrame(self.groupBox_Results)
         self.frame_3.setObjectName(u"frame_3")
         sizePolicy1.setHeightForWidth(self.frame_3.sizePolicy().hasHeightForWidth())
         self.frame_3.setSizePolicy(sizePolicy1)
@@ -423,13 +431,12 @@ class Ui_Widget_FAIR(object):
 
         self.horizontalLayout_4.addWidget(self.frame_3)
 
-        self.horizontalLayout_4.setStretch(0, 1)
-        self.horizontalLayout_4.setStretch(1, 1)
 
-        self.verticalLayout_5.addLayout(self.horizontalLayout_4)
+        self.horizontalLayout_12.addWidget(self.groupBox_Results)
 
-        self.verticalLayout_5.setStretch(0, 1)
-        self.verticalLayout_5.setStretch(1, 1)
+
+        self.verticalLayout_5.addLayout(self.horizontalLayout_12)
+
 
         self.retranslateUi(Widget_FAIR)
 
@@ -463,5 +470,6 @@ class Ui_Widget_FAIR(object):
         self.pushButton_Save_mask.setText(QCoreApplication.translate("Widget_FAIR", u"Save", None))
         self.label_18.setText(QCoreApplication.translate("Widget_FAIR", u"Overlap", None))
         self.pushButton_Save_overlap.setText(QCoreApplication.translate("Widget_FAIR", u"Save", None))
+        self.groupBox_Results.setTitle(QCoreApplication.translate("Widget_FAIR", u"Results", None))
     # retranslateUi
 

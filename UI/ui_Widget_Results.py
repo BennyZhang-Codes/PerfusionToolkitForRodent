@@ -26,7 +26,7 @@ class Ui_Widget_Results(object):
     def setupUi(self, Widget_Results):
         if not Widget_Results.objectName():
             Widget_Results.setObjectName(u"Widget_Results")
-        Widget_Results.resize(544, 682)
+        Widget_Results.resize(464, 591)
         self.verticalLayout = QVBoxLayout(Widget_Results)
         self.verticalLayout.setSpacing(6)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -111,14 +111,20 @@ class Ui_Widget_Results(object):
 
         self.horizontalLayout_3.addLayout(self.horizontalLayout_2)
 
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_3.addItem(self.horizontalSpacer)
-
         self.pushButton_Save = QPushButton(Widget_Results)
         self.pushButton_Save.setObjectName(u"pushButton_Save")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.pushButton_Save.sizePolicy().hasHeightForWidth())
+        self.pushButton_Save.setSizePolicy(sizePolicy1)
+        self.pushButton_Save.setMinimumSize(QSize(40, 0))
 
         self.horizontalLayout_3.addWidget(self.pushButton_Save)
+
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_3.addItem(self.horizontalSpacer_4)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_3)
@@ -127,18 +133,18 @@ class Ui_Widget_Results(object):
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.widget_result = MResult(Widget_Results)
         self.widget_result.setObjectName(u"widget_result")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.widget_result.sizePolicy().hasHeightForWidth())
-        self.widget_result.setSizePolicy(sizePolicy1)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.widget_result.sizePolicy().hasHeightForWidth())
+        self.widget_result.setSizePolicy(sizePolicy2)
 
         self.horizontalLayout.addWidget(self.widget_result)
 
         self.widget_colorbar = MColorBar(Widget_Results)
         self.widget_colorbar.setObjectName(u"widget_colorbar")
-        sizePolicy1.setHeightForWidth(self.widget_colorbar.sizePolicy().hasHeightForWidth())
-        self.widget_colorbar.setSizePolicy(sizePolicy1)
+        sizePolicy2.setHeightForWidth(self.widget_colorbar.sizePolicy().hasHeightForWidth())
+        self.widget_colorbar.setSizePolicy(sizePolicy2)
 
         self.horizontalLayout.addWidget(self.widget_colorbar)
 

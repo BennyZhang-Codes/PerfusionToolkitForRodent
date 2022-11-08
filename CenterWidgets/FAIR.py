@@ -28,10 +28,10 @@ class Widget_FAIR(QWidget, Ui_Widget_FAIR):
 
     def _setupUI(self):
         self.groupBox_ROI.setEnabled(False)
-
+        self.groupBox_Results.setEnabled(False)
+    
         self.chart = MChart_FAIR()
-        self.chart.setTheme(QChart.ChartThemeDark)
-        self.chart.setAnimationOptions(QChart.SeriesAnimations)
+
 
         self.chartView.setChart(self.chart)
         self.graphicsView.set_mainwindow(self.mainwindow)
@@ -123,6 +123,8 @@ class Widget_FAIR(QWidget, Ui_Widget_FAIR):
         self.progressBar_FAIR.setEnabled(False)
         self.pushButton_FAIR_run.setEnabled(True)
         self.pushButton_FAIR_run.setVisible(True)
+
+        self.groupBox_Results.setEnabled(True)
 
         self.widget_result_CBF.setImageArray(CBF[0])
 
