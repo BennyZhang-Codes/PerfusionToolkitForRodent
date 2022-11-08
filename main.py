@@ -36,8 +36,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def _setup(self):
 
-        # root = r'E:\ISMRM2023\Example\Example_mice_DSC'
-        # self.tabWidget.addTab(DSC.Widget_DSC(root, self), '(DSC) {}'.format(os.path.basename(root)))
+        root = r'E:\ISMRM2023\Example\Example_mice_FAIR'
+        self.tabWidget.addTab(FAIR.Widget_FAIR(root, self), '(FAIR) {}'.format(os.path.basename(root)))
+
+        root = r'E:\ISMRM2023\Example\Example_mice_DSC'
+        self.tabWidget.addTab(DSC.Widget_DSC(root, self), '(DSC) {}'.format(os.path.basename(root)))
 
         # root = r'E:\PySide6\examplefiles\E7_DCE_FLASH'
         # self.tabWidget.addTab(DSC.Widget_DSC(root, self), '(DSC) {}'.format(os.path.basename(root)))
@@ -45,8 +48,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # root = r'E:\ISMRM2023\Example\Example_mice_T2'
         # self.tabWidget.addTab(Browse.Widget_Browse(root, self), '(Viewer) {}'.format(os.path.basename(root)))
 
-        root = r'E:\ISMRM2023\Example\Example_mice_FAIR\pdata\1\dicom'
-        self.tabWidget.addTab(FAIR.Widget_FAIR(root, self), '(FAIR) {}'.format(os.path.basename(root)))
+
 
     @Slot(int)
     def on_tabWidget_tabCloseRequested(self, idx):

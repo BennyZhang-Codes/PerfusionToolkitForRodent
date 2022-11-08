@@ -393,6 +393,18 @@
               </item>
               <item>
                <widget class="QPushButton" name="pushButton_FAIR_run">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>50</width>
+                  <height>28</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Run</string>
                 </property>
@@ -506,6 +518,18 @@
             </item>
             <item>
              <widget class="QPushButton" name="pushButton_Save_mask">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>35</width>
+                <height>28</height>
+               </size>
+              </property>
               <property name="text">
                <string>Save</string>
               </property>
@@ -584,6 +608,18 @@
             </item>
             <item>
              <widget class="QPushButton" name="pushButton_Save_overlap">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>35</width>
+                <height>28</height>
+               </size>
+              </property>
               <property name="text">
                <string>Save</string>
               </property>

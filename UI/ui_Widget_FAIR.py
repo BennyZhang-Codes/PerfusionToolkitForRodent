@@ -267,6 +267,12 @@ class Ui_Widget_FAIR(object):
 
         self.pushButton_FAIR_run = QPushButton(self.groupBox_FAIR)
         self.pushButton_FAIR_run.setObjectName(u"pushButton_FAIR_run")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.pushButton_FAIR_run.sizePolicy().hasHeightForWidth())
+        self.pushButton_FAIR_run.setSizePolicy(sizePolicy1)
+        self.pushButton_FAIR_run.setMinimumSize(QSize(50, 28))
 
         self.horizontalLayout_10.addWidget(self.pushButton_FAIR_run)
 
@@ -324,6 +330,9 @@ class Ui_Widget_FAIR(object):
 
         self.pushButton_Save_mask = QPushButton(self.groupBox_ROI)
         self.pushButton_Save_mask.setObjectName(u"pushButton_Save_mask")
+        sizePolicy1.setHeightForWidth(self.pushButton_Save_mask.sizePolicy().hasHeightForWidth())
+        self.pushButton_Save_mask.setSizePolicy(sizePolicy1)
+        self.pushButton_Save_mask.setMinimumSize(QSize(35, 28))
 
         self.horizontalLayout_35.addWidget(self.pushButton_Save_mask)
 
@@ -332,11 +341,11 @@ class Ui_Widget_FAIR(object):
 
         self.frame = QFrame(self.groupBox_ROI)
         self.frame.setObjectName(u"frame")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
-        self.frame.setSizePolicy(sizePolicy1)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
+        self.frame.setSizePolicy(sizePolicy2)
         self.frame.setFrameShape(QFrame.StyledPanel)
         self.frame.setFrameShadow(QFrame.Raised)
         self.horizontalLayout_36 = QHBoxLayout(self.frame)
@@ -371,6 +380,9 @@ class Ui_Widget_FAIR(object):
 
         self.pushButton_Save_overlap = QPushButton(self.groupBox_ROI)
         self.pushButton_Save_overlap.setObjectName(u"pushButton_Save_overlap")
+        sizePolicy1.setHeightForWidth(self.pushButton_Save_overlap.sizePolicy().hasHeightForWidth())
+        self.pushButton_Save_overlap.setSizePolicy(sizePolicy1)
+        self.pushButton_Save_overlap.setMinimumSize(QSize(35, 28))
 
         self.horizontalLayout_38.addWidget(self.pushButton_Save_overlap)
 
@@ -379,8 +391,8 @@ class Ui_Widget_FAIR(object):
 
         self.frame_2 = QFrame(self.groupBox_ROI)
         self.frame_2.setObjectName(u"frame_2")
-        sizePolicy1.setHeightForWidth(self.frame_2.sizePolicy().hasHeightForWidth())
-        self.frame_2.setSizePolicy(sizePolicy1)
+        sizePolicy2.setHeightForWidth(self.frame_2.sizePolicy().hasHeightForWidth())
+        self.frame_2.setSizePolicy(sizePolicy2)
         self.frame_2.setAutoFillBackground(False)
         self.frame_2.setStyleSheet(u"")
         self.frame_2.setFrameShape(QFrame.StyledPanel)
@@ -413,8 +425,8 @@ class Ui_Widget_FAIR(object):
         self.horizontalLayout_4.setContentsMargins(5, 5, 5, 5)
         self.frame_3 = QFrame(self.groupBox_Results)
         self.frame_3.setObjectName(u"frame_3")
-        sizePolicy1.setHeightForWidth(self.frame_3.sizePolicy().hasHeightForWidth())
-        self.frame_3.setSizePolicy(sizePolicy1)
+        sizePolicy2.setHeightForWidth(self.frame_3.sizePolicy().hasHeightForWidth())
+        self.frame_3.setSizePolicy(sizePolicy2)
         self.frame_3.setFrameShape(QFrame.StyledPanel)
         self.frame_3.setFrameShadow(QFrame.Raised)
         self.verticalLayout_15 = QVBoxLayout(self.frame_3)

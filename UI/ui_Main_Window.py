@@ -27,6 +27,9 @@ class Ui_MainWindow(object):
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.setEnabled(True)
         MainWindow.resize(1044, 707)
+        font = QFont()
+        font.setPointSize(9)
+        MainWindow.setFont(font)
         icon = QIcon()
         icon.addFile(u":/\u65b0\u524d\u7f00/GUI_Logo.ico", QSize(), QIcon.Normal, QIcon.Off)
         MainWindow.setWindowIcon(icon)
@@ -98,7 +101,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Rodent Perfusion Toolkit", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Perfusion Toolkit For Rodent", None))
 #if QT_CONFIG(statustip)
         MainWindow.setStatusTip("")
 #endif // QT_CONFIG(statustip)

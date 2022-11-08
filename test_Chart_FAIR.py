@@ -1,18 +1,13 @@
 
 import sys
-import math
-from PySide6 import QtCore, QtDataVisualization
+
 from PySide6.QtWidgets import *
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtCharts import *
 
 import numpy as np
-
-
-
 from MyWidgets.MChart.MChart_FAIR import MChartView, MChart_FAIR
-from MyWidgets.Mmodel.TabelModel import TimePointsTableModel
 
 
 class InteractScatterChart(MChartView):
@@ -53,6 +48,8 @@ class Example(QMainWindow):
         self.setCentralWidget(self.w)
         # self.resize(500, 300)
         self.setWindowTitle('InteractScatterChart')
+        
+        
         print(scatter.Mchart.LineSeries_Non.color())
         print(scatter.Mchart.LineSeries_Sel.color())
 

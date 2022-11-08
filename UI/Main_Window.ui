@@ -13,8 +13,13 @@
     <height>707</height>
    </rect>
   </property>
+  <property name="font">
+   <font>
+    <pointsize>9</pointsize>
+   </font>
+  </property>
   <property name="windowTitle">
-   <string>Rodent Perfusion Toolkit</string>
+   <string>Perfusion Toolkit For Rodent</string>
   </property>
   <property name="windowIcon">
    <iconset resource="icons.qrc">

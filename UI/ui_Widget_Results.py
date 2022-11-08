@@ -118,7 +118,7 @@ class Ui_Widget_Results(object):
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.pushButton_Save.sizePolicy().hasHeightForWidth())
         self.pushButton_Save.setSizePolicy(sizePolicy1)
-        self.pushButton_Save.setMinimumSize(QSize(40, 0))
+        self.pushButton_Save.setMinimumSize(QSize(40, 28))
 
         self.horizontalLayout_3.addWidget(self.pushButton_Save)
 

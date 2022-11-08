@@ -34,7 +34,6 @@ class MChart_FAIR(QChart):
         self.setAnimationOptions(QChart.SeriesAnimations)
         self.setAcceptHoverEvents(True)
         self.init_series()
-        self.setTitle('Time-Series curve of Inversion Recovery')
 
     def setData(self, xdata, sel_ydata, non_ydata) -> None:
         self.xdata = xdata
@@ -48,7 +47,7 @@ class MChart_FAIR(QChart):
         self.axes(Qt.Vertical)[0].setRange(0, y_max)
         self.axes(Qt.Horizontal)[0].setRange(0, self.xdata.max()*1.1)
 
-        
+
     def init_series(self) -> None:
         self.ScatterSeries_up = QScatterSeries()
         self.ScatterSeries_up.setMarkerSize(12)

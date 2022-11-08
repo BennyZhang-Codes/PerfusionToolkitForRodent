@@ -83,7 +83,7 @@ class Ui_Widget_DSC(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.widget_tools.sizePolicy().hasHeightForWidth())
         self.widget_tools.setSizePolicy(sizePolicy)
-        self.widget_tools.setMinimumSize(QSize(256, 0))
+        self.widget_tools.setMinimumSize(QSize(290, 0))
         self.verticalLayout_9 = QVBoxLayout(self.widget_tools)
         self.verticalLayout_9.setSpacing(0)
         self.verticalLayout_9.setObjectName(u"verticalLayout_9")
@@ -93,7 +93,7 @@ class Ui_Widget_DSC(object):
         self.scrollArea_2.setWidgetResizable(True)
         self.scrollAreaWidgetContents_2 = QWidget()
         self.scrollAreaWidgetContents_2.setObjectName(u"scrollAreaWidgetContents_2")
-        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 306, 687))
+        self.scrollAreaWidgetContents_2.setGeometry(QRect(0, 0, 305, 687))
         self.verticalLayout_4 = QVBoxLayout(self.scrollAreaWidgetContents_2)
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.verticalLayout_4.setContentsMargins(5, 5, 5, 5)
@@ -346,6 +346,12 @@ class Ui_Widget_DSC(object):
 
         self.pushButton_DSC_run = QPushButton(self.groupBox_2)
         self.pushButton_DSC_run.setObjectName(u"pushButton_DSC_run")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.pushButton_DSC_run.sizePolicy().hasHeightForWidth())
+        self.pushButton_DSC_run.setSizePolicy(sizePolicy1)
+        self.pushButton_DSC_run.setMinimumSize(QSize(50, 28))
 
         self.horizontalLayout_30.addWidget(self.pushButton_DSC_run)
 
@@ -361,10 +367,10 @@ class Ui_Widget_DSC(object):
 
         self.groupBox_3 = QGroupBox(self.scrollAreaWidgetContents_2)
         self.groupBox_3.setObjectName(u"groupBox_3")
-        self.verticalLayout_12 = QVBoxLayout(self.groupBox_3)
-        self.verticalLayout_12.setSpacing(3)
-        self.verticalLayout_12.setObjectName(u"verticalLayout_12")
-        self.verticalLayout_12.setContentsMargins(3, 3, 3, 3)
+        self.verticalLayout_3 = QVBoxLayout(self.groupBox_3)
+        self.verticalLayout_3.setSpacing(3)
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.verticalLayout_3.setContentsMargins(3, 3, 3, 3)
         self.horizontalLayout_33 = QHBoxLayout()
         self.horizontalLayout_33.setObjectName(u"horizontalLayout_33")
         self.label_16 = QLabel(self.groupBox_3)
@@ -382,7 +388,7 @@ class Ui_Widget_DSC(object):
         self.horizontalLayout_33.addItem(self.horizontalSpacer_11)
 
 
-        self.verticalLayout_12.addLayout(self.horizontalLayout_33)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_33)
 
         self.horizontalLayout_32 = QHBoxLayout()
         self.horizontalLayout_32.setObjectName(u"horizontalLayout_32")
@@ -416,7 +422,7 @@ class Ui_Widget_DSC(object):
         self.horizontalLayout_32.addItem(self.horizontalSpacer_10)
 
 
-        self.verticalLayout_12.addLayout(self.horizontalLayout_32)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_32)
 
         self.horizontalLayout_25 = QHBoxLayout()
         self.horizontalLayout_25.setObjectName(u"horizontalLayout_25")
@@ -433,12 +439,9 @@ class Ui_Widget_DSC(object):
 
         self.pushButton_correction = QPushButton(self.groupBox_3)
         self.pushButton_correction.setObjectName(u"pushButton_correction")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.pushButton_correction.sizePolicy().hasHeightForWidth())
         self.pushButton_correction.setSizePolicy(sizePolicy1)
-        self.pushButton_correction.setMinimumSize(QSize(50, 30))
+        self.pushButton_correction.setMinimumSize(QSize(50, 28))
 
         self.horizontalLayout_25.addWidget(self.pushButton_correction)
 
@@ -447,20 +450,9 @@ class Ui_Widget_DSC(object):
         self.horizontalLayout_25.addItem(self.horizontalSpacer_9)
 
 
-        self.verticalLayout_12.addLayout(self.horizontalLayout_25)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_25)
 
-        self.scrollArea_correction = QScrollArea(self.groupBox_3)
-        self.scrollArea_correction.setObjectName(u"scrollArea_correction")
-        self.scrollArea_correction.setMaximumSize(QSize(16777215, 200))
-        self.scrollArea_correction.setWidgetResizable(True)
-        self.scrollAreaWidgetContents_3 = QWidget()
-        self.scrollAreaWidgetContents_3.setObjectName(u"scrollAreaWidgetContents_3")
-        self.scrollAreaWidgetContents_3.setGeometry(QRect(0, 0, 286, 268))
-        self.verticalLayout_3 = QVBoxLayout(self.scrollAreaWidgetContents_3)
-        self.verticalLayout_3.setSpacing(3)
-        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.verticalLayout_3.setContentsMargins(3, 3, 3, 3)
-        self.widget_correction_before = QWidget(self.scrollAreaWidgetContents_3)
+        self.widget_correction_before = QWidget(self.groupBox_3)
         self.widget_correction_before.setObjectName(u"widget_correction_before")
         self.verticalLayout_11 = QVBoxLayout(self.widget_correction_before)
         self.verticalLayout_11.setSpacing(3)
@@ -485,21 +477,28 @@ class Ui_Widget_DSC(object):
         self.horizontalLayout_19.setObjectName(u"horizontalLayout_19")
         self.label_9 = QLabel(self.widget_correction_before)
         self.label_9.setObjectName(u"label_9")
-        sizePolicy1.setHeightForWidth(self.label_9.sizePolicy().hasHeightForWidth())
-        self.label_9.setSizePolicy(sizePolicy1)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.label_9.sizePolicy().hasHeightForWidth())
+        self.label_9.setSizePolicy(sizePolicy2)
         self.label_9.setMinimumSize(QSize(80, 0))
         self.label_9.setMaximumSize(QSize(80, 16777215))
 
         self.horizontalLayout_19.addWidget(self.label_9)
 
+        self.horizontalSpacer_18 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_19.addItem(self.horizontalSpacer_18)
+
         self.label_correction_before_row = QLabel(self.widget_correction_before)
         self.label_correction_before_row.setObjectName(u"label_correction_before_row")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.label_correction_before_row.sizePolicy().hasHeightForWidth())
-        self.label_correction_before_row.setSizePolicy(sizePolicy2)
-        self.label_correction_before_row.setMinimumSize(QSize(192, 48))
+        sizePolicy3 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.label_correction_before_row.sizePolicy().hasHeightForWidth())
+        self.label_correction_before_row.setSizePolicy(sizePolicy3)
+        self.label_correction_before_row.setMinimumSize(QSize(150, 48))
         self.label_correction_before_row.setMaximumSize(QSize(400, 48))
         self.label_correction_before_row.setBaseSize(QSize(0, 0))
 
@@ -512,18 +511,22 @@ class Ui_Widget_DSC(object):
         self.horizontalLayout_21.setObjectName(u"horizontalLayout_21")
         self.label_10 = QLabel(self.widget_correction_before)
         self.label_10.setObjectName(u"label_10")
-        sizePolicy1.setHeightForWidth(self.label_10.sizePolicy().hasHeightForWidth())
-        self.label_10.setSizePolicy(sizePolicy1)
+        sizePolicy2.setHeightForWidth(self.label_10.sizePolicy().hasHeightForWidth())
+        self.label_10.setSizePolicy(sizePolicy2)
         self.label_10.setMinimumSize(QSize(80, 0))
         self.label_10.setMaximumSize(QSize(80, 16777215))
 
         self.horizontalLayout_21.addWidget(self.label_10)
 
+        self.horizontalSpacer_19 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_21.addItem(self.horizontalSpacer_19)
+
         self.label_correction_before_col = QLabel(self.widget_correction_before)
         self.label_correction_before_col.setObjectName(u"label_correction_before_col")
-        sizePolicy2.setHeightForWidth(self.label_correction_before_col.sizePolicy().hasHeightForWidth())
-        self.label_correction_before_col.setSizePolicy(sizePolicy2)
-        self.label_correction_before_col.setMinimumSize(QSize(192, 48))
+        sizePolicy3.setHeightForWidth(self.label_correction_before_col.sizePolicy().hasHeightForWidth())
+        self.label_correction_before_col.setSizePolicy(sizePolicy3)
+        self.label_correction_before_col.setMinimumSize(QSize(150, 48))
         self.label_correction_before_col.setMaximumSize(QSize(400, 48))
 
         self.horizontalLayout_21.addWidget(self.label_correction_before_col)
@@ -534,7 +537,7 @@ class Ui_Widget_DSC(object):
 
         self.verticalLayout_3.addWidget(self.widget_correction_before)
 
-        self.widget_correction_after = QWidget(self.scrollAreaWidgetContents_3)
+        self.widget_correction_after = QWidget(self.groupBox_3)
         self.widget_correction_after.setObjectName(u"widget_correction_after")
         self.verticalLayout_10 = QVBoxLayout(self.widget_correction_after)
         self.verticalLayout_10.setSpacing(3)
@@ -558,18 +561,22 @@ class Ui_Widget_DSC(object):
         self.horizontalLayout_22.setObjectName(u"horizontalLayout_22")
         self.label_11 = QLabel(self.widget_correction_after)
         self.label_11.setObjectName(u"label_11")
-        sizePolicy1.setHeightForWidth(self.label_11.sizePolicy().hasHeightForWidth())
-        self.label_11.setSizePolicy(sizePolicy1)
+        sizePolicy2.setHeightForWidth(self.label_11.sizePolicy().hasHeightForWidth())
+        self.label_11.setSizePolicy(sizePolicy2)
         self.label_11.setMinimumSize(QSize(80, 0))
         self.label_11.setMaximumSize(QSize(80, 16777215))
 
         self.horizontalLayout_22.addWidget(self.label_11)
 
+        self.horizontalSpacer_20 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_22.addItem(self.horizontalSpacer_20)
+
         self.label_correction_after_row = QLabel(self.widget_correction_after)
         self.label_correction_after_row.setObjectName(u"label_correction_after_row")
-        sizePolicy2.setHeightForWidth(self.label_correction_after_row.sizePolicy().hasHeightForWidth())
-        self.label_correction_after_row.setSizePolicy(sizePolicy2)
-        self.label_correction_after_row.setMinimumSize(QSize(192, 48))
+        sizePolicy3.setHeightForWidth(self.label_correction_after_row.sizePolicy().hasHeightForWidth())
+        self.label_correction_after_row.setSizePolicy(sizePolicy3)
+        self.label_correction_after_row.setMinimumSize(QSize(150, 48))
         self.label_correction_after_row.setMaximumSize(QSize(400, 48))
 
         self.horizontalLayout_22.addWidget(self.label_correction_after_row)
@@ -581,18 +588,22 @@ class Ui_Widget_DSC(object):
         self.horizontalLayout_23.setObjectName(u"horizontalLayout_23")
         self.label_12 = QLabel(self.widget_correction_after)
         self.label_12.setObjectName(u"label_12")
-        sizePolicy1.setHeightForWidth(self.label_12.sizePolicy().hasHeightForWidth())
-        self.label_12.setSizePolicy(sizePolicy1)
+        sizePolicy2.setHeightForWidth(self.label_12.sizePolicy().hasHeightForWidth())
+        self.label_12.setSizePolicy(sizePolicy2)
         self.label_12.setMinimumSize(QSize(80, 0))
         self.label_12.setMaximumSize(QSize(80, 16777215))
 
         self.horizontalLayout_23.addWidget(self.label_12)
 
+        self.horizontalSpacer_21 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_23.addItem(self.horizontalSpacer_21)
+
         self.label_correction_after_col = QLabel(self.widget_correction_after)
         self.label_correction_after_col.setObjectName(u"label_correction_after_col")
-        sizePolicy2.setHeightForWidth(self.label_correction_after_col.sizePolicy().hasHeightForWidth())
-        self.label_correction_after_col.setSizePolicy(sizePolicy2)
-        self.label_correction_after_col.setMinimumSize(QSize(192, 48))
+        sizePolicy3.setHeightForWidth(self.label_correction_after_col.sizePolicy().hasHeightForWidth())
+        self.label_correction_after_col.setSizePolicy(sizePolicy3)
+        self.label_correction_after_col.setMinimumSize(QSize(150, 48))
         self.label_correction_after_col.setMaximumSize(QSize(400, 48))
 
         self.horizontalLayout_23.addWidget(self.label_correction_after_col)
@@ -603,13 +614,9 @@ class Ui_Widget_DSC(object):
 
         self.verticalLayout_3.addWidget(self.widget_correction_after)
 
-        self.verticalSpacer = QSpacerItem(20, 3, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer = QSpacerItem(20, 12, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_3.addItem(self.verticalSpacer)
-
-        self.scrollArea_correction.setWidget(self.scrollAreaWidgetContents_3)
-
-        self.verticalLayout_12.addWidget(self.scrollArea_correction)
 
 
         self.verticalLayout_4.addWidget(self.groupBox_3)
@@ -629,11 +636,11 @@ class Ui_Widget_DSC(object):
         self.splitter_2.addWidget(self.layoutWidget)
         self.widget_chart = QWidget(self.splitter_2)
         self.widget_chart.setObjectName(u"widget_chart")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.widget_chart.sizePolicy().hasHeightForWidth())
-        self.widget_chart.setSizePolicy(sizePolicy3)
+        sizePolicy4 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy4.setHorizontalStretch(0)
+        sizePolicy4.setVerticalStretch(0)
+        sizePolicy4.setHeightForWidth(self.widget_chart.sizePolicy().hasHeightForWidth())
+        self.widget_chart.setSizePolicy(sizePolicy4)
         self.horizontalLayout_5 = QHBoxLayout(self.widget_chart)
         self.horizontalLayout_5.setSpacing(0)
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
@@ -684,11 +691,11 @@ class Ui_Widget_DSC(object):
 
         self.frame = QFrame(self.groupBox_ROI)
         self.frame.setObjectName(u"frame")
-        sizePolicy4 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        sizePolicy4.setHorizontalStretch(0)
-        sizePolicy4.setVerticalStretch(0)
-        sizePolicy4.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
-        self.frame.setSizePolicy(sizePolicy4)
+        sizePolicy5 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy5.setHorizontalStretch(0)
+        sizePolicy5.setVerticalStretch(0)
+        sizePolicy5.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
+        self.frame.setSizePolicy(sizePolicy5)
         self.frame.setFrameShape(QFrame.StyledPanel)
         self.frame.setFrameShadow(QFrame.Raised)
         self.horizontalLayout_36 = QHBoxLayout(self.frame)
@@ -725,8 +732,8 @@ class Ui_Widget_DSC(object):
 
         self.frame_2 = QFrame(self.groupBox_ROI)
         self.frame_2.setObjectName(u"frame_2")
-        sizePolicy4.setHeightForWidth(self.frame_2.sizePolicy().hasHeightForWidth())
-        self.frame_2.setSizePolicy(sizePolicy4)
+        sizePolicy5.setHeightForWidth(self.frame_2.sizePolicy().hasHeightForWidth())
+        self.frame_2.setSizePolicy(sizePolicy5)
         self.frame_2.setAutoFillBackground(False)
         self.frame_2.setStyleSheet(u"")
         self.frame_2.setFrameShape(QFrame.StyledPanel)
@@ -754,8 +761,8 @@ class Ui_Widget_DSC(object):
         self.horizontalLayout_10.setContentsMargins(3, 3, 3, 3)
         self.frame_3 = QFrame(self.groupBox_Results)
         self.frame_3.setObjectName(u"frame_3")
-        sizePolicy4.setHeightForWidth(self.frame_3.sizePolicy().hasHeightForWidth())
-        self.frame_3.setSizePolicy(sizePolicy4)
+        sizePolicy5.setHeightForWidth(self.frame_3.sizePolicy().hasHeightForWidth())
+        self.frame_3.setSizePolicy(sizePolicy5)
         self.frame_3.setFrameShape(QFrame.StyledPanel)
         self.frame_3.setFrameShadow(QFrame.Raised)
         self.verticalLayout_15 = QVBoxLayout(self.frame_3)
@@ -764,8 +771,8 @@ class Ui_Widget_DSC(object):
         self.verticalLayout_15.setContentsMargins(0, 0, 0, 0)
         self.widget_result_CBF = Widget_Results(self.frame_3)
         self.widget_result_CBF.setObjectName(u"widget_result_CBF")
-        sizePolicy3.setHeightForWidth(self.widget_result_CBF.sizePolicy().hasHeightForWidth())
-        self.widget_result_CBF.setSizePolicy(sizePolicy3)
+        sizePolicy4.setHeightForWidth(self.widget_result_CBF.sizePolicy().hasHeightForWidth())
+        self.widget_result_CBF.setSizePolicy(sizePolicy4)
 
         self.verticalLayout_15.addWidget(self.widget_result_CBF)
 
@@ -774,8 +781,8 @@ class Ui_Widget_DSC(object):
 
         self.frame_4 = QFrame(self.groupBox_Results)
         self.frame_4.setObjectName(u"frame_4")
-        sizePolicy4.setHeightForWidth(self.frame_4.sizePolicy().hasHeightForWidth())
-        self.frame_4.setSizePolicy(sizePolicy4)
+        sizePolicy5.setHeightForWidth(self.frame_4.sizePolicy().hasHeightForWidth())
+        self.frame_4.setSizePolicy(sizePolicy5)
         self.frame_4.setFrameShape(QFrame.StyledPanel)
         self.frame_4.setFrameShadow(QFrame.Raised)
         self.verticalLayout_16 = QVBoxLayout(self.frame_4)
@@ -792,8 +799,8 @@ class Ui_Widget_DSC(object):
 
         self.frame_5 = QFrame(self.groupBox_Results)
         self.frame_5.setObjectName(u"frame_5")
-        sizePolicy4.setHeightForWidth(self.frame_5.sizePolicy().hasHeightForWidth())
-        self.frame_5.setSizePolicy(sizePolicy4)
+        sizePolicy5.setHeightForWidth(self.frame_5.sizePolicy().hasHeightForWidth())
+        self.frame_5.setSizePolicy(sizePolicy5)
         self.frame_5.setFrameShape(QFrame.StyledPanel)
         self.frame_5.setFrameShadow(QFrame.Raised)
         self.verticalLayout_17 = QVBoxLayout(self.frame_5)
@@ -818,8 +825,8 @@ class Ui_Widget_DSC(object):
 
         self.tableView = MTableView(self.widget_center)
         self.tableView.setObjectName(u"tableView")
-        sizePolicy3.setHeightForWidth(self.tableView.sizePolicy().hasHeightForWidth())
-        self.tableView.setSizePolicy(sizePolicy3)
+        sizePolicy4.setHeightForWidth(self.tableView.sizePolicy().hasHeightForWidth())
+        self.tableView.setSizePolicy(sizePolicy4)
         self.tableView.setMinimumSize(QSize(50, 0))
         self.tableView.setMaximumSize(QSize(200, 16777215))
         self.tableView.setEditTriggers(QAbstractItemView.AnyKeyPressed|QAbstractItemView.DoubleClicked|QAbstractItemView.EditKeyPressed|QAbstractItemView.SelectedClicked)
@@ -939,13 +946,13 @@ class Ui_Widget_DSC(object):
         self.checkBox_correction_z.setToolTip(QCoreApplication.translate("Widget_DSC", u"Slice", None))
 #endif // QT_CONFIG(tooltip)
         self.checkBox_correction_z.setText(QCoreApplication.translate("Widget_DSC", u"Z", None))
-        self.pushButton_correction.setText(QCoreApplication.translate("Widget_DSC", u"RUN", None))
-        self.label_7.setText(QCoreApplication.translate("Widget_DSC", u"before:", None))
+        self.pushButton_correction.setText(QCoreApplication.translate("Widget_DSC", u"Run", None))
+        self.label_7.setText(QCoreApplication.translate("Widget_DSC", u"check:", None))
         self.label_9.setText(QCoreApplication.translate("Widget_DSC", u"Center Row", None))
         self.label_correction_before_row.setText("")
         self.label_10.setText(QCoreApplication.translate("Widget_DSC", u"Center Col", None))
         self.label_correction_before_col.setText("")
-        self.label_8.setText(QCoreApplication.translate("Widget_DSC", u"after:", None))
+        self.label_8.setText(QCoreApplication.translate("Widget_DSC", u"corrected:", None))
         self.label_11.setText(QCoreApplication.translate("Widget_DSC", u"Center Row", None))
         self.label_correction_after_row.setText("")
         self.label_12.setText(QCoreApplication.translate("Widget_DSC", u"Center Col", None))

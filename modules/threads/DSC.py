@@ -158,11 +158,11 @@ class Thread_DSC(QThread):
 
         Output
         -------
-        CBF : mL/100 mL/min
+        CBF : mL/100g/min
         CBV : mL/100 mL
         MTT : s
         """
-        CBF = np.amax(ResidualFunction) / TR * 60 * 100           # mL/100 mL/min
+        CBF = np.amax(ResidualFunction) / TR * 60 * 100 / 0.9          # mL/100g/min
         CBV = np.trapz(dR2s_TIS) / np.trapz(dR2s_AIF) * 100       # mL/100 mL
         MTT = CBV / CBF * 60                                      # s
         return CBF, CBV, MTT 
