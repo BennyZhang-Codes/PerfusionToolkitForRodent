@@ -37,9 +37,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def _setup(self):
 
         root = r'E:\ISMRM2023\Example\Example_mice_FAIR'
+        root = '/media/benny/File/ISMRM2023/Example/Example_mice_FAIR'
         self.tabWidget.addTab(FAIR.Widget_FAIR(root, self), '(FAIR) {}'.format(os.path.basename(root)))
 
         root = r'E:\ISMRM2023\Example\Example_mice_DSC'
+        root = '/media/benny/File/ISMRM2023/Example/Example_mice_DSC'
         self.tabWidget.addTab(DSC.Widget_DSC(root, self), '(DSC) {}'.format(os.path.basename(root)))
 
         # root = r'E:\PySide6\examplefiles\E7_DCE_FLASH'

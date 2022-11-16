@@ -123,7 +123,7 @@ class read_FAIR_folder(MAbstractDicomReader):
         img = []
         dss = []
         for dcm_name in dcm_list:
-            dcm_path = self.DicomRoot + '\\' + dcm_name
+            dcm_path = self.DicomRoot + '/' + dcm_name
             ds = dcmread(dcm_path)
             SliceLocation.add(ds.SliceLocation)
             InversionTime.add(ds.InversionTime)

@@ -6,8 +6,6 @@ from PySide6.QtWidgets import *
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtCharts import *
-from jupyter_client import BlockingKernelClient
-from matplotlib.pyplot import scatter
 import numpy as np
 
 

@@ -1,4 +1,3 @@
-from asyncio.windows_events import NULL
 import sys
 
 from PySide6.QtCore import *
@@ -20,7 +19,7 @@ class Example(QMainWindow):
         super().__init__()
 
         img = MResult(self)
-        ds = dcmread(r'E:\A30\DSC\Im00008.dcm')
+        ds = dcmread(r'/media/benny/File/A30/DSC/Im00008.dcm')
         img.setImgArray(ds.pixel_array)
 
         combox = MColorMapComboBox()
