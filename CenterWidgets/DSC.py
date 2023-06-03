@@ -139,7 +139,7 @@ class Widget_DSC(QWidget, Ui_Widget_DSC):
     def __curve(self, xdata: np.array, ydata: np.array) -> None:
         self.xdata = xdata
         self.ydata = ydata
-        self.model = TimePointsTableModel(xdata[:300], ydata[:300])
+        self.model = TimePointsTableModel(xdata, ydata)
         self.tableView.setModel(self.model)
         self.chart.setModel(self.model)
         self.chart.selected_point.connect(self.tableView.selectRow)

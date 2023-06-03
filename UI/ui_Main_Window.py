@@ -19,7 +19,7 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
 from PySide6.QtWidgets import (QApplication, QHBoxLayout, QMainWindow, QMenu,
     QMenuBar, QSizePolicy, QStatusBar, QTabWidget,
     QWidget)
-import UI.icons_rc
+import UI.rc_icons
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
